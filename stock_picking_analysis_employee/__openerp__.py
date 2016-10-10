@@ -33,4 +33,5 @@ Report financed by Dermanord-Svensk Hudvård AB""",
 'depends': ['stock_picking_analysis','hr'],
 'data': [ 'stock_picking_report_view.xml',],
 'installable': True,
+'auto_install': True,
 }

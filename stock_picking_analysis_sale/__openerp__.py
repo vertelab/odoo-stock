@@ -19,18 +19,18 @@
 #
 ##############################################################################
 {
-'name': 'stock_picking_analysis_delivery',
+'name': 'stock_picking_analysis_sale',
 'version': '0.1',
-'summary': 'Extended stock picking analysis with weight and carrier',
+'summary': 'Extended stock picking analysis with order',
 'category': 'stock',
 'description': """Extended stock picking analysis with weight and carrier
 
-    carrier_id, volume, weight, weight_net, number_of_packages
+sale_id
 
 Report financed by Dermanord-Svensk Hudvård AB""",
 'author': 'Vertel AB',
 'website': 'http://www.vertel.se',
-'depends': ['stock_picking_analysis','delivery'],
+'depends': ['stock_picking_analysis','sale'],
 'data': [ 'stock_picking_report_view.xml',],
 'installable': True,
 'auto_install': True,

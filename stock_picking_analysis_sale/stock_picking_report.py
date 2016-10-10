@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# OpenERP, Open Source Management Solution, third party addon
-# Copyright (C) 2004-2015 Vertel AB (<http://vertel.se>).
+# Odoo, Open Source Management Solution, third party addon
+# Copyright (C) 2016- Vertel AB (<http://vertel.se>).
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -18,20 +18,23 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-{
-'name': 'stock_picking_analysis_delivery',
-'version': '0.1',
-'summary': 'Extended stock picking analysis with weight and carrier',
-'category': 'stock',
-'description': """Extended stock picking analysis with weight and carrier
 
-    carrier_id, volume, weight, weight_net, number_of_packages
+from openerp import tools
+from openerp import models, fields, api, _
 
-Report financed by Dermanord-Svensk Hudvård AB""",
-'author': 'Vertel AB',
-'website': 'http://www.vertel.se',
-'depends': ['stock_picking_analysis','delivery'],
-'data': [ 'stock_picking_report_view.xml',],
-'installable': True,
-'auto_install': True,
-}
+import openerp.addons.decimal_precision as dp
+
+class stock_picking_report(models.Model):
+    _inherit = "stock_picking.report"
+    
+    sale_id = fields.Many2one(comodel_name="sale.order",string="Order",readonly=True)
+
+    def _select(self):
+        return  super(stock_picking_report, self)._select() + ", s.sale_id as sale_id"
+
+    def _group_by(self):
+        return super(stock_picking_report, self)._group_by() + ", s.sale_id"
+
+    def _from(self):
+        return super(stock_picking_report, self)._from() + "left join sale_order on (s.sale_id = sale_order.id)\n"
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

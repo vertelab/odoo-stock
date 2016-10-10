@@ -2,7 +2,7 @@
 ##############################################################################
 #
 # OpenERP, Open Source Management Solution, third party addon
-# Copyright (C) 2004-2015 Vertel AB (<http://vertel.se>).
+# Copyright (C) 2016- Vertel AB (<http://vertel.se>).
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -18,20 +18,5 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-{
-'name': 'stock_picking_analysis_delivery',
-'version': '0.1',
-'summary': 'Extended stock picking analysis with weight and carrier',
-'category': 'stock',
-'description': """Extended stock picking analysis with weight and carrier
-
-    carrier_id, volume, weight, weight_net, number_of_packages
-
-Report financed by Dermanord-Svensk Hudvård AB""",
-'author': 'Vertel AB',
-'website': 'http://www.vertel.se',
-'depends': ['stock_picking_analysis','delivery'],
-'data': [ 'stock_picking_report_view.xml',],
-'installable': True,
-'auto_install': True,
-}
+import stock_picking_report
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

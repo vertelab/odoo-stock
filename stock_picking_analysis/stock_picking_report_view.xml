@@ -95,7 +95,7 @@
         <field name="help">This report performs analysis on your picking. Analysis check your stock performance and sort it by different group criteria (salesman, partner, product, etc.) Use this report to perform analysis on sales not having invoiced yet. If you want to analyse your turnover, you should use the Invoice Analysis report in the Accounting application.</field>
     </record>
 
-    <menuitem action="action_stock_picking_report_all" id="menu_report_stock_picking_all" parent="base.next_id_64" sequence="10"/>
+    <menuitem action="action_stock_picking_report_all" id="menu_report_stock_picking_all" parent="base.next_id_61" sequence="50"/>
 
 </data>
 </openerp>

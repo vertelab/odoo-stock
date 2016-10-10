@@ -1,0 +1,120 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* stock_picking_reports
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0-20160410\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-04-25 07:36+0000\n"
+"PO-Revision-Date: 2016-04-25 07:36+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_picking_reports
+#: code:addons/stock_picking_reports/stock.py:46
+#, python-format
+msgid " (not reserved)"
+msgstr ""
+
+#. module: stock_picking_reports
+#: code:addons/stock_picking_reports/stock.py:44
+#, python-format
+msgid "(transfered)"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Barcode"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Commitment Date"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Customer Address:"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Delivery Address:"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Destination"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Order (Origin)"
+msgstr ""
+
+#. module: stock_picking_reports
+#: model:ir.actions.report.xml,name:stock_picking_reports.picking_operations_report
+msgid "Picking with location"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Product"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Quantity"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock.report_picking
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Ref"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Ref:"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Scheduled Date"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Source"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "State"
+msgstr ""
+
+#. module: stock_picking_reports
+#: model:ir.model,name:stock_picking_reports.model_stock_move
+msgid "Stock Move"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Supplier Address:"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "VAT:"
+msgstr ""
+
+#. module: stock_picking_reports
+#: view:website:stock_picking_reports.picking_operations_document
+msgid "Warehouse Address:"
+msgstr ""
+
