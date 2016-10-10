@@ -36,6 +36,7 @@ class stock_picking_report(models.Model):
     product_uom = fields.Many2one(comodel_name='product.uom', string='Unit of Measure', readonly=True)
     product_uom_qty = fields.Float(string='# of Qty', readonly=True)
 
+    group_id = fields.Many2one(comodel_name='procurement.group', string='Procurement Group', readonly=True)
     picking_type_id = fields.Many2one(comodel_name='stock.picking.type', string='Picking Type', readonly=True)
     move_type = fields.Selection([('direct', 'Partial'), ('one', 'All at once')],string="Move Type", readonly=True)
     location_id = fields.Many2one(comodel_name='stock.location', string='Location', readonly=True)
@@ -61,6 +62,7 @@ class stock_picking_report(models.Model):
         select_str = """
              SELECT min(l.id) as id,
                     l.product_id as product_id,
+                    s.group_id as group_id,
                     t.uom_id as product_uom,
                     sum(l.product_qty / u.factor * u2.factor) as product_uom_qty,
                     sum(l.qty_done) as nbr_sku,
@@ -91,6 +93,7 @@ class stock_picking_report(models.Model):
                     left join stock_picking_type pt on (s.picking_type_id = pt.id)
                     left join stock_location location on (l.location_id = location.id)
                     left join stock_location dest on (l.location_dest_id = dest.id)
+                    left join procurement_group on (s.group_id = procurement_group.id)
         """
         return from_str
 
@@ -98,6 +101,7 @@ class stock_picking_report(models.Model):
         group_by_str = """
             GROUP BY l.product_id,
                     l.picking_id,
+                    s.group_id,
                     t.uom_id,
                     t.categ_id,
                     s.date,

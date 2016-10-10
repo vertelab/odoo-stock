@@ -30,11 +30,11 @@ class stock_picking_report(models.Model):
     sale_id = fields.Many2one(comodel_name="sale.order",string="Order",readonly=True)
 
     def _select(self):
-        return  super(stock_picking_report, self)._select() + ", s.sale_id as sale_id"
+        return  super(stock_picking_report, self)._select() + ", sale_order.id as sale_id"
 
     def _group_by(self):
-        return super(stock_picking_report, self)._group_by() + ", s.sale_id"
+        return super(stock_picking_report, self)._group_by() + ", sale_order.id"
 
     def _from(self):
-        return super(stock_picking_report, self)._from() + "left join sale_order on (s.sale_id = sale_order.id)\n"
+        return super(stock_picking_report, self)._from() + "left join sale_order on (s.group_id = sale_order.procurement_group_id)\n"
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
