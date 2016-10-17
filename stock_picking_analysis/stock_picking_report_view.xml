@@ -97,5 +97,43 @@
 
     <menuitem action="action_stock_picking_report_all" id="menu_report_stock_picking_all" parent="stock.next_id_61" sequence="50"/>
 
+
+  <record id="view_wizard_picking_analysis" model="ir.ui.view">
+            <field name="name">Stock Picking Analysis III</field>
+            <field name="model">wizard.picking.analysis</field>
+            <field name="arch" type="xml">
+                <form string="Choose your date">
+                    <p class="oe_gray" attrs="{'invisible': [('choose_date', '=', False)]}">
+                        Choose the date for which you want to get the stock picking analysis of your products.
+
+                        This will filter the stock operation that weren't done at the selected date, to retreive the quantity
+                        you had, and gives you the inventory value according to the standard price used at that time.
+                    </p>
+                    <p class="oe_gray" attrs="{'invisible': [('choose_date', '=', True)]}">
+                        Retrieve the stock history analysis of your products at current day
+                    </p>
+                    <group>
+                        <field name="choose_date"/>
+                        <field name="date_start" attrs="{'invisible': [('choose_date', '=', False)]}"/>
+                        <field name="date_stop" attrs="{'invisible': [('choose_date', '=', False)]}"/>
+                    </group>
+                    <footer>
+                        <button name="open_table" string="Retrieve the Picking transaktions" type="object"  class="oe_highlight"  />
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_wizard_stock_picking_analysis" model="ir.actions.act_window">
+            <field name="name">Stock Picking Analysis II</field>
+            <field name="res_model">wizard.picking.analysis</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="stock_picking_analysis.view_wizard_picking_analysis"/>
+            <field name="target">new</field>
+        </record>
+        <menuitem id="menu_action_wizard_picking_analysis" action="action_wizard_stock_picking_analysis" parent="stock.next_id_61" sequence="55"/>
+
 </data>
 </openerp>

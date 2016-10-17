@@ -22,6 +22,9 @@
 from openerp import tools
 from openerp import models, fields, api, _
 
+import logging
+_logger = logging.getLogger(__name__)
+
 class stock_picking_report(models.Model):
     _name = "stock_picking.report"
     _description = "Stock Picking Statistics"
@@ -48,7 +51,7 @@ class stock_picking_report(models.Model):
     leadtime = fields.Float(string='Leadtime', digits=(16,2), readonly=True)
     categ_id = fields.Many2one(comodel_name='product.category',string='Category of Product', readonly=True)
     nbr_lines = fields.Integer(string='# of Lines', readonly=True)
-    nbr_sku = fields.Integer(string='# of SKU', readonly=True)
+    
     state = fields.Selection([
             ('cancel', 'Cancelled'),
             ('draft', 'Draft'),
@@ -65,7 +68,6 @@ class stock_picking_report(models.Model):
                     s.group_id as group_id,
                     t.uom_id as product_uom,
                     sum(l.product_qty / u.factor * u2.factor) as product_uom_qty,
-                    sum(l.qty_done) as nbr_sku,
                     count(*) as nbr_lines,
                     s.date as date,
                     s.date_done as date_done,
@@ -125,5 +127,35 @@ class stock_picking_report(models.Model):
             FROM ( %s )
             %s
             )""" % (self._table, self._select(), self._from(), self._group_by()))
+
+
+class wizard_picking_analysis(models.TransientModel):
+    _name = 'wizard.picking.analysis'
+    _description = 'Wizard that opens the stock picking analysis table'
+
+    choose_date = fields.Boolean(string='Choose a Particular Date', default=False)
+    date_start = fields.Datetime(string='Date Start', required=True)
+    date_stop = fields.Datetime(string='Date Stop', required=True, default=fields.Datetime.now)
+
+    @api.v7
+    def open_table(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+        data = self.read(cr, uid, ids, context=context)[0]
+        ctx = context.copy()
+        _logger.warn('date: %s\n date_start: %s\n domain: %s' %(data['date_start'], data['date_stop'], "[('date', '<=', '" + data['date_start'] + "'), ('date', '>=', '" + data['date_stop'] + "')]"))
+        _logger.warn(ctx)
+        ctx['history_date'] = data['date_stop']
+        ctx['search_default_group_by_product'] = True
+        ctx['search_default_group_by_location'] = True
+        return {
+            'domain': "[('date', '<=', '%s'), ('date', '>=', '%s')]" %(data['date_stop'], data['date_start']),
+            'name': _('Stock Picking transaktions At Date'),
+            'view_type': 'form',
+            'view_mode': 'graph',
+            'res_model': 'stock_history.report',
+            'type': 'ir.actions.act_window',
+            'context': ctx,
+        }
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -28,9 +28,11 @@ class stock_picking_report(models.Model):
     _inherit = "stock_picking.report"
     
     sale_id = fields.Many2one(comodel_name="sale.order",string="Order",readonly=True)
+    nbr_orders = fields.Integer(string='# of Orders', readonly=True)
 
     def _select(self):
-        return  super(stock_picking_report, self)._select() + ", sale_order.id as sale_id"
+        return  super(stock_picking_report, self)._select() + """, sale_order.id as sale_id,
+        count(sale_order.*)"""
 
     def _group_by(self):
         return super(stock_picking_report, self)._group_by() + ", sale_order.id"
