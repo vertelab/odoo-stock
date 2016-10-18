@@ -32,7 +32,7 @@ class stock_picking_report(models.Model):
 
     def _select(self):
         return  super(stock_picking_report, self)._select() + """, sale_order.id as sale_id,
-        count(sale_order.*)"""
+        count(sale_order.*) as nbr_orders"""
 
     def _group_by(self):
         return super(stock_picking_report, self)._group_by() + ", sale_order.id"

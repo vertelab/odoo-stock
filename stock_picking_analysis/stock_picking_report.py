@@ -134,7 +134,7 @@ class wizard_picking_analysis(models.TransientModel):
     _description = 'Wizard that opens the stock picking analysis table'
 
     choose_date = fields.Boolean(string='Choose a Particular Date', default=False)
-    date_start = fields.Datetime(string='Date Start', required=True)
+    date_start = fields.Datetime(string='Date Start', required=True, default=fields.Datetime.now)
     date_stop = fields.Datetime(string='Date Stop', required=True, default=fields.Datetime.now)
 
     @api.v7
@@ -153,7 +153,7 @@ class wizard_picking_analysis(models.TransientModel):
             'name': _('Stock Picking transaktions At Date'),
             'view_type': 'form',
             'view_mode': 'graph',
-            'res_model': 'stock_history.report',
+            'res_model': 'stock_picking.report',
             'type': 'ir.actions.act_window',
             'context': ctx,
         }
