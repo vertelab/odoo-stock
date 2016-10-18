@@ -32,24 +32,23 @@ class wizard_history_analysis(models.TransientModel):
     date_start = fields.Datetime(string='Date Start', required=True, default=fields.Datetime.now)
     date_stop = fields.Datetime(string='Date Stop', required=True, default=fields.Datetime.now)
 
-    @api.v7
-    def open_table(self, cr, uid, ids, context=None):
-        if context is None:
-            context = {}
-        data = self.read(cr, uid, ids, context=context)[0]
-        ctx = context.copy()
-        _logger.warn(ctx)
-        ctx['history_date'] = data['date_stop']
-        ctx['search_default_group_by_product'] = True
-        ctx['search_default_group_by_location'] = True
+    @api.multi
+    def open_table(self):
+        #~ if context is None:
+            #~ context = {}
+        #~ data = self.read(cr, uid, ids, context=context)[0]
+        #~ ctx = context.copy()
+        #~ ctx['history_date'] = data['date_stop']
+        #~ ctx['search_default_group_by_product'] = True
+        #~ ctx['search_default_group_by_location'] = True
         return {
-            'domain': "[('date', '<=', '%s'), ('date', '>=', '%s')]" %(data['date_stop'], data['date_start']) if self.choose_date else '[]',
+            'domain': "[('date', '>=', '%s'), ('date', '<=', '%s')]" %(self[0].date_start, self[0].date_stop) if self[0].choose_date else '[]',
             'name': _('Stock History Value At Date'),
             'view_type': 'form',
             'view_mode': 'graph',
             'res_model': 'stock_history.report',
             'type': 'ir.actions.act_window',
-            'context': ctx,
+            #~ 'context': ctx,
         }
 
 
