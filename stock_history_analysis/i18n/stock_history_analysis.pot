@@ -1,0 +1,226 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* stock_history_analysis
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0-20161016\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-10-18 06:11+0000\n"
+"PO-Revision-Date: 2016-10-18 06:11+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_history_analysis
+#: field:stock_history.report,nbr_lines:0
+msgid "# of Lines"
+msgstr "# of Lines"
+
+#. module: stock_history_analysis
+#: view:wizard.history.analysis:stock_history_analysis.view_wizard_history_analysis
+msgid "Cancel"
+msgstr "Cancel"
+
+#. module: stock_history_analysis
+#: view:stock_history.report:stock_history_analysis.view_stock_history_analysis_search
+#: field:stock_history.report,product_categ_id:0
+msgid "Category of Product"
+msgstr "Category of Product"
+
+#. module: stock_history_analysis
+#: field:wizard.history.analysis,choose_date:0
+msgid "Choose a Particular Date"
+msgstr "Choose a Particular Date"
+
+#. module: stock_history_analysis
+#: view:wizard.history.analysis:stock_history_analysis.view_wizard_history_analysis
+msgid "Choose the date for which you want to get the stock history analysis of your products.\n"
+"\n"
+"                        This will filter the stock operation that weren't done at the selected date, to retreive the quantity\n"
+"                        you had, and gives you the inventory value according to the standard price used at that time."
+msgstr "Choose the date for which you want to get the stock history analysis of your products.\n"
+"\n"
+"                        This will filter the stock operation that weren't done at the selected date, to retreive the quantity\n"
+"                        you had, and gives you the inventory value according to the standard price used at that time."
+
+#. module: stock_history_analysis
+#: view:wizard.history.analysis:stock_history_analysis.view_wizard_history_analysis
+msgid "Choose your date"
+msgstr "Choose your date"
+
+#. module: stock_history_analysis
+#: view:stock_history.report:stock_history_analysis.view_stock_history_analysis_search
+#: field:stock_history.report,company_id:0
+msgid "Company"
+msgstr "Company"
+
+#. module: stock_history_analysis
+#: field:wizard.history.analysis,create_uid:0
+msgid "Created by"
+msgstr "Created by"
+
+#. module: stock_history_analysis
+#: field:wizard.history.analysis,create_date:0
+msgid "Created on"
+msgstr "Created on"
+
+#. module: stock_history_analysis
+#: field:stock_history.report,date:0
+msgid "Date Created"
+msgstr "Date Created"
+
+#. module: stock_history_analysis
+#: field:wizard.history.analysis,date_start:0
+msgid "Date Start"
+msgstr "Date Start"
+
+#. module: stock_history_analysis
+#: field:wizard.history.analysis,date_stop:0
+msgid "Date Stop"
+msgstr "Date Stop"
+
+#. module: stock_history_analysis
+#: view:stock_history.report:stock_history_analysis.view_stock_history_analysis_search
+msgid "Date of the history"
+msgstr "Date of the history"
+
+#. module: stock_history_analysis
+#: field:stock_history.report,display_name:0
+#: field:wizard.history.analysis,display_name:0
+msgid "Display Name"
+msgstr "Display Name"
+
+#. module: stock_history_analysis
+#: view:stock_history.report:stock_history_analysis.view_stock_history_analysis_search
+msgid "Extended Filters"
+msgstr "Extended Filters"
+
+#. module: stock_history_analysis
+#: view:stock_history.report:stock_history_analysis.view_stock_history_analysis_search
+msgid "Group By"
+msgstr "Group By"
+
+#. module: stock_history_analysis
+#: field:stock_history.report,id:0
+#: field:wizard.history.analysis,id:0
+msgid "ID"
+msgstr "ID"
+
+#. module: stock_history_analysis
+#: field:stock_history.report,product_inventory_value:0
+msgid "Inventory Value"
+msgstr "Inventory Value"
+
+#. module: stock_history_analysis
+#: field:stock_history.report,__last_update:0
+#: field:wizard.history.analysis,__last_update:0
+msgid "Last Modified on"
+msgstr "Last Modified on"
+
+#. module: stock_history_analysis
+#: field:wizard.history.analysis,write_uid:0
+msgid "Last Updated by"
+msgstr "Last Updated by"
+
+#. module: stock_history_analysis
+#: field:wizard.history.analysis,write_date:0
+msgid "Last Updated on"
+msgstr "Last Updated on"
+
+#. module: stock_history_analysis
+#: view:stock_history.report:stock_history_analysis.view_stock_history_analysis_search
+#: field:stock_history.report,location_id:0
+msgid "Location"
+msgstr "Location"
+
+#. module: stock_history_analysis
+#: view:stock_history.report:stock_history_analysis.view_stock_history_analysis_search
+msgid "Month"
+msgstr "Month"
+
+#. module: stock_history_analysis
+#: field:stock_history.report,product_id:0
+msgid "Product"
+msgstr "Product"
+
+#. module: stock_history_analysis
+#: field:stock_history.report,quantity:0
+msgid "Product Quantity"
+msgstr "Product Quantity"
+
+#. module: stock_history_analysis
+#: field:stock_history.report,quant_location_id:0
+msgid "Quant Location"
+msgstr "Quant Location"
+
+#. module: stock_history_analysis
+#: view:wizard.history.analysis:stock_history_analysis.view_wizard_history_analysis
+msgid "Retrieve the Inventory Value"
+msgstr "Retrieve the Inventory Value"
+
+#. module: stock_history_analysis
+#: view:wizard.history.analysis:stock_history_analysis.view_wizard_history_analysis
+msgid "Retrieve the stock history analysis of your products at current day"
+msgstr "Retrieve the stock history analysis of your products at current day"
+
+#. module: stock_history_analysis
+#: view:stock_history.report:stock_history_analysis.view_stock_history_analysis_search
+#: field:stock_history.report,source:0
+msgid "Source"
+msgstr "Source"
+
+#. module: stock_history_analysis
+#: model:ir.actions.act_window,name:stock_history_analysis.action_stock_history_report_all
+#: model:ir.ui.menu,name:stock_history_analysis.menu_report_stock_history_all
+#: view:stock_history.report:stock_history_analysis.view_stock_history_analysis
+#: view:stock_history.report:stock_history_analysis.view_stock_history_analysis_search
+msgid "Stock History Analysis"
+msgstr "Stock History Analysis"
+
+#. module: stock_history_analysis
+#: model:ir.model,name:stock_history_analysis.model_stock_history_report
+msgid "Stock History Statistics"
+msgstr "Stock History Statistics"
+
+#. module: stock_history_analysis
+#: model:ir.actions.act_window,name:stock_history_analysis.action_wizard_stock_history_analysis
+#: model:ir.ui.menu,name:stock_history_analysis.menu_action_wizard_history_analysis
+msgid "Stock History Valuation"
+msgstr "Stock History Valuation"
+
+#. module: stock_history_analysis
+#: code:addons/stock_history_analysis/wizard/stock_history_wizard.py:48
+#: code:addons/wizard/stock_history_wizard.py:48
+#, python-format
+msgid "Stock History Value At Date"
+msgstr "Stock History Value At Date"
+
+#. module: stock_history_analysis
+#: field:stock_history.report,move_id:0
+msgid "Stock Move"
+msgstr "Stock Move"
+
+#. module: stock_history_analysis
+#: view:stock_history.report:stock_history_analysis.view_stock_history_analysis_search
+msgid "This Year"
+msgstr "This Year"
+
+#. module: stock_history_analysis
+#: model:ir.actions.act_window,help:stock_history_analysis.action_stock_history_report_all
+msgid "This report performs analysis on your stock history. Analysis check your stock performance and sort it by different group criteria (stock location, product, etc.)."
+msgstr "This report performs analysis on your stock history. Analysis check your stock performance and sort it by different group criteria (stock location, product, etc.)."
+
+#. module: stock_history_analysis
+#: field:stock_history.report,price_unit_on_quant:0
+msgid "Value"
+msgstr "Value"
+
+#. module: stock_history_analysis
+#: view:wizard.history.analysis:stock_history_analysis.view_wizard_history_analysis
+msgid "or"
+msgstr "or"
+
