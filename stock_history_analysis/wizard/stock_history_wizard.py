@@ -28,8 +28,8 @@ class wizard_history_analysis(models.TransientModel):
     _name = 'wizard.history.analysis'
     _description = 'Wizard that opens the stock history analysis table'
 
-    choose_date = fields.Boolean(string='Choose a Particular Date', default=False)
-    date_start = fields.Datetime(string='Date Start', required=True)
+    choose_date = fields.Boolean(string='Choose a Date interval', default=False)
+    date_start = fields.Datetime(string='Date Start', required=True, default=fields.Datetime.now)
     date_stop = fields.Datetime(string='Date Stop', required=True, default=fields.Datetime.now)
 
     @api.v7
@@ -38,13 +38,12 @@ class wizard_history_analysis(models.TransientModel):
             context = {}
         data = self.read(cr, uid, ids, context=context)[0]
         ctx = context.copy()
-        _logger.warn('date: %s\n date_start: %s\n domain: %s' %(data['date_start'], data['date_stop'], "[('date', '<=', '" + data['date_start'] + "'), ('date', '>=', '" + data['date_stop'] + "')]"))
         _logger.warn(ctx)
         ctx['history_date'] = data['date_stop']
         ctx['search_default_group_by_product'] = True
         ctx['search_default_group_by_location'] = True
         return {
-            'domain': "[('date', '<=', '%s'), ('date', '>=', '%s')]" %(data['date_stop'], data['date_start']),
+            'domain': "[('date', '<=', '%s'), ('date', '>=', '%s')]" %(data['date_stop'], data['date_start']) if self.choose_date else '[]',
             'name': _('Stock History Value At Date'),
             'view_type': 'form',
             'view_mode': 'graph',
