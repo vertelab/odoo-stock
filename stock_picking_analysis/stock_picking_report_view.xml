@@ -50,27 +50,18 @@
             <search string="Stock Picking Analysis">
                 <field name="date"/>
                 <field name="date_done"/>
-                <filter string="This Year" name="year" invisible="1" domain="[('date','&lt;=', time.strftime('%%Y-12-31')),('date','&gt;=',time.strftime('%%Y-01-01'))]"/>
+                <filter string="This Year" name="year" invisible="0" domain="[('date','&lt;=', time.strftime('%%Y-12-31')),('date','&gt;=',time.strftime('%%Y-01-01'))]"/>
+                <filter string="This Month" name="month" invisible="0" domain="[('date','&lt;=', time.strftime('%%Y-%%m-%%d')),('date','&gt;=',time.strftime('%%Y-%%m-01'))]"/>
                 <filter name="Draft" string="Draft" domain="[('state','=','draft')]"/>
                 <filter name="Confirmed" string="Confirmed" domain="[('state','not in',('draft', 'cancel'))]"/>
                 <separator/>
-<!--
-                <filter string="My Sales" help="My Sales" domain="[('user_id','=',uid)]"/>
--->
                 <field name="partner_id"/>
                 <field name="product_id"/>
-<!--
-                <field name="user_id"/>
--->
                 <group expand="0" string="Extended Filters">
                     <field name="categ_id" filter_domain="[('categ_id', 'child_of', self)]"/>
                     <field name="company_id" groups="base.group_multi_company"/>
                 </group>
                 <group expand="1" string="Group By">
-<!--
-                    <filter string="Salesperson" name="User" context="{'group_by':'user_id'}"/>
-                    <filter string="Sales Team" context="{'group_by':'section_id'}" groups="base.group_multi_salesteams"/>
--->
                     <filter string="Location" name="Location" context="{'group_by':'location_id'}"/>
                     <filter string="Destination" name="Destination" context="{'group_by':'location_dest_id'}"/>
                     <filter string="Customer" name="Customer" context="{'group_by':'partner_id'}"/>
@@ -84,6 +75,7 @@
         </field>
     </record>
 
+<!--
     <record id="action_stock_picking_report_all" model="ir.actions.act_window">
         <field name="name">Stock Picking Analysis</field>
         <field name="res_model">stock_picking.report</field>
@@ -96,10 +88,11 @@
     </record>
 
     <menuitem action="action_stock_picking_report_all" id="menu_report_stock_picking_all" parent="stock.next_id_61" sequence="50"/>
+-->
 
 
   <record id="view_wizard_picking_analysis" model="ir.ui.view">
-            <field name="name">Stock Picking Analysis III</field>
+            <field name="name">Stock Picking Analysis</field>
             <field name="model">wizard.picking.analysis</field>
             <field name="arch" type="xml">
                 <form string="Choose your date">
@@ -126,7 +119,7 @@
             </field>
         </record>
         <record id="action_wizard_stock_picking_analysis" model="ir.actions.act_window">
-            <field name="name">Stock Picking Analysis II</field>
+            <field name="name">Stock Picking Analysis</field>
             <field name="res_model">wizard.picking.analysis</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>

@@ -143,13 +143,12 @@ class wizard_picking_analysis(models.TransientModel):
             context = {}
         data = self.read(cr, uid, ids, context=context)[0]
         ctx = context.copy()
-        _logger.warn('date: %s\n date_start: %s\n domain: %s' %(data['date_start'], data['date_stop'], "[('date', '<=', '" + data['date_start'] + "'), ('date', '>=', '" + data['date_stop'] + "')]"))
-        _logger.warn(ctx)
-        ctx['history_date'] = data['date_stop']
-        ctx['search_default_group_by_product'] = True
-        ctx['search_default_group_by_location'] = True
+        if data['choose_date']:
+            ctx['history_date'] = data['date_stop']
+            ctx['search_default_group_by_product'] = True
+            ctx['search_default_group_by_location'] = True
         return {
-            'domain': "[('date', '<=', '%s'), ('date', '>=', '%s')]" %(data['date_stop'], data['date_start']),
+            'domain': "[('date', '<=', '%s'), ('date', '>=', '%s')]" %(data['date_stop'], data['date_start']) if data['choose_date'] else "[]",
             'name': _('Stock Picking transaktions At Date'),
             'view_type': 'form',
             'view_mode': 'graph',
