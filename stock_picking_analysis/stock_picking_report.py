@@ -35,21 +35,21 @@ class stock_picking_report(models.Model):
 
     date = fields.Datetime(string='Date Created', readonly=True)
     date_done = fields.Datetime(string='Date Done', readonly=True)
-    product_id = fields.Many2one(comodel_name='product.product',string='Product', readonly=True)
-    product_uom = fields.Many2one(comodel_name='product.uom', string='Unit of Measure', readonly=True)
-    product_uom_qty = fields.Float(string='# of Qty', readonly=True)
+    #~ product_id = fields.Many2one(comodel_name='product.product',string='Product', readonly=True)
+    #~ product_uom = fields.Many2one(comodel_name='product.uom', string='Unit of Measure', readonly=True)
+    #~ product_uom_qty = fields.Float(string='# of Qty', readonly=True)
 
     group_id = fields.Many2one(comodel_name='procurement.group', string='Procurement Group', readonly=True)
     picking_type_id = fields.Many2one(comodel_name='stock.picking.type', string='Picking Type', readonly=True)
     move_type = fields.Selection([('direct', 'Partial'), ('one', 'All at once')],string="Move Type", readonly=True)
-    location_id = fields.Many2one(comodel_name='stock.location', string='Location', readonly=True)
-    location_dest_id = fields.Many2one(comodel_name='stock.location', string='Destination', readonly=True)
+    #~ location_id = fields.Many2one(comodel_name='stock.location', string='Location', readonly=True)
+    #~ location_dest_id = fields.Many2one(comodel_name='stock.location', string='Destination', readonly=True)
         
     partner_id = fields.Many2one(comodel_name='res.partner', string='Partner', readonly=True)
     company_id = fields.Many2one(comodel_name='res.company', string='Company', readonly=True)
     delay = fields.Float(string='Commitment Delay', digits=(16,2), readonly=True)
     leadtime = fields.Float(string='Leadtime', digits=(16,2), readonly=True)
-    categ_id = fields.Many2one(comodel_name='product.category',string='Category of Product', readonly=True)
+    #~ categ_id = fields.Many2one(comodel_name='product.category',string='Category of Product', readonly=True)
     nbr_lines = fields.Integer(string='# of Lines', readonly=True)
     nbr_group = fields.Integer(string='# of Group', readonly=True)
     nbr_pickings = fields.Integer(string='# of Pickings', readonly=True)
@@ -65,79 +65,65 @@ class stock_picking_report(models.Model):
     
     _order = 'date desc'
 
+#~ (select count(*) from stock_pack_operation where picking_id = sp.id) as nbr_lines,
+
     def _select(self):
         select_str = """
-             SELECT min(l.id) as id,
-                    l.product_id as product_id,
-                    s.group_id as group_id,
-                    count(s.group_id) as nbr_group,
-                    count(s.id) as nbr_pickings,
-                    t.uom_id as product_uom,
-                    sum(l.product_qty / u.factor * u2.factor) as product_uom_qty,
-                    count(*) as nbr_lines,
-                    s.date as date,
-                    s.date_done as date_done,
-                    s.partner_id as partner_id,
-                    s.company_id as company_id,
-                    extract(epoch from avg(date_trunc('day',s.date_done)-date_trunc('day',s.min_date)))/(24*60*60)::decimal(16,2) as delay,
-                    extract(epoch from avg(date_trunc('day',s.date_done)-date_trunc('day',s.date)))/(24*60*60)::decimal(16,2) as leadtime,
-                    s.state,
-                    t.categ_id as categ_id,
-                    l.location_id as location_id,
-                    l.location_dest_id as location_dest_id,
-                    s.picking_type_id as picking_type_id,
-                    s.move_type as move_type
+             SELECT min(sp.id) as id,
+                    sp.group_id as group_id,
+                    count(distinct sp.group_id) as nbr_group,
+                    count(distinct sp.id) as nbr_pickings,
+                    count(distinct spo) as nbr_lines,
+                    sp.date as date,
+                    sp.date_done as date_done,
+                    sp.partner_id as partner_id,
+                    sp.company_id as company_id,
+                    extract(epoch from avg(date_trunc('day',sp.date_done)-date_trunc('day',sp.min_date)))/(24*60*60)::decimal(16,2) as delay,
+                    extract(epoch from avg(date_trunc('day',sp.date_done)-date_trunc('day',sp.date)))/(24*60*60)::decimal(16,2) as leadtime,
+                    sp.state,
+                    sp.picking_type_id as picking_type_id,
+                    sp.move_type as move_type
         """
         return select_str
 
     def _from(self):
         from_str = """
-                stock_pack_operation l
-                    join stock_picking s on (l.picking_id=s.id)
-                        left join product_product p on (l.product_id=p.id)
-                            left join product_template t on (p.product_tmpl_id=t.id)
-                    left join product_uom u on (u.id=l.product_uom_id)
-                    left join product_uom u2 on (u2.id=t.uom_id)
-                    left join stock_picking_type pt on (s.picking_type_id = pt.id)
-                    left join stock_location location on (l.location_id = location.id)
-                    left join stock_location dest on (l.location_dest_id = dest.id)
-                    left join procurement_group on (s.group_id = procurement_group.id)
+                stock_picking sp
+                    left join stock_pack_operation spo on (sp.id = spo.picking_id)
+                    left join stock_picking_type pt on (sp.picking_type_id = pt.id)
+                    left join procurement_group on (sp.group_id = procurement_group.id)
         """
         return from_str
 
     def _group_by(self):
         group_by_str = """
-            GROUP BY l.product_id,
-                    l.picking_id,
-                    s.group_id,
-                    t.uom_id,
-                    t.categ_id,
-                    s.date,
-                    s.date_done,
-                    s.partner_id,
-                    s.company_id,
-                    l.location_id,
-                    l.location_dest_id,
-                    s.state,
-                    s.picking_type_id,
-                    s.move_type,
-                    t.categ_id
+            GROUP BY 
+                    sp.group_id,
+                    sp.date,
+                    sp.date_done,
+                    sp.partner_id,
+                    sp.company_id,
+                    sp.state,
+                    sp.picking_type_id,
+                    sp.move_type,
+                    sp.id,
+                    spo.id
         """
         return group_by_str
 
     def init(self, cr):
         # self._table = sale_report
+        #~ raise Warning("""CREATE or REPLACE VIEW %s as (
+            #~ %s
+            #~ FROM ( %s )
+            #~ %s
+            #~ )""" % (self._table, self._select(), self._from(), self._group_by()))
         tools.drop_view_if_exists(cr, self._table)
         cr.execute("""CREATE or REPLACE VIEW %s as (
             %s
             FROM ( %s )
             %s
             )""" % (self._table, self._select(), self._from(), self._group_by()))
-        #~ raise Warning("""CREATE or REPLACE VIEW %s as (
-            #~ %s
-            #~ FROM ( %s )
-            #~ %s
-            #~ )""" % (self._table, self._select(), self._from(), self._group_by()))
 
 
 class wizard_picking_analysis(models.TransientModel):

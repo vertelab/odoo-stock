@@ -46,13 +46,13 @@ class stock_picking_report(models.Model):
     qc_id =  fields.Many2one("hr.employee","Controlled by",readonly=True)
 
     def _select(self):
-        return  super(stock_picking_report, self)._select() + ", s.employee_id as employee_id, s.qc_id as qc_id"
+        return  super(stock_picking_report, self)._select() + ", sp.employee_id as employee_id, sp.qc_id as qc_id"
 
     def _group_by(self):
-        return super(stock_picking_report, self)._group_by() + ", s.employee_id, s.qc_id"
+        return super(stock_picking_report, self)._group_by() + ", sp.employee_id, sp.qc_id"
 
     def _from(self):
-        return super(stock_picking_report, self)._from() + "left join hr_employee on (s.employee_id = hr_employee.id)\nleft join hr_employee qc on (s.qc_id = qc.id)\n"
+        return super(stock_picking_report, self)._from() + "left join hr_employee on (sp.employee_id = hr_employee.id)\nleft join hr_employee qc on (sp.qc_id = qc.id)\n"
         
         
     def _read_group_process_groupby(self, gb, query, context):
