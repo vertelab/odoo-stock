@@ -40,6 +40,7 @@
         </field>
     </record>
 
+<!--
     <record id="action_stock_history_report_all" model="ir.actions.act_window">
         <field name="name">Stock History Analysis</field>
         <field name="res_model">stock_history.report</field>
@@ -51,6 +52,7 @@
     </record>
 
     <menuitem action="action_stock_history_report_all" id="menu_report_stock_history_all" parent="stock.next_id_61" sequence="60"/>
+-->
 
 </data>
 </openerp>
