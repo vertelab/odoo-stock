@@ -51,13 +51,17 @@ class stock_picking_report(models.Model):
     leadtime = fields.Float(string='Leadtime', digits=(16,2), readonly=True)
     categ_id = fields.Many2one(comodel_name='product.category',string='Category of Product', readonly=True)
     nbr_lines = fields.Integer(string='# of Lines', readonly=True)
-    
+    nbr_group = fields.Integer(string='# of Group', readonly=True)
+    nbr_pickings = fields.Integer(string='# of Pickings', readonly=True)
+        
     state = fields.Selection([
-            ('cancel', 'Cancelled'),
-            ('draft', 'Draft'),
-            ('confirmed', 'Confirmed'),
-            ('exception', 'Exception'),
-            ('done', 'Done')], 'Order Status', readonly=True)
+                ('draft', 'Draft'),
+                ('cancel', 'Cancelled'),
+                ('waiting', 'Waiting Another Operation'),
+                ('confirmed', 'Waiting Availability'),
+                ('partially_available', 'Partially Available'),
+                ('assigned', 'Ready to Transfer'),
+                ('done', 'Transferred')], readonly=True)
     
     _order = 'date desc'
 
@@ -66,6 +70,8 @@ class stock_picking_report(models.Model):
              SELECT min(l.id) as id,
                     l.product_id as product_id,
                     s.group_id as group_id,
+                    count(s.group_id) as nbr_group,
+                    count(s.id) as nbr_pickings,
                     t.uom_id as product_uom,
                     sum(l.product_qty / u.factor * u2.factor) as product_uom_qty,
                     count(*) as nbr_lines,
@@ -87,7 +93,7 @@ class stock_picking_report(models.Model):
     def _from(self):
         from_str = """
                 stock_pack_operation l
-                      join stock_picking s on (l.picking_id=s.id)
+                    join stock_picking s on (l.picking_id=s.id)
                         left join product_product p on (l.product_id=p.id)
                             left join product_template t on (p.product_tmpl_id=t.id)
                     left join product_uom u on (u.id=l.product_uom_id)
@@ -127,6 +133,11 @@ class stock_picking_report(models.Model):
             FROM ( %s )
             %s
             )""" % (self._table, self._select(), self._from(), self._group_by()))
+        #~ raise Warning("""CREATE or REPLACE VIEW %s as (
+            #~ %s
+            #~ FROM ( %s )
+            #~ %s
+            #~ )""" % (self._table, self._select(), self._from(), self._group_by()))
 
 
 class wizard_picking_analysis(models.TransientModel):
