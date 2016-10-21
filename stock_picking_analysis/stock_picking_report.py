@@ -25,6 +25,16 @@ from openerp import models, fields, api, _
 import logging
 _logger = logging.getLogger(__name__)
 
+class stock_picking(models.Model):
+    _inherit = 'stock.picking'
+    
+    nbr_lines = fields.Integer('# lines', compute='_get_nbr_lines', store=True)
+    
+    @api.one
+    @api.depends('pack_operation_ids')
+    def _get_nbr_lines(self):
+        self.nbr_lines = len(self.pack_operation_ids)
+
 class stock_picking_report(models.Model):
     _name = "stock_picking.report"
     _description = "Stock Picking Statistics"
@@ -122,16 +132,6 @@ class stock_picking_report(models.Model):
             FROM ( %s )
             %s
             )""" % (self._table, self._select(), self._from(), self._group_by()))
-
-class stock_picking(models.Model):
-    _inherit = 'stock.picking'
-    
-    nbr_lines = fields.Integer('# lines', compute='_get_nbr_lines', store=True)
-    
-    @api.one
-    @api.depends('pack_operation_ids')
-    def _get_nbr_lines(self):
-        self.nbr_lines = len(self.pack_operation_ids)
 
 class wizard_picking_analysis(models.TransientModel):
     _name = 'wizard.picking.analysis'
