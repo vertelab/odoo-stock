@@ -73,7 +73,7 @@ class stock_picking_report(models.Model):
                     sp.group_id as group_id,
                     count(distinct sp.group_id) as nbr_group,
                     count(distinct sp.id) as nbr_pickings,
-                    count(distinct spo) as nbr_lines,
+                    sp.nbr_lines as nbr_lines,
                     sp.date as date,
                     sp.date_done as date_done,
                     sp.partner_id as partner_id,
@@ -89,7 +89,6 @@ class stock_picking_report(models.Model):
     def _from(self):
         from_str = """
                 stock_picking sp
-                    left join stock_pack_operation spo on (sp.id = spo.picking_id)
                     left join stock_picking_type pt on (sp.picking_type_id = pt.id)
                     left join procurement_group on (sp.group_id = procurement_group.id)
         """
@@ -106,8 +105,7 @@ class stock_picking_report(models.Model):
                     sp.state,
                     sp.picking_type_id,
                     sp.move_type,
-                    sp.id,
-                    spo.id
+                    sp.id
         """
         return group_by_str
 
@@ -125,6 +123,15 @@ class stock_picking_report(models.Model):
             %s
             )""" % (self._table, self._select(), self._from(), self._group_by()))
 
+class stock_picking(models.Model):
+    _inherit = 'stock.picking'
+    
+    nbr_lines = fields.Integer('# lines', compute='_get_nbr_lines', store=True)
+    
+    @api.one
+    @api.depends('pack_operation_ids')
+    def _get_nbr_lines(self):
+        self.nbr_lines = len(self.pack_operation_ids)
 
 class wizard_picking_analysis(models.TransientModel):
     _name = 'wizard.picking.analysis'
