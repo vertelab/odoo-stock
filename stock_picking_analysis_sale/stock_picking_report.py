@@ -38,5 +38,5 @@ class stock_picking_report(models.Model):
         return super(stock_picking_report, self)._group_by() + ", sale_order.id"
 
     def _from(self):
-        return super(stock_picking_report, self)._from() + "left join sale_order on (s.group_id = sale_order.procurement_group_id)\n"
+        return super(stock_picking_report, self)._from() + "left join sale_order on (sp.group_id = sale_order.procurement_group_id)\n"
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

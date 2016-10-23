@@ -34,11 +34,11 @@ class stock_picking_report(models.Model):
     number_of_packages = fields.Integer(string='Number of Packages', readonly=True)
 
     def _select(self):
-        return  super(stock_picking_report, self)._select() + ", s.carrier_id as carrier_id,  s.volume as volume, s.weight as weight, s.weight_net as weight_net, s.number_of_packages as number_of_packages"
+        return  super(stock_picking_report, self)._select() + ", sp.carrier_id as carrier_id,  sp.volume as volume, sp.weight as weight, sp.weight_net as weight_net, sp.number_of_packages as number_of_packages"
 
     def _group_by(self):
-        return super(stock_picking_report, self)._group_by() + ", s.carrier_id,  s.volume, s.weight, s.weight_net, s.number_of_packages"
+        return super(stock_picking_report, self)._group_by() + ", sp.carrier_id,  sp.volume, sp.weight, sp.weight_net, sp.number_of_packages"
 
     def _from(self):
-        return super(stock_picking_report, self)._from() + "left join delivery_carrier on (s.carrier_id = delivery_carrier.id)\n"
+        return super(stock_picking_report, self)._from() + "left join delivery_carrier on (sp.carrier_id = delivery_carrier.id)\n"
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
