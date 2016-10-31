@@ -2,49 +2,21 @@
 <openerp>
 <data>
 
-    <record id="filter_pickedby" model="ir.filters">
-        <field name="name">Picked by, by day</field>
-        <field name="model_id">stock_picking.report</field>
-        <field name="employee_id" eval="False"/>
-        <field name="context">{'group_by': ['employee_id','date_done:day']}</field>
-    </record>
-
-    <record id="vpicktree" model="ir.ui.view">
-            <field name="name">stock.picking.tree</field>
-            <field name="model">stock.picking</field>
-            <field name="inherit_id" ref="stock.vpicktree"/>
+        <record id="view_stock_picking_analysis_search" model="ir.ui.view">
+            <field name="name">stock.picking.analysis.search</field>
+            <field name="model">stock_picking.report</field>
+            <field name="inherit_id" ref="stock_picking_analysis.view_stock_picking_analysis_search"/>
             <field name="arch" type="xml">
-                <field name="backorder_id" position="after">
+                <field name="partner_id" position="after">
                     <field name="employee_id"/>
-                    <field name="qc_id"/>
-                </field>
-            </field>
-    </record>
-
-        <record id="view_picking_internal_search" model="ir.ui.view">
-            <field name="name">stock.picking.internal.search</field>
-            <field name="model">stock.picking</field>
-            <field name="inherit_id" ref="stock.view_picking_internal_search"/>
-            <field name="arch" type="xml">
-                <filter name="backorder" position="after">
-                    <filter name="ready4picking" domain="[('ready4picking','=',1)]"/>
-                    <filter name="pure_cell" domain="[('pure_cell','=',1)]"/>
-                    <filter name="claim" domain="[('claim','=',1)]"/>
-                </filter>
-                <field name="group_id" position="after">
-                    <field name="employee_id"/>
-                    <field name="qc_id"/>
+                    <field name="qc_id_id"/>
                 </field>
                 <group string="Group By" position="inside">
-                    <filter string="Picked by" domain="[]" context="{'group_by':'employee_id'}"/>
-                    <filter string="Controlled by" domain="[]" context="{'group_by':'qc_id'}"/>
+                    <filter string="Picking employee" context="{'group_by':'employee_id'}"/>
+                    <filter string="Quality checker" context="{'group_by':'qc_id'}"/>
                 </group>
             </field>
         </record>
-
-
-
-
 
 </data>
 </openerp>

@@ -7,43 +7,12 @@
          <field name="model">stock_picking.report</field>
          <field name="arch" type="xml">
              <graph string="Stock Picking Analysis" type="pivot" stacked="True">
-<!--
-                 <field name="location_id" type="row"/>
--->
                  <field name="date" interval="month" type="col"/>
                  <field name="nbr_lines" type="measure"/>
              </graph>
          </field>
     </record>
 
-    <!-- Custom reports (aka filters) -->
-<!--
-    <record id="filter_sale_report_sales_funnel" model="ir.filters">
-        <field name="name">Sales Funnel</field>
-        <field name="model_id">sale.report</field>
-        <field name="domain">['&amp;', ('date','&lt;=', time.strftime('%%Y-12-31')), '&amp;', ('date','&gt;=',time.strftime('%%Y-01-01')), ('state','not in',('cancel',))]</field>
-        <field name="user_id" eval="False"/>
-        <field name="context">{'group_by': ['state'], 'measures': ['price_total']}</field>
-    </record>
-    <record id="filter_sale_report_salespersons" model="ir.filters">
-        <field name="name">By Salespersons</field>
-        <field name="model_id">sale.report</field>
-        <field name="user_id" eval="False"/>
-        <field name="context">{'group_by': ['date:month', 'user_id']}</field>
-    </record>
-    <record id="filter_sale_report_salesteam" model="ir.filters">
-        <field name="name">By Salesteam</field>
-        <field name="model_id">sale.report</field>
-        <field name="user_id" eval="False"/>
-        <field name="context">{'group_by': ['date:month', 'section_id']}</field>
-    </record>
-    <record id="filter_isale_report_product" model="ir.filters">
-        <field name="name">By Product</field>
-        <field name="model_id">sale.report</field>
-        <field name="user_id" eval="False"/>
-        <field name="context">{'group_by': ['date:month', 'product_id']}</field>
-    </record>
--->
 
     <record id="view_stock_picking_analysis_search" model="ir.ui.view">
         <field name="name">stock.picking.analysis.search</field>
@@ -58,27 +27,20 @@
                 <filter name="Confirmed" string="Confirmed" domain="[('state','not in',('draft', 'cancel'))]"/>
                 <separator/>
                 <field name="partner_id"/>
-<!--
-                <field name="product_id"/>
--->
+                <field name="group_id"/>
+                <field name="picking_type_id"/>
+                <field name="move_type"/>
+                <field name="company_id"/>
+                
                 <group expand="0" string="Extended Filters">
-<!--
-                    <field name="categ_id" filter_domain="[('categ_id', 'child_of', self)]"/>
--->
                     <field name="company_id" groups="base.group_multi_company"/>
                 </group>
                 <group expand="1" string="Group By">
-<!--
-                    <filter string="Location" name="Location" context="{'group_by':'location_id'}"/>
--->
-<!--
-                    <filter string="Destination" name="Destination" context="{'group_by':'location_dest_id'}"/>
--->
                     <filter string="Customer" name="Customer" context="{'group_by':'partner_id'}"/>
-<!--
-                    <filter string="Category of Product" name="Category" context="{'group_by':'categ_id'}"/>
--->
-                    <filter string="Status" context="{'group_by':'state'}"/>
+                    <filter string="State" context="{'group_by':'state'}"/>
+                    <filter string="Group" context="{'group_by':'group_id'}"/>
+                    <filter string="picking_type_id" context="{'group_by':'picking_type_id'}"/>
+                    <filter string="move_type" context="{'group_by':'move_type'}"/>
                     <filter string="Company" groups="base.group_multi_company" context="{'group_by':'company_id'}"/>
                     <separator/>
                     <filter string="Month" context="{'group_by':'date:month'}" help="Date of the picking order"/>
@@ -87,21 +49,7 @@
         </field>
     </record>
 
-<!--
-    <record id="action_stock_picking_report_all" model="ir.actions.act_window">
-        <field name="name">Stock Picking Analysis</field>
-        <field name="res_model">stock_picking.report</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">graph</field>
-        <field name="search_view_id" ref="view_stock_picking_analysis_search"/>
-        <field name="view_id" ref="view_stock_picking_analysis"/>
-        <field name="context">{'search_default_Sales':1, 'group_by_no_leaf':1,'group_by':[]}</field>
-        <field name="help">This report performs analysis on your picking. Analysis check your stock performance and sort it by different group criteria (salesman, partner, product, etc.) Use this report to perform analysis on sales not having invoiced yet. If you want to analyse your turnover, you should use the Invoice Analysis report in the Accounting application.</field>
-    </record>
-
-    <menuitem action="action_stock_picking_report_all" id="menu_report_stock_picking_all" parent="stock.next_id_61" sequence="50"/>
--->
-
+    
 
   <record id="view_wizard_picking_analysis" model="ir.ui.view">
             <field name="name">Stock Picking Analysis</field>

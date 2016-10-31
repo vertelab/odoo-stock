@@ -29,9 +29,8 @@ class stock_picking(models.Model):
     _inherit = 'stock.picking'
     
     nbr_lines = fields.Integer('# lines', compute='_get_nbr_lines', store=True)
-    
     @api.one
-    @api.depends('pack_operation_ids')
+    @api.depends('pack_operation_ids','carrier_tracking_ref')
     def _get_nbr_lines(self):
         self.nbr_lines = len(self.pack_operation_ids)
 
