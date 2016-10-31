@@ -28,6 +28,7 @@
                 <separator/>
                 <field name="partner_id"/>
                 <field name="group_id"/>
+                <field name="picking_id"/>
                 <field name="picking_type_id"/>
                 <field name="move_type"/>
                 <field name="company_id"/>

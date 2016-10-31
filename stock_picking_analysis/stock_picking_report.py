@@ -49,6 +49,7 @@ class stock_picking_report(models.Model):
     #~ product_uom_qty = fields.Float(string='# of Qty', readonly=True)
 
     group_id = fields.Many2one(comodel_name='procurement.group', string='Procurement Group', readonly=True)
+    picking_id = fields.Many2one(comodel_name='stock.picking', string='Picking', readonly=True)
     picking_type_id = fields.Many2one(comodel_name='stock.picking.type', string='Picking Type', readonly=True)
     move_type = fields.Selection([('direct', 'Partial'), ('one', 'All at once')],string="Move Type", readonly=True)
     #~ location_id = fields.Many2one(comodel_name='stock.location', string='Location', readonly=True)
@@ -79,6 +80,7 @@ class stock_picking_report(models.Model):
     def _select(self):
         select_str = """
              SELECT min(sp.id) as id,
+                    sp.id as picking_id,
                     sp.group_id as group_id,
                     count(distinct sp.group_id) as nbr_group,
                     count(distinct sp.id) as nbr_pickings,
