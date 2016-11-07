@@ -27,7 +27,7 @@ class stock_history_report(models.Model):
     _description = "Stock History Statistics"
     _auto = False
     _rec_name = 'date'
-
+    _order = 'date desc'
 
     date = fields.Datetime(string='Date Created', readonly=True)
     product_id = fields.Many2one(comodel_name='product.product',string='Product', readonly=True)
@@ -38,14 +38,20 @@ class stock_history_report(models.Model):
     product_categ_id = fields.Many2one(comodel_name='product.category',string='Category of Product', readonly=True)
     nbr_lines = fields.Integer(string='# of Lines', readonly=True)
     source = fields.Char(string='Source', readonly=True)
-    product_inventory_value = fields.Float(string='Inventory Value', readonly=True)
+    product_inventory_value = fields.Float(string='Inventory Value (FIFO)', readonly=True)
+    cost_price = fields.Float(string='Inventory Value (cost price)', readonly=True)
+    #~ replacement_value = fields.Float(string='Inventory Value (replacement)', readonly=True)
     move_id = fields.Many2one(comodel_name='stock.move', string='Stock Move', readonly=True)
     price_unit_on_quant = fields.Float(string='Value', readonly=True)
-
-    _order = 'date desc'
+    #~ standard_price = fields.Float(string='Cost Price', readonly=True)
+    max_price = fields.Float(string='Max price', readonly=True)
 
     def init(self, cr):
         # self._table = sale_report
+
+        #~ max(price_unit_on_quant) as max_price,
+        #~ sum(max_price * quantity) as replacement_value,
+
         tools.drop_view_if_exists(cr, self._table)
         cr.execute("""
             CREATE OR REPLACE VIEW stock_history_report AS (
@@ -60,7 +66,9 @@ class stock_history_report(models.Model):
                 SUM(quantity) as quantity,
                 count(*) as nbr_lines,
                 COALESCE(SUM(price_unit_on_quant * quantity) / NULLIF(SUM(quantity), 0), 0) as price_unit_on_quant,
+                sum(standard_price * quantity) as cost_price,
                 sum(price_unit_on_quant * quantity) as product_inventory_value,
+
                 source
                 FROM
                 ((SELECT
@@ -74,6 +82,8 @@ class stock_history_report(models.Model):
                     quant.qty AS quantity,
                     stock_move.date AS date,
                     quant.cost as price_unit_on_quant,
+                    product_product.standard_price as standard_price,
+                    max(quant.cost) as max_price,
                     stock_move.origin AS source
                 FROM
                     stock_move
@@ -96,6 +106,17 @@ class stock_history_report(models.Model):
                     not (source_location.company_id is null and dest_location.company_id is null) or
                     source_location.company_id != dest_location.company_id or
                     source_location.usage not in ('internal', 'transit'))
+                group by stock_move.id,
+                    dest_location.id,
+                    quant_location.id,
+                    dest_location.company_id,
+                    stock_move.product_id,
+                    product_template.categ_id,
+                    quant.qty,
+                    stock_move.date,
+                    quant.cost,
+                    product_product.standard_price,
+                    source_location.id
                 ) UNION ALL
                 (SELECT
                     (-1) * stock_move.id AS id,
@@ -108,6 +129,8 @@ class stock_history_report(models.Model):
                     - quant.qty AS quantity,
                     stock_move.date AS date,
                     quant.cost as price_unit_on_quant,
+                    product_product.standard_price as standard_price,
+                    max(quant.cost) as max_price,
                     stock_move.origin AS source
                 FROM
                     stock_move
@@ -130,8 +153,19 @@ class stock_history_report(models.Model):
                     not (dest_location.company_id is null and source_location.company_id is null) or
                     dest_location.company_id != source_location.company_id or
                     dest_location.usage not in ('internal', 'transit'))
+                group by stock_move.id,
+                    dest_location.id,
+                    quant_location.id,
+                    dest_location.company_id,
+                    stock_move.product_id,
+                    product_template.categ_id,
+                    quant.qty,
+                    stock_move.date,
+                    quant.cost,
+                    product_product.standard_price,
+                    source_location.id
                 ))
                 AS foo
-                GROUP BY move_id, location_id, quant_location_id, company_id, product_id, product_categ_id, date, source
+                GROUP BY move_id, location_id, quant_location_id, company_id, product_id, product_categ_id, date, price_unit_on_quant, source
             )""")
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
