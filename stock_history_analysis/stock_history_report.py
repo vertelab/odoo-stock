@@ -44,7 +44,7 @@ class stock_history_report(models.Model):
     move_id = fields.Many2one(comodel_name='stock.move', string='Stock Move', readonly=True)
     price_unit_on_quant = fields.Float(string='Value', readonly=True)
     #~ standard_price = fields.Float(string='Cost Price', readonly=True)
-    max_price = fields.Float(string='Max price', readonly=True)
+    #~ max_price = fields.Float(string='Max price', readonly=True)
 
     def init(self, cr):
         # self._table = sale_report
@@ -83,7 +83,6 @@ class stock_history_report(models.Model):
                     stock_move.date AS date,
                     quant.cost as price_unit_on_quant,
                     product_product.standard_price as standard_price,
-                    max(quant.cost) as max_price,
                     stock_move.origin AS source
                 FROM
                     stock_move
@@ -130,7 +129,6 @@ class stock_history_report(models.Model):
                     stock_move.date AS date,
                     quant.cost as price_unit_on_quant,
                     product_product.standard_price as standard_price,
-                    max(quant.cost) as max_price,
                     stock_move.origin AS source
                 FROM
                     stock_move
