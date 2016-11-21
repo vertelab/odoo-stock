@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <report id="stock_delivery_slip_report" model="stock.picking" string="Stock Delivery Slip" report_type="qweb-pdf" name="stock_multiple_picker.stock_delivery_slip_document" file="stock_multiple_picker.stock_delivery_slip_document"/>
+        <template id="stock_delivery_slip_document">
+            <t t-call="report.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-foreach="o.employee_ids" t-as="employee">
+                        <t t-call="report.external_layout">
+                            <div class="page">
+                                <div class="row">
+                                    <div class="col-xs-4 pull-right">
+                                        <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', o.name, 600, 100)" style="width:300px;height:50px;" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div t-if="o.picking_type_id.code=='incoming' and o.partner_id">
+                                            <span>
+                                                <strong>Supplier Address:</strong>
+                                            </span>
+                                        </div>
+                                        <div t-if="o.picking_type_id.code=='internal' and o.partner_id">
+                                            <span>
+                                                <strong>Warehouse Address:</strong>
+                                            </span>
+                                        </div>
+                                        <div t-if="o.picking_type_id.code=='outgoing' and o.partner_id">
+                                            <span>
+                                                <strong>Customer Address:</strong>
+                                            </span>
+                                        </div>
+                                        <div t-if="o.partner_id" name="partner_header">
+                                            <div t-field="o.partner_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: true}" />
+                                            <p t-if="o.partner_id.vat">
+                                                VAT:
+                                                <span t-field="o.partner_id.vat"/>
+                                            </p>
+                                            <div>
+                                                <span>
+                                                    <strong>Kundnummer: </strong>
+                                                </span>
+                                                <span t-field="o.partner_id.customer_no"/>
+                                            </div>
+                                            <div t-if="employee">
+                                                <span>
+                                                    <strong>Plockansvarig:</strong><br />
+                                                    <span t-field="employee.name"/>
+                                                </span>
+                                            </div>
+                                            <!--
+                                            <p t-if="o.partner_id.ref">
+                                                Ref:
+                                                <span t-field="o.partner_id.ref"/>
+                                            </p>
+                                            -->
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-5 col-xs-offset-1">
+                                        <span>
+                                            <strong>Delivery Address:</strong>
+                                        </span>
+                                        <!-- if there is delivery address -->
+                                        <div t-if="o.address_id">
+                                            <div t-field="o.address_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: true}" />
+                                        </div>
+    <!--
+                                        <div t-if="o.move_lines and o.move_lines[0].partner_id and o.move_lines[0].partner_id.id != o.partner_id.id">
+                                            <span>
+                                                <strong>Delivery Address:</strong>
+                                            </span>
+                                            <div t-field="o.move_lines[0].partner_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: true}" />
+                                        </div>
+    -->
+                                        <div t-if="o.picking_type_id.code != 'internal' and (not o.move_lines or not o.move_lines[0].partner_id) and o.picking_type_id.warehouse_id.partner_id">
+                                            <span>
+                                                <strong>Warehouse Address:</strong>
+                                            </span>
+                                            <div t-field="o.picking_type_id.warehouse_id.partner_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: true}" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <h2>
+                                    <span>Delivery slip</span>
+                                    :
+                                    <span t-field="o.sale_id.name"/>
+                                </h2>
+
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <strong>Beskrivning</strong>
+                                            </th>
+                                            <th class="text-right">
+                                                <strong>Kvantitet</strong>
+                                            </th>
+                                            <th class="text-right">
+                                                <strong>Vikt</strong>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="total_quantity" t-value="0"/>
+                                        <t t-set="total_weight" t-value="0"/>
+                                        <tr t-foreach="o.move_lines" t-as="ml">
+                                            <t t-if="not ml.scrapped and ml.employee_id == employee">
+                                                <t t-set="total_quantity" t-value="total_quantity + ml.product_qty"/>
+                                                <t t-set="total_weight" t-value="total_weight + ml.weight"/>
+                                                <td>
+                                                    <span t-field="ml.product_id"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-field="ml.product_qty"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-field="ml.weight"/>
+                                                </td>
+                                            </t>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-right">
+                                                <strong>Total</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="total_quantity"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="total_weight"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</openerp>

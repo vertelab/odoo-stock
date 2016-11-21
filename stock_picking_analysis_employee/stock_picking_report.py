@@ -32,13 +32,6 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
-class stock_picking(models.Model):
-    _inherit = "stock.picking"
-
-    employee_id = fields.Many2one(string='Picking employee', comodel_name='hr.employee')
-    qc_id = fields.Many2one(string='Controlled by', comodel_name='hr.employee')
-    
-
 class stock_picking_report(models.Model):
     _inherit = "stock_picking.report"
 
@@ -53,8 +46,8 @@ class stock_picking_report(models.Model):
 
     def _from(self):
         return super(stock_picking_report, self)._from() + "left join hr_employee on (sp.employee_id = hr_employee.id)\nleft join hr_employee qc on (sp.qc_id = qc.id)\n"
-        
-        
+
+
     def _read_group_process_groupby(self, gb, query, context):
         """
             Helper method to collect important information about groupbys: raw
@@ -100,9 +93,9 @@ class stock_picking_report(models.Model):
         return {
             'field': split[0],
             'groupby': gb,
-            'type': field_type, 
+            'type': field_type,
             'display_format': display_formats[gb_function or 'month'] if temporal else None,
-            'interval': time_intervals[gb_function or 'month'] if temporal else None,                
+            'interval': time_intervals[gb_function or 'month'] if temporal else None,
             'tz_convert': tz_convert,
             'qualified_field': qualified_field
         }

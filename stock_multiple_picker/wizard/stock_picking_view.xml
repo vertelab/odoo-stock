@@ -10,7 +10,7 @@
                 <form string="Set Picking Employees">
                     <group>
                         <field name="picking_id"/>
-                        <field name="employee_ids" widget='many2many_tags'/>
+                        <field name="employee_ids" widget="many2many_tags"/>
                         <field name="force"/>
                     </group>
                     <footer>
