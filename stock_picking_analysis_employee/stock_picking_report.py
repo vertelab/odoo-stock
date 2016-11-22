@@ -35,17 +35,21 @@ _logger = logging.getLogger(__name__)
 class stock_picking_report(models.Model):
     _inherit = "stock_picking.report"
 
-    employee_id =  fields.Many2one("hr.employee","Picked by",readonly=True)
-    qc_id =  fields.Many2one("hr.employee","Controlled by",readonly=True)
+    employee_id =  fields.Many2one("hr.employee", "Picking Employee", readonly=True)
+    legacy_employee_id =  fields.Many2one("hr.employee", "Picking Employee (legacy)", readonly=True)
+    qc_id =  fields.Many2one("hr.employee", "Controlled by", readonly=True)
 
     def _select(self):
-        return  super(stock_picking_report, self)._select() + ", sp.employee_id as employee_id, sp.qc_id as qc_id"
+        return  super(stock_picking_report, self)._select() + ", sp.employee_id as legacy_employee_id, move.employee_id as employee_id, sp.qc_id as qc_id"
 
     def _group_by(self):
-        return super(stock_picking_report, self)._group_by() + ", sp.employee_id, sp.qc_id"
+        return super(stock_picking_report, self)._group_by() + ", sp.employee_id, move.employee_id, sp.qc_id"
 
     def _from(self):
-        return super(stock_picking_report, self)._from() + "left join hr_employee on (sp.employee_id = hr_employee.id)\nleft join hr_employee qc on (sp.qc_id = qc.id)\n"
+        return super(stock_picking_report, self)._from() + """left join hr_employee on (sp.employee_id = hr_employee.id)
+        left join hr_employee qc on (sp.qc_id = qc.id)
+        left join stock_move move on (sp.id = move.picking_id)
+        """
 
 
     def _read_group_process_groupby(self, gb, query, context):
