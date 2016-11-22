@@ -105,17 +105,6 @@ class stock_history_report(models.Model):
                     not (source_location.company_id is null and dest_location.company_id is null) or
                     source_location.company_id != dest_location.company_id or
                     source_location.usage not in ('internal', 'transit'))
-                group by stock_move.id,
-                    dest_location.id,
-                    quant_location.id,
-                    dest_location.company_id,
-                    stock_move.product_id,
-                    product_template.categ_id,
-                    quant.qty,
-                    stock_move.date,
-                    quant.cost,
-                    product_product.standard_price,
-                    source_location.id
                 ) UNION ALL
                 (SELECT
                     (-1) * stock_move.id AS id,
@@ -151,17 +140,6 @@ class stock_history_report(models.Model):
                     not (dest_location.company_id is null and source_location.company_id is null) or
                     dest_location.company_id != source_location.company_id or
                     dest_location.usage not in ('internal', 'transit'))
-                group by stock_move.id,
-                    dest_location.id,
-                    quant_location.id,
-                    dest_location.company_id,
-                    stock_move.product_id,
-                    product_template.categ_id,
-                    quant.qty,
-                    stock_move.date,
-                    quant.cost,
-                    product_product.standard_price,
-                    source_location.id
                 ))
                 AS foo
                 GROUP BY move_id, location_id, quant_location_id, company_id, product_id, product_categ_id, date, price_unit_on_quant, source
