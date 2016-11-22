@@ -29,6 +29,7 @@ class stock_history_report(models.Model):
     _rec_name = 'date'
     _order = 'date desc'
 
+    quant_id = fields.Many2one(comodel_name='stock.quant', string='Stock Quant', readonly=True)
     date = fields.Datetime(string='Date Created', readonly=True)
     product_id = fields.Many2one(comodel_name='product.product',string='Product', readonly=True)
     quantity = fields.Float(string='Product Quantity', readonly=True)
@@ -58,6 +59,7 @@ class stock_history_report(models.Model):
               SELECT MIN(id) as id,
                 date,
                 move_id,
+                quant_id,
                 location_id,
                 quant_location_id,
                 company_id,
@@ -80,6 +82,7 @@ class stock_history_report(models.Model):
                     stock_move.product_id AS product_id,
                     product_template.categ_id AS product_categ_id,
                     quant.qty AS quantity,
+                    quant.id AS quant_id,
                     stock_move.date AS date,
                     quant.cost as price_unit_on_quant,
                     product_product.standard_price as standard_price,
@@ -108,6 +111,7 @@ class stock_history_report(models.Model):
                 group by stock_move.id,
                     dest_location.id,
                     quant_location.id,
+                    quant.id,
                     dest_location.company_id,
                     stock_move.product_id,
                     product_template.categ_id,
@@ -119,6 +123,7 @@ class stock_history_report(models.Model):
                 ) UNION ALL
                 (SELECT
                     (-1) * stock_move.id AS id,
+                    quant.id AS quant_id,
                     stock_move.id AS move_id,
                     source_location.id AS location_id,
                     quant_location.id AS quant_location_id,
@@ -154,6 +159,7 @@ class stock_history_report(models.Model):
                 group by stock_move.id,
                     dest_location.id,
                     quant_location.id,
+                    quant.id,
                     dest_location.company_id,
                     stock_move.product_id,
                     product_template.categ_id,
@@ -164,6 +170,6 @@ class stock_history_report(models.Model):
                     source_location.id
                 ))
                 AS foo
-                GROUP BY move_id, location_id, quant_location_id, company_id, product_id, product_categ_id, date, price_unit_on_quant, source
+                GROUP BY move_id, location_id, quant_location_id, company_id, product_id, product_categ_id, date, price_unit_on_quant, quant_id, source
             )""")
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
