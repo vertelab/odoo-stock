@@ -2,7 +2,7 @@
 ##############################################################################
 #
 # OpenERP, Open Source Management Solution, third party addon
-# Copyright (C) 2016- Vertel AB (<http://vertel.se>).
+# Copyright (C) 2017- Vertel AB (<http://vertel.se>).
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -29,23 +29,6 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
-#~ class stock_picking(models.Model):
-    #~ _inherit = "stock.picking"
-
-    #~ qc_id = fields.Many2one(string='Controlled by', comodel_name='hr.employee')
-
-    #~ @api.one
-    #~ def _employee_ids(self):
-        #~ self.employee_ids = [(6,0,self.move_lines.mapped('employee_id.id'))]
-    #~ employee_ids = fields.Many2many(string="Pickers",comodel_name="hr.employee", compute='_employee_ids')
-
-
-#~ class stock_move(models.Model):
-    #~ _inherit = "stock.move"
-
-    #~ employee_id = fields.Many2one(string='Picking employee', comodel_name='hr.employee')
-
-
 class PrepickingController(http.Controller):
 
     @http.route(['/prepicking/web/'], type='http', auth='user', website=True)
@@ -54,5 +37,27 @@ class PrepickingController(http.Controller):
             return http.local_redirect('/web/login?redirect=/prepicking/web')
 
         return request.render('stock_prepicking.prepicking_index')
+
+class stock_picking(models.Model):
+    _inherit = "stock.picking"
+
+    prepicked = fields.Boolean('Prepicked', compute='_get_prepicked', store=True)
+
+    @api.one
+    @api.depends('move_lines', 'state', 'move_lines.prepicked', 'move_lines.product_uom_qty')
+    def _get_prepicked(self):
+        if self.state != 'assigned':
+            self.prepicked = False
+            return
+        for line in self.move_lines:
+            if line.prepicked != line.product_uom_qty:
+                self.prepicked = False
+                return
+        self.prepicked = True
+
+class stock_move(models.Model):
+    _inherit = "stock.move"
+
+    prepicked = fields.Float('To be picked')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

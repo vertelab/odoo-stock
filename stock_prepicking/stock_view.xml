@@ -1,46 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record id="vpicktree" model="ir.ui.view">
-            <field name="name">stock.picking.tree</field>
-            <field name="model">stock.picking</field>
-            <field name="inherit_id" ref="stock.vpicktree"/>
+        
+        <record id="view_move_picking_tree" model="ir.ui.view">
+            <field name="name">stock.move.tree prepicking</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_picking_tree"/>
             <field name="arch" type="xml">
-                <field name="state" position="before">
-                    <field name="qc_id"/>
-                    <field name="employee_ids"/>
+                <field name="product_uom_qty" position="after">
+                    <field name="prepicked"/>
                 </field>
+                <tree position="attributes">
+                    <attribute name="colors">grey:scrapped == True; blue: prepicked == product_uom_qty;</attribute>
+                </tree>
             </field>
         </record>
-
+        
         <record id="view_picking_internal_search" model="ir.ui.view">
-            <field name="name">stock.picking.internal.search</field>
+            <field name="name">stock.picking.internal.search prepicking</field>
             <field name="model">stock.picking</field>
             <field name="inherit_id" ref="stock.view_picking_internal_search"/>
             <field name="arch" type="xml">
                 <field name="group_id" position="after">
-                    <field name="qc_id"/>
-                    <field name="employee_ids"/>
+                    <field name="prepicked"/>
                 </field>
+                <filter name="confirmed" position="after">
+                    <filter name="prepicked_filter" string="Ready to pack" domain="[('prepicked','=', True)]"/>
+                </filter>
             </field>
         </record>
-
-        <record id="view_picking_form" model="ir.ui.view">
-            <field name="name">stock.picking.form.inherit</field>
-            <field name="model">stock.picking</field>
-            <field name="priority" eval="99"/>
-            <field name="inherit_id" ref="stock.view_picking_form"/>
-            <field name="arch" type="xml">
-                <field name="state" position="before">
-                    <button name="stock_multiple_picker.stock_picking_wizard_form_act" type="action" string="Set Picking Users" class="oe_highlight"/>
-                </field>
-                <field name="backorder_id" position="after">
-                    <field name="employee_ids" widget="many2many_tags"/>
-                    <field name="write_date"/>
-                    <field name="qc_id"/>
-                </field>
-            </field>
-        </record>
-
+        
     </data>
 </openerp>
