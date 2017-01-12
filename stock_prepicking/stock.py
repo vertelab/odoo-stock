@@ -31,12 +31,12 @@ _logger = logging.getLogger(__name__)
 
 class PrepickingController(http.Controller):
 
-    @http.route(['/prepicking/web/'], type='http', auth='user', website=True)
-    def prepicking(self, debug=False, **post):
-        if not request.session.uid:
-            return http.local_redirect('/web/login?redirect=/prepicking/web')
-
-        return request.render('stock_prepicking.prepicking_index')
+    @http.route(['/prepicking/<model("stock.picking"):picking>/picking'], type='http', auth="user", website=True)
+    def prepicking(self, picking=None, **post):
+        #~ if not request.session.uid:
+            #~ return http.local_redirect('/web/login?redirect=/prepicking/web')
+        #~ pickings = request.env['stock.picking'].search([('employee_ids', 'in', request.env['hr.employee'].search([('user_id', '=', request.env.user.id)]))])
+        return request.render('stock_prepicking.prepicking_index', {'pickings': [picking]})
 
 class stock_picking(models.Model):
     _inherit = "stock.picking"
@@ -109,6 +109,6 @@ class stock_move(models.Model):
             else:
                 pp_qty -= 1.0 if pp_qty >= 1.0 else 0.0
             self.write(cr, uid, move_id.id, {'prepicked': pp_qty})
-        return move_id.id
+        return move_id.id if move_id else None
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

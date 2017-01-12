@@ -32,32 +32,73 @@
                     <t t-call-assets="web.assets_common" t-css="false" />
                     <t t-call-assets="web.assets_backend" t-css="false" />
 
-                    <script type="text/javascript" id="loading-script" t-raw="init">
-                        $(function() {
-                            var s = new openerp.init();
-                            var wc = new s.web.WebClient();
-
-                            wc.show_application = function() {
-                                wc.action_manager.do_action("stock.prepicking.ui", {});
-                            };
-
-                            wc.do_push_state = function(state){};
-                            wc.setElement($(document.body));
-                            wc.start();
-                        });
-                    </script>
-
                 </head>
                 <body>
-                    <div class='openerp openerp_webclient_container'>
-                        <table class='oe_webclient'>
-                            <tr>
-                                <td class='oe_application' />
-                            </tr>
-                        </table>
-                    </div>
+                    <t t-call="stock_prepicking.prepicking_tmp"/>
                 </body>
             </html>
+        </template>
+
+        <template id="prepicking_tmp" name="Prepicking Template">
+            <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+                <div class="container">
+                    <div class="navbar-right">
+                        <button class="btn btn-default navbar-btn pp_prev" type="button">&lt; Föregående</button>
+                        <button class="btn btn-default navbar-btn pp_next" type="button">Next &gt;</button>
+                    </div>
+                </div>
+            </div>
+            <input id="current_picking" type="hidden" t-att-value="pickings[0].id"/>
+            <t t-set="picking" t-value="pickings[0]"/>
+            <div class="container">
+                <div>
+                    <div class="col-sm-4 col-xs-6">
+                        <h2 class=""><t t-esc="picking.name"/></h2>
+                    </div>
+                </div>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Product</th>
+                            <th class="text-center" width="150">Scanned</th>
+                            <th class="text-center">To Do</th>
+                            <th>From</th>
+                            <th>To</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="picking.move_lines" t-as="l">
+                            <tr class="">
+                                <td class="">
+                                    <t t-esc="l.product_id.name"/>
+                                </td>
+                                <td class="brctbl-col2 text-center">
+                                    <div class="input-group">
+                                        <span class="input-group-addon input-sm"><a href="#"><i class="fa fa-minus"></i></a></span>
+                                        <form class="">
+                                            <input class="form-control text-center pp_qty" type="text" t-att-value="l.prepicked"/>
+                                        </form>
+                                        <span class="input-group-addon js_plus input-sm"><a href="#"><i class="fa fa-plus"></i></a></span>
+                                    </div>
+                                </td>
+                                <td class="brctbl-col3 text-center">
+                                    <t t-esc="l.product_uom_qty"/> <t t-esc="l.product_uom.name"/>
+                                </td>
+                                <td class="brctbl-col4">
+                                    <t t-if="len(l.reserved_quant_ids)">
+                                        <t t-esc="l.reserved_quant_ids[0].location_id.name"/>
+                                    </t>
+                                </td>
+                                <td class="brctbl-col4">
+                                    <t t-if="l.location_dest_id">
+                                        <t t-esc="l.location_dest_id.name"/>
+                                    </t>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
         </template>
 
     </data>
