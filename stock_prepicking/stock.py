@@ -55,9 +55,60 @@ class stock_picking(models.Model):
                 return
         self.prepicked = True
 
+    def process_barcode_from_prepicking(self, cr, uid, picking_id, barcode_str):
+        '''This function is called each time there barcode scanner reads an input'''
+        lot_obj = self.pool.get('stock.production.lot')
+        package_obj = self.pool.get('stock.quant.package')
+        product_obj = self.pool.get('product.product')
+        stock_move_obj = self.pool.get('stock.move')
+        stock_location_obj = self.pool.get('stock.location')
+        answer = {'filter_loc': False, 'move_id': False}
+        #check if the barcode correspond to a location
+        matching_location_ids = stock_location_obj.search(cr, uid, [('loc_barcode', '=', barcode_str)])
+        if matching_location_ids:
+            #if we have a location, return immediatly with the location name
+            location = stock_location_obj.browse(cr, uid, matching_location_ids[0])
+            answer['filter_loc'] = stock_location_obj._name_get(cr, uid, location)
+            answer['filter_loc_id'] = matching_location_ids[0]
+            return answer
+        #check if the barcode correspond to a product
+        matching_product_ids = product_obj.search(cr, uid, ['|', ('ean13', '=', barcode_str), ('default_code', '=', barcode_str)])
+        if matching_product_ids:
+            op_id = stock_move_obj._search_and_increment(cr, uid, picking_id, [('product_id', '=', matching_product_ids[0])], increment=True)
+            answer['move_id'] = op_id
+            return answer
+        #check if the barcode correspond to a lot
+        matching_lot_ids = lot_obj.search(cr, uid, [('name', '=', barcode_str)])
+        if matching_lot_ids:
+            lot = lot_obj.browse(cr, uid, matching_lot_ids[0])
+            op_id = stock_move_obj._search_and_increment(cr, uid, picking_id, [('product_id', '=', lot.product_id.id), ('lot_id', '=', lot.id)], increment=True)
+            answer['move_id'] = op_id
+            return answer
+        #check if the barcode correspond to a package
+        matching_package_ids = package_obj.search(cr, uid, [('name', '=', barcode_str)])
+        if matching_package_ids:
+            package = package_obj.browse(cr, uid, matching_package_ids[0])
+            op_id = stock_move_obj._search_and_increment(cr, uid, picking_id, [('product_id', '=', package.quant_ids.mapped('product_id').id)], increment=True)
+            answer['move_id'] = op_id
+            return answer
+        return answer
+
 class stock_move(models.Model):
     _inherit = "stock.move"
 
-    prepicked = fields.Float('To be picked')
+    prepicked = fields.Float(string='To be picked')
+
+    def _search_and_increment(self, cr, uid, picking_id, domain, increment=True):
+        move_id = None
+        existing_move_ids = self.search(cr, uid, [('picking_id', '=', picking_id)] + domain)
+        if len(existing_move_ids) > 0:
+            move_id = self.browse(cr, uid, existing_move_ids[0])
+            pp_qty = move_id.prepicked
+            if increment:
+                pp_qty += 1.0
+            else:
+                pp_qty -= 1.0 if pp_qty >= 1.0 else 0.0
+            self.write(cr, uid, move_id.id, {'prepicked': pp_qty})
+        return move_id.id
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

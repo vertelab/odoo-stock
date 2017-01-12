@@ -1,4 +1,4 @@
-function openerp_picking_widgets(instance){
+function openerp_prepicking_widgets(instance){
 
     var module = instance.stock;
     var _t     = instance.web._t;
@@ -448,10 +448,10 @@ function openerp_picking_widgets(instance){
             var self = this;
             $(window).bind('hashchange', function(){
                 var states = $.bbq.getState();
-                if (states.action === "stock.ui"){
+                if (states.action === "stock.prepicking.ui"){
                     self.do_action({
                         type:   'ir.actions.client',
-                        tag:    'stock.ui',
+                        tag:    'stock.prepicking.ui',
                         target: 'current',
                     },{
                         clear_breadcrumbs: true,
@@ -515,11 +515,11 @@ function openerp_picking_widgets(instance){
             });
         },
         goto_picking: function(picking_id){
-            $.bbq.pushState('#action=stock.ui&picking_id='+picking_id);
+            $.bbq.pushState('#action=stock.prepicking.ui&picking_id='+picking_id);
             $(window).trigger('hashchange');
         },
         goto_last_picking_of_type: function(type_id){
-            $.bbq.pushState('#action=stock.ui&picking_type_id='+type_id);
+            $.bbq.pushState('#action=stock.prepicking.ui&picking_type_id='+type_id);
             $(window).trigger('hashchange');
         },
         search_picking: function(barcode){
@@ -845,10 +845,10 @@ function openerp_picking_widgets(instance){
         },
         scan: function(ean){ //scans a barcode, sends it to the server, then reload the ui
             var self = this;
-            var product_visible_ids = this.picking_editor.get_visible_ids();
             return new instance.web.Model('stock.picking')
-                .call('process_barcode_from_ui', [self.picking.id, ean, product_visible_ids])
+                .call('process_barcode_from_prepicking', [self.picking.id, ean])
                 .then(function(result){
+                    console.log(result);
                     if (result.filter_loc !== false){
                         //check if we have receive a location as answer
                         if (result.filter_loc !== undefined){
@@ -872,7 +872,7 @@ function openerp_picking_widgets(instance){
         scan_product_id: function(product_id,increment,op_id){ //performs the same operation as a scan, but with product id instead
             var self = this;
             return new instance.web.Model('stock.picking')
-                .call('process_product_id_from_ui', [self.picking.id, product_id, op_id, increment])
+                .call('process_barcode_from_prepicking', [self.picking.id, product_id, op_id, increment])
                 .then(function(result){
                     return self.refresh_ui(self.picking.id);
                 });
@@ -1026,7 +1026,7 @@ function openerp_picking_widgets(instance){
             instance.webclient.set_content_full_screen(false);
         },
     });
-    openerp.web.client_actions.add('stock.ui', 'instance.stock.PickingMainWidget');
+    openerp.web.client_actions.add('stock.prepicking.ui', 'instance.stock.PickingMainWidget');
 
     module.BarcodeScanner = instance.web.Class.extend({
         connect: function(callback){
@@ -1068,5 +1068,5 @@ function openerp_picking_widgets(instance){
 
 openerp.stock = function(openerp) {
     openerp.stock = openerp.stock || {};
-    openerp_picking_widgets(openerp);
+    openerp_prepicking_widgets(openerp);
 }

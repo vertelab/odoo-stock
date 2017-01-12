@@ -38,7 +38,7 @@
                             var wc = new s.web.WebClient();
 
                             wc.show_application = function() {
-                                wc.action_manager.do_action("stock.ui", {});
+                                wc.action_manager.do_action("stock.prepicking.ui", {});
                             };
 
                             wc.do_push_state = function(state){};
