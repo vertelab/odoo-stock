@@ -26,14 +26,11 @@ from openerp import models, fields, api, _
 import logging
 _logger = logging.getLogger(__name__)
 
-
-#~ class stock_picking(models.Model):
-    #~ _inherit = "stock.picking"
-
-
-
-#~ class stock_move(models.Model):
-    #~ _inherit = "stock.move"
+class stock_package(models.Model):
+    
+    _inherit = "stock.quant.package"
+    
+    parent_id = fields.Many2one('stock.quant.package', 'Parent Package', help="The package containing this item", ondelete='restrict', readonly=False)
 
 class product_ul(models.Model):
     _inherit = 'product.ul'
