@@ -111,4 +111,25 @@ class stock_move(models.Model):
             self.write(cr, uid, move_id.id, {'prepicked': pp_qty})
         return move_id.id if move_id else None
 
+    def move_line_increment(self, cr, uid, move_id, increase):
+        move = self.browse(cr, uid, int(move_id))
+        full = False
+        if move:
+            pp_qty = move.prepicked
+            if increase == 'True':
+                if pp_qty < move.product_uom_qty:
+                    pp_qty += 1.0
+                    if pp_qty < move.product_uom_qty:
+                        full = False
+                    else:
+                        full = True
+                else:
+                    full = True
+            if increase == 'False':
+                if pp_qty > 0.0:
+                    pp_qty -= 1.0
+                full = False
+            self.write(cr, uid, move.id, {'prepicked': pp_qty})
+        return full
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

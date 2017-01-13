@@ -68,17 +68,17 @@
                     </thead>
                     <tbody>
                         <t t-foreach="picking.move_lines" t-as="l">
-                            <tr class="">
+                            <tr t-att-id="'move_line_row_%s' %l.id" t-att-class="'success' if l.prepicked == l.product_uom_qty else ''">
                                 <td class="">
                                     <t t-esc="l.product_id.name"/>
                                 </td>
                                 <td class="brctbl-col2 text-center">
                                     <div class="input-group">
-                                        <span class="input-group-addon input-sm"><a href="#"><i class="fa fa-minus"></i></a></span>
+                                        <span class="input-group-addon input-sm" t-att-onclick="'move_line_increment(&quot;%s&quot;,&quot;%s&quot;)' %(l.id, False)"><a href="#"><i class="fa fa-minus"></i></a></span>
                                         <form class="">
-                                            <input class="form-control text-center pp_qty" type="text" t-att-value="l.prepicked"/>
+                                            <input t-att-id="'move_line_qty_%s' %l.id" class="form-control text-center" type="0" t-att-value="l.prepicked"/>
                                         </form>
-                                        <span class="input-group-addon js_plus input-sm"><a href="#"><i class="fa fa-plus"></i></a></span>
+                                        <span class="input-group-addon input-sm" t-att-onclick="'move_line_increment(&quot;%s&quot;,&quot;%s&quot;)' %(l.id, True)"><a href="#"><i class="fa fa-plus"></i></a></span>
                                     </div>
                                 </td>
                                 <td class="brctbl-col3 text-center">
