@@ -1,5 +1,6 @@
 var picking = new openerp.web.Model('stock.picking');
 var move = new openerp.web.Model('stock.move');
+var _t = new openerp.web._t;
 
 $(document).ready(function() {
     var pressed = false;
@@ -29,7 +30,7 @@ $('.move_line_qty_input').live("keypress", function(e) {
             move_line_set(($(self).attr("id").split("_"))[3], parseFloat($(self).val()));
         }
         else
-            window.alert("Please enter a number!");
+            window.alert(_t("Please enter a number!"));
     }
 });
 
