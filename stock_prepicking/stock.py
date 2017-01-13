@@ -96,7 +96,7 @@ class stock_picking(models.Model):
 class stock_move(models.Model):
     _inherit = "stock.move"
 
-    prepicked = fields.Float(string='To be picked')
+    prepicked = fields.Float(string='To be picked', default=0.0)
 
     def _search_and_increment(self, cr, uid, picking_id, domain, increment=True):
         move_id = None
@@ -131,5 +131,10 @@ class stock_move(models.Model):
                 full = False
             self.write(cr, uid, move.id, {'prepicked': pp_qty})
         return full
+
+    def move_line_set(self, cr, uid, move_id, qty):
+        move = self.browse(cr, uid, int(move_id))
+        if move:
+            self.write(cr, uid, move.id, {'prepicked': qty})
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

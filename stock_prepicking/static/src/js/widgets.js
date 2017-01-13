@@ -8,12 +8,11 @@ $(document).ready(function() {
         if (e.which >= 48 && e.which <= 57) {
             chars.push(String.fromCharCode(e.which));
         }
-        console.log(e.which + ":" + chars.join("|"));
         if (pressed == false) {
             setTimeout(function(){
                 if (chars.length >= 10) {
                     var barcode = chars.join("");
-                    prepicking_increment(barcode);
+                    rfid_increment(barcode);
                 }
                 chars = [];
                 pressed = false;
@@ -23,7 +22,18 @@ $(document).ready(function() {
     });
 });
 
-function prepicking_increment(barcode){
+$('.move_line_qty_input').live("keypress", function(e) {
+    if (e.keyCode == 13) { // TODO: this is enter key, how about enter key on a tablet or other mobile devices?
+        var self = this;
+            if ($.isNumeric($(self).val())){
+            move_line_set(($(self).attr("id").split("_"))[3], parseFloat($(self).val()));
+        }
+        else
+            window.alert("Please enter a number!");
+    }
+});
+
+function rfid_increment(barcode){
     picking.call('process_barcode_from_prepicking', [parseInt($("#current_picking").val()), barcode]).then(function(result){
         $("table").load(document.URL +  " table");
     });
@@ -39,6 +49,10 @@ function move_line_increment(move_id, increase){
     });
 }
 
-function rewrite_qty(move_id) {
-    console.log($("#move_line_qty_" + move_id).val());
+function move_line_set(move_id, qty) {
+    move.call('move_line_set', [parseInt(move_id), qty]).then(function(result){
+        $("table").load(document.URL +  " table");
+    });
 }
+
+
