@@ -32,7 +32,7 @@ function prepicking_increment(barcode){
 function move_line_increment(move_id, increase){
     move.call('move_line_increment', [parseInt(move_id), increase]).then(function(result){
         if(result == true)
-            $("#move_line_row_" + move_id).attr({"class": "success"});
+            $("#move_line_row_" + move_id).addClass("success");
         if(result == false)
             $("#move_line_row_" + move_id).removeClass("success");
         $("table").load(document.URL +  " table");

@@ -31,7 +31,7 @@ _logger = logging.getLogger(__name__)
 
 class PrepickingController(http.Controller):
 
-    @http.route(['/prepicking/<model("stock.picking"):picking>/picking'], type='http', auth="user", website=True)
+    @http.route(['/prepicking/<model("stock.picking"):picking>'], type='http', auth="user", website=True)
     def prepicking(self, picking=None, **post):
         #~ if not request.session.uid:
             #~ return http.local_redirect('/web/login?redirect=/prepicking/web')
