@@ -30,6 +30,6 @@ Report financed by Dermanord-Svensk Hudvård AB""",
 'author': 'Vertel AB',
 'website': 'http://www.vertel.se',
 'depends': ['stock_account'],
-'data': [ 'stock_history_report_view.xml', 'wizard/stock_history_wizard_view.xml'],
+'data': [ 'stock_history_report_view.xml', 'wizard/stock_history_wizard_view.xml', 'security/ir.model.access.csv'],
 'installable': True,
 }
