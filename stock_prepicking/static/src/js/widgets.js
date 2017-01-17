@@ -3,7 +3,7 @@ var move = new openerp.web.Model('stock.move');
 var operation = new openerp.web.Model('stock.pack.operation');
 var _t = new openerp.web._t;
 var picking_id = window.location.href.substr(window.location.href.indexOf("picking_id=") + 11);
-var waiting_ids = [];
+var prepicking_ids = [];
 var todo_ids = [];
 
 $(document).ready(function() {
@@ -40,22 +40,28 @@ $('.move_line_qty_input').live("keypress", function(e) {
 
 $("#js_select").live("change", function(){
     var selection = $("#js_select").attr("value");
-    if (selection === "ToDo"){
-        $(".pack_in_queue").removeClass("hidden");
-        $(".js_putinpack").removeClass("hidden");
-        $(".js_drop_down").removeClass("hidden");
-    }
-    if (selection === "Waiting"){
-        $(".pack_in_queue").addClass("hidden");
-        $(".js_putinpack").removeClass("hidden");
-        $(".js_drop_down").removeClass("hidden");
+    if (selection === "Prepick"){
+        $(".btn_prepick").removeClass("hidden");
+        $(".js_putinpack").addClass("hidden");
+        $(".js_drop_down").addClass("hidden");
+        $(".prepick_title").removeClass("hidden");
+        $(".prepick_body").removeClass("hidden");
         $.each($("table .js_pack_op_line:not(.processed)"), function(){
             console.log($(this).attr("data-id"));
             todo_ids.push(parseInt($(this).attr("data-id")));
         });
     }
+    if (selection === "ToDo"){
+        $(".btn_prepick").addClass("hidden");
+        $(".js_putinpack").removeClass("hidden");
+        $(".js_drop_down").removeClass("hidden");
+        $(".prepick_title").addClass("hidden");
+        $(".prepick_body").addClass("hidden");
+    }
     if (selection === "Processed"){
-        $(".pack_in_queue").addClass("hidden");
+        $(".btn_prepick").addClass("hidden");
+        $(".prepick_title").addClass("hidden");
+        $(".prepick_body").addClass("hidden");
         //~ $.each($("table .js_op_table_todo").find(".success"), function(){
             //~ console.log($(this).attr("data-id"));
             //~ pack_op_ids.push(parseInt($(this).attr("data-id")));
@@ -63,12 +69,12 @@ $("#js_select").live("change", function(){
     }
 });
 
-$(".pack_in_queue").live("click", function(){
+$(".btn_prepick").live("click", function(){
     $.each($("table .js_pack_op_line_todo"), function(){
         console.log($(this).attr("data-id"));
-        waiting_ids.push(parseInt($(this).attr("data-id")));
+        prepicking_ids.push(parseInt($(this).attr("data-id")));
     });
-    operation.call('action_waiting',[[parseInt(picking_id)], pack_op_ids])
+    //~ operation.call('action_waiting',[[parseInt(picking_id)], pack_op_ids])
     //~ picking.call('action_pack',[[parseInt(picking_id)], pack_op_ids])
     //~ .then(function(pack){
         //~ console.log(pack);

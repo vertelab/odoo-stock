@@ -2,10 +2,10 @@
 <template>
     <t t-extend="PickingEditorWidget">
         <t t-jquery="#js_select_todo" t-operation="after">
-            <option value="Waiting" id="js_select_waiting">Waiting for pack</option>
+            <option value="Prepick" id="js_select_prepick">Prepick</option>
         </t>
         <t t-jquery=".js_putinpack" t-operation="before">
-            <button class="btn btn-warning pack_in_queue">In Queue</button>
+            <button class="btn btn-warning btn_prepick hidden">In Queue</button>
         </t>
         <t t-jquery=".js_op_table_todo" t-operation="replace">
             <table class='table table-condensed js_op_table_todo'>
@@ -13,6 +13,7 @@
                     <tr>
                         <th class="text-left">Product</th>
                         <th class='text-center' width="150">Scanned</th>
+                        <th class="text-center prepick_title hidden">Prepicked</th>
                         <th class='text-center'>Todo</th>
                         <th>From</th>
                         <th>To</th>
@@ -40,19 +41,16 @@
                                 <t t-if="(row.cols.processed == 'true' || row.cols.container)">
                                     <t t-esc="row.cols.rem" />
                                 </t>
-                                <t t-if="row.cols.waiting_to_be_packed == 'false' &amp;&amp; !row.cols.container">
-                                    <div class="input-group">
-                                        <span class="input-group-addon js_waiting_minus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-minus"></i></a></span>
-                                        <form class="js_submit_value">
-                                            <input type="text" class="form-control text-center js_waiting_qty" t-att-value="row.cols.rem"></input>
-                                            <!-- <input type="submit" class="hidden"></input> -->
-                                        </form>
-                                        <span class="input-group-addon js_waiting_plus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-plus"></i></a></span>
-                                    </div>
-                                </t>
-                                <t t-if="(row.cols.waiting_to_be_packed == 'true' || row.cols.container)">
-                                    <t t-esc="row.cols.rem" />
-                                </t>
+                            </td>
+                            <td class="brctbl-col3 text-center prepick_body hidden">
+                                <div class="input-group">
+                                    <span class="input-group-addon js_prepick_minus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-minus"></i></a></span>
+                                    <form class="js_submit_value">
+                                        <input type="text" class="form-control text-center js_prepick_qty" t-att-value="row.cols.rem"></input>
+                                        <!-- <input type="submit" class="hidden"></input> -->
+                                    </form>
+                                    <span class="input-group-addon js_prepick_plus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-plus"></i></a></span>
+                                </div>
                             </td>
                             <td class="brctbl-col3 text-center">
                                 <t t-esc="row.cols.qty"/> <t t-esc="row.cols.uom" />
