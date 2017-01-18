@@ -13,7 +13,7 @@
                     <tr>
                         <th class="text-left">Product</th>
                         <th class='text-center' width="150">Scanned</th>
-                        <th class="text-center prepick_title hidden">Prepicked</th>
+                        <th class="text-center prepick_title">Prepicked</th>
                         <th class='text-center'>Todo</th>
                         <th>From</th>
                         <th>To</th>
@@ -42,7 +42,7 @@
                                     <t t-esc="row.cols.rem" />
                                 </t>
                             </td>
-                            <td class="brctbl-col3 text-center prepick_body hidden">
+                            <td class="brctbl-col3 text-center prepick_body">
                                 <div class="input-group">
                                     <span class="input-group-addon js_prepick_minus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-minus"></i></a></span>
                                     <form class="js_submit_value">

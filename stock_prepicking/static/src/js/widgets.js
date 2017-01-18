@@ -44,8 +44,6 @@ $("#js_select").live("change", function(){
         $(".btn_prepick").removeClass("hidden");
         $(".js_putinpack").addClass("hidden");
         $(".js_drop_down").addClass("hidden");
-        $(".prepick_title").removeClass("hidden");
-        $(".prepick_body").removeClass("hidden");
         $.each($("table .js_pack_op_line:not(.processed)"), function(){
             console.log($(this).attr("data-id"));
             todo_ids.push(parseInt($(this).attr("data-id")));
@@ -55,13 +53,9 @@ $("#js_select").live("change", function(){
         $(".btn_prepick").addClass("hidden");
         $(".js_putinpack").removeClass("hidden");
         $(".js_drop_down").removeClass("hidden");
-        $(".prepick_title").addClass("hidden");
-        $(".prepick_body").addClass("hidden");
     }
     if (selection === "Processed"){
         $(".btn_prepick").addClass("hidden");
-        $(".prepick_title").addClass("hidden");
-        $(".prepick_body").addClass("hidden");
         //~ $.each($("table .js_op_table_todo").find(".success"), function(){
             //~ console.log($(this).attr("data-id"));
             //~ pack_op_ids.push(parseInt($(this).attr("data-id")));
