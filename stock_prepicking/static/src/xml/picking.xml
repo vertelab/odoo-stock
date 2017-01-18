@@ -12,8 +12,8 @@
                 <thead>
                     <tr>
                         <th class="text-left">Product</th>
-                        <th class='text-center' width="150">Scanned</th>
                         <th class="text-center prepick_title">Prepicked</th>
+                        <th class='text-center' width="150">Scanned</th>
                         <th class='text-center'>Todo</th>
                         <th>From</th>
                         <th>To</th>
@@ -22,10 +22,20 @@
 
                 <tbody>
                     <t t-foreach="widget.get_rows()" t-as="row">
-                        <tr t-att-class="row.classes + 'js_pack_op_line js_pack_op_line_todo'" t-att-data-id="row.cols.id" t-att-data-container-id="row.cols.container_id" t-att-data-package-id="row.cols.package_id" t-att-data-ulid="row.cols.ul_id">
+                        <tr t-att-class="row.classes + 'js_pack_op_line'" t-att-data-id="row.cols.id" t-att-data-container-id="row.cols.container_id" t-att-data-package-id="row.cols.package_id" t-att-data-ulid="row.cols.ul_id">
                             <td t-att-class="'brctbl-col1 text-left' + row.cols.head_container ? ' js_unfold' : ''">
                                 <t t-if="!row.cols.head_container &amp;&amp; row.cols.container"><span class="fa fa-level-up fa-rotate-90" style="margin-left:10px;margin-right:10px;"></span></t>
                                 <t t-esc="row.cols.product" />
+                            </td>
+                            <td class="brctbl-col3 text-center prepick_body">
+                                <div class="input-group">
+                                    <span class="input-group-addon js_prepick_minus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-minus"></i></a></span>
+                                    <form class="js_submit_value">
+                                        <input type="text" class="form-control text-center js_prepick_qty" t-att-value="row.cols.rem"></input>
+                                        <!-- <input type="submit" class="hidden"></input> -->
+                                    </form>
+                                    <span class="input-group-addon js_prepick_plus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-plus"></i></a></span>
+                                </div>
                             </td>
                             <td class='brctbl-col2 text-center js_row_qty'>
                                 <t t-if="row.cols.processed == 'false' &amp;&amp; !row.cols.container">
@@ -41,16 +51,6 @@
                                 <t t-if="(row.cols.processed == 'true' || row.cols.container)">
                                     <t t-esc="row.cols.rem" />
                                 </t>
-                            </td>
-                            <td class="brctbl-col3 text-center prepick_body">
-                                <div class="input-group">
-                                    <span class="input-group-addon js_prepick_minus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-minus"></i></a></span>
-                                    <form class="js_submit_value">
-                                        <input type="text" class="form-control text-center js_prepick_qty" t-att-value="row.cols.rem"></input>
-                                        <!-- <input type="submit" class="hidden"></input> -->
-                                    </form>
-                                    <span class="input-group-addon js_prepick_plus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-plus"></i></a></span>
-                                </div>
                             </td>
                             <td class="brctbl-col3 text-center">
                                 <t t-esc="row.cols.qty"/> <t t-esc="row.cols.uom" />
