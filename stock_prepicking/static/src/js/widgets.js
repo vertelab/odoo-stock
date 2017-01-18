@@ -56,6 +56,7 @@ $("#js_select").live("change", function(){
         $(".btn_prepick").addClass("hidden");
         $(".js_putinpack").removeClass("hidden");
         $(".js_drop_down").removeClass("hidden");
+        $(".js_row_qty").find(".js_minus, .js_qty, .js_plus").prop('disabled', false);
     }
     if (selection === "Processed"){
         $(".btn_prepick").addClass("hidden");
