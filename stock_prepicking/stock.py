@@ -90,7 +90,19 @@ class stock_picking(models.Model):
             answer['move_id'] = mv_id
             return answer
         return answer
-
+    
+    @api.model
+    def process_barcode_from_ui(self, picking_id, barcode_str, visible_op_ids, prepicking=False):
+        '''This function is called each time there barcode scanner reads an input'''
+        if prepicking:
+            answer = {'filter_loc': False, 'operation_id': False}
+            products = self.env['product.product'].search_read(['|', ('ean13', '=', barcode_str), ('default_code', '=', barcode_str)], ['id'])
+            if products:
+                op_id = self.env['stock.pack.operation']._search_and_increment_prepick(picking_id, [('product_id', '=', [p['id'] for p in products][0])], filter_visible=True, visible_op_ids=visible_op_ids, increment=True)
+                answer['operation_id'] = op_id
+                return answer
+        return super(stock_picking, self).process_barcode_from_ui(picking_id, barcode_str, visible_op_ids)
+        
 class stock_move(models.Model):
     _inherit = "stock.move"
 
@@ -140,7 +152,57 @@ class stock_pack_operation(models.Model):
     _inherit = "stock.pack.operation"
 
     waiting_to_be_packed = fields.Boolean('Waiting to be Packed', default=False)
+    prepicked = fields.Float('Picked')
+    
+    @api.model
+    def _search_and_increment_prepick(self, picking_id, domain, filter_visible=False, visible_op_ids=False, increment=True):
+        '''Search for an operation with given 'domain' in a picking, if it exists increment the prepicked (+1) otherwise create it
 
+        :param domain: list of tuple directly reusable as a domain
+        context can receive a key 'current_package_id' with the package to consider for this operation
+        returns True
+        '''
+        _logger.warn('picking_id: %s\ndomain: %s\nfilter_visible: %s\nvisible_op_ids: %s\nincrement: %s' % (picking_id, domain, filter_visible, visible_op_ids, increment))
+        existing_operations = self.search([('picking_id', '=', picking_id)] + domain)
+        todo_operations = self.browse([])
+        if existing_operations:
+            if filter_visible:
+                todo_operations = [r for r in existing_operations if r.id in visible_op_ids]
+            else:
+                todo_operations = [r for r in existing_operations]
+        if todo_operations:
+            #existing operation found for the given domain and picking => increment its quantity
+            op = todo_operations[0]
+            operation_id = op.id
+            if increment:
+                op.prepicked += 1
+            else:
+                op.prepicked -= 1 if op.prepicked >= 1 else 0
+                #~ if op.prepicked == 0 and op.product_qty == 0:
+                    #~ #we have a line with 0 qty set, so delete it
+                    #~ op.unlink()
+                    #~ return False
+        else:
+            #no existing operation found for the given domain and picking => create a new one
+            picking = self.env["stock.picking"].browse(picking_id)
+            values = {
+                'picking_id': picking_id,
+                'product_qty': 0,
+                'location_id': picking.location_id.id, 
+                'location_dest_id': picking.location_dest_id.id,
+                'qty_done': 0,
+                'prepicked': 1,
+                }
+            for key in domain:
+                var_name, dummy, value = key
+                uom_id = False
+                if var_name == 'product_id':
+                    values.update({'product_id': self.env['product.product'].browse(value).uom_id.id})
+                else:
+                    values.update({var_name: value})
+            operation_id = self.create(values)
+        return operation_id
+    
     def action_waiting(self, cr, uid, ids, context=None):
         ''' Used by barcode interface to say that pack_operation has been moved from src location
             to destination location, if qty_done is less than product_qty than we have to split the

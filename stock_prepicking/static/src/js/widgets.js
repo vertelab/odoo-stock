@@ -6,37 +6,37 @@ var picking_id = window.location.href.substr(window.location.href.indexOf("picki
 var prepicking_ids = [];
 var todo_ids = [];
 
-$(document).ready(function() {
-    var pressed = false;
-    var chars = [];
-    $(window).keypress(function(e) {
-        if (e.which >= 48 && e.which <= 57) {
-            chars.push(String.fromCharCode(e.which));
-        }
-        if (pressed == false) {
-            setTimeout(function(){
-                if (chars.length >= 10) {
-                    var barcode = chars.join("");
-                    rfid_increment(barcode);
-                }
-                chars = [];
-                pressed = false;
-            },500);
-        }
-        pressed = true;
-    });
-});
+//~ $(document).ready(function() {
+    //~ var pressed = false;
+    //~ var chars = [];
+    //~ $(window).keypress(function(e) {
+        //~ if (e.which >= 48 && e.which <= 57) {
+            //~ chars.push(String.fromCharCode(e.which));
+        //~ }
+        //~ if (pressed == false) {
+            //~ setTimeout(function(){
+                //~ if (chars.length >= 10) {
+                    //~ var barcode = chars.join("");
+                    //~ rfid_increment(barcode);
+                //~ }
+                //~ chars = [];
+                //~ pressed = false;
+            //~ },500);
+        //~ }
+        //~ pressed = true;
+    //~ });
+//~ });
 
-$('.move_line_qty_input').live("keypress", function(e) {
-    if (e.keyCode == 13) { // TODO: this is enter key, how about enter key on a tablet or other mobile devices?
-        var self = this;
-            if ($.isNumeric($(self).val())){
-            move_line_set(($(self).attr("id").split("_"))[3], parseFloat($(self).val()));
-        }
-        else
-            window.alert(_t("Please enter a number!"));
-    }
-});
+//~ $('.move_line_qty_input').live("keypress", function(e) {
+    //~ if (e.keyCode == 13) { // TODO: this is enter key, how about enter key on a tablet or other mobile devices?
+        //~ var self = this;
+            //~ if ($.isNumeric($(self).val())){
+            //~ move_line_set(($(self).attr("id").split("_"))[3], parseFloat($(self).val()));
+        //~ }
+        //~ else
+            //~ window.alert(_t("Please enter a number!"));
+    //~ }
+//~ });
 
 $("#js_select").live("change", function(){
     var selection = $("#js_select").attr("value");

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template>
     <t t-extend="PickingEditorWidget">
-        <t t-jquery="#js_select_todo" t-operation="after">
+        <t t-jquery="#js_select_todo" t-operation="before">
             <option value="Prepick" id="js_select_prepick">Prepick</option>
         </t>
-        <t t-jquery=".js_putinpack" t-operation="before">
-            <button class="btn btn-warning btn_prepick hidden">In Queue</button>
-        </t>
+        
         <t t-jquery=".js_op_table_todo" t-operation="replace">
             <table class='table table-condensed js_op_table_todo'>
                 <thead>

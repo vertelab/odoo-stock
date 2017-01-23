@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+        
+        <template id="stock_assets_backend" name="stock assets" inherit_id="stock.assets_backend">
+            <xpath expr="//script" position="replace">
+                <script type="text/javascript" src="/stock_prepicking/static/src/js/widgets2.js"></script>
+            </xpath>
+        </template>
 
         <template id="assets_backend" name="stock prepicking assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
