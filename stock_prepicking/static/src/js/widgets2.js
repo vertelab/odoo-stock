@@ -897,7 +897,12 @@ function openerp_picking_widgets(instance){
                 return new instance.web.Model('stock.pack.operation')
                     .call('action_drop_down', [pack_op_ids])
                     .then(function(data){
-                        console.log('invoice: ' + data);
+                        if(data != ''){
+                            return new instance.web.Model('account.invoice').call('do_print_invoice', [[parseInt(data)]])
+                               .then(function(action){
+                                    return self.do_action(action);
+                               });
+                        }
                             return self.refresh_ui(self.picking.id).then(function(){
                                 if (self.picking_editor.check_done()){
                                     return self.done();

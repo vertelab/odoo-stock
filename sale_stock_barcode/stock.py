@@ -44,17 +44,14 @@ class stock_pack_operation(models.Model):
     @api.one
     def create_invoice_from_barcode_ui(self):
         '''
-            Create invoice from Barcode interface, validate and print
+            Create invoice from Barcode interface and validate
         '''
         res = self.picking_id.action_invoice_create(
               journal_id = self._get_journal(),
               group = True,
               type = {'sale':'out_invoice', 'purchase':'in_invoice', 'sale_refund':'out_refund', 'purchase_refund':'in_refund'}.get(self._get_journal_type(), 'out_invoice'))
-        invoice = self.env['account.invoice'].browse(res[0])
-        invoice.state = 'open'
+        self.env['account.invoice'].browse(res[0]).state = 'open'
         return res
-        #~ _logger.warn(self.env['report'].get_action(invoice, 'account.report_invoice'))
-        #~ _logger.warn(invoice)
 
     @api.model
     def _get_journal(self):
@@ -66,5 +63,19 @@ class stock_pack_operation(models.Model):
         type = self.picking_id.picking_type_id.code
         usage = self.picking_id.move_lines[0].location_id.usage if type == 'incoming' else self.picking_id.move_lines[0].location_dest_id.usage
         return JOURNAL_TYPE_MAP.get((type, usage), ['sale'])[0]
+
+
+class account_invoice(models.Model):
+    _inherit = 'account.invoice'
+
+    #~ @api.model
+    #~ def do_print_invoice(self):
+        #~ '''This function prints the invoice created in barcode ui'''
+        #~ return self.env['report'].get_action(self, 'account.report_invoice')
+
+    def do_print_invoice(self, cr, uid, ids, context=None):
+        '''This function prints the invoice created in barcode ui'''
+        context = dict(context or {}, active_ids=ids)
+        return self.pool.get("report").get_action(cr, uid, ids, 'account.report_invoice', context=context)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
