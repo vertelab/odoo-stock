@@ -88,6 +88,7 @@ function openerp_picking_widgets(instance){
                                     processed: packopline.processed,
                                     package_id: myPackage.id,
                                     ul_id: myPackage.ul_id[0],
+                                    ul_name: myPackage.ul_id[1],
                             },
                             classes: ('success container_head ') + (packopline.processed === "true" ? 'processed hidden ':''),
                         });
@@ -112,6 +113,7 @@ function openerp_picking_widgets(instance){
                                 processed: packopline.processed,
                                 package_id: undefined,
                                 ul_id: -1,
+                                ul_name: -1,
                         },
                         classes: color + (packopline.result_package_id[1] !== undefined ? 'in_container_hidden ' : '') + (packopline.processed === "true" ? 'processed hidden ':''),
                     });
@@ -335,6 +337,9 @@ function openerp_picking_widgets(instance){
                 if (pack_id){
                     self.getParent().set_package_pack(pack_id, ul_id);
                     $('.container_head[data-package-id="'+pack_id+'"]').data('ulid', ul_id);
+                    self.getParent().refresh_ui(self.getParent().picking.id).then(function(){
+                        //~ return self.blink(select_dom_element.data('id'));
+                    });
                 }
             });
 
