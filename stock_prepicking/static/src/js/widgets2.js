@@ -553,6 +553,8 @@ function openerp_picking_widgets(instance){
             return results;
         },
         on_scan: function(barcode){
+            if (barcode.indexOf('-') >= 0)
+                barcode = barcode.split('-').join('/');
             var self = this;
             for(var i = 0, len = this.pickings.length; i < len; i++){
                 var picking = this.pickings[i];
@@ -720,7 +722,6 @@ function openerp_picking_widgets(instance){
                 }).then(function(pack_op_ids){
                         return new instance.web.Model('stock.pack.operation').call('read',[pack_op_ids, [], new instance.web.CompoundContext()])
                 }).then(function(operations){
-                    console.log(operations);
                     self.packoplines = operations;
                     var package_ids = [];
 
@@ -1065,8 +1066,8 @@ function openerp_picking_widgets(instance){
                     }
                     code = "";
                 },100);
-            };
 
+            };
             $('body').on('keypress', this.handler);
 
         },
