@@ -91,6 +91,7 @@ function openerp_picking_widgets(instance){
                                     processed: packopline.processed,
                                     package_id: myPackage.id,
                                     ul_id: myPackage.ul_id[0],
+                                    ul_name: myPackage.ul_id[1],
                             },
                             classes: ('success container_head ') + (packopline.processed === "true" ? 'processed hidden ':''),
                         });
@@ -115,6 +116,7 @@ function openerp_picking_widgets(instance){
                                 processed: packopline.processed,
                                 package_id: undefined,
                                 ul_id: -1,
+                                ul_name: -1,
                         },
                         classes: color + color_prepick + (packopline.result_package_id[1] !== undefined ? 'in_container_hidden ' : '') + (packopline.processed === "true" ? 'processed hidden ':''),
                     });
@@ -380,6 +382,9 @@ function openerp_picking_widgets(instance){
                 if (pack_id){
                     self.getParent().set_package_pack(pack_id, ul_id);
                     $('.container_head[data-package-id="'+pack_id+'"]').data('ulid', ul_id);
+                    self.getParent().refresh_ui(self.getParent().picking.id).then(function(){
+                        //~ return self.blink(select_dom_element.data('id'));
+                    });
                 }
             });
 
@@ -593,6 +598,8 @@ function openerp_picking_widgets(instance){
             return results;
         },
         on_scan: function(barcode){
+            if (barcode.indexOf('-') >= 0)
+                barcode = barcode.split('-').join('/');
             var self = this;
             for(var i = 0, len = this.pickings.length; i < len; i++){
                 var picking = this.pickings[i];
@@ -684,8 +691,6 @@ function openerp_picking_widgets(instance){
         // belonging to the category
         load: function(picking_id){
             var self = this;
-
-
             function load_picking_list(type_id){
                 var pickings = new $.Deferred();
                 new instance.web.Model('stock.picking')
@@ -708,7 +713,6 @@ function openerp_picking_widgets(instance){
                             pickings.resolve(picking_ids);
                         }
                     });
-
                 return pickings;
             }
 
@@ -763,7 +767,6 @@ function openerp_picking_widgets(instance){
                 }).then(function(pack_op_ids){
                         return new instance.web.Model('stock.pack.operation').call('read',[pack_op_ids, [], new instance.web.CompoundContext()])
                 }).then(function(operations){
-                    console.log(operations);
                     self.packoplines = operations;
                     var package_ids = [];
 
@@ -1108,8 +1111,8 @@ function openerp_picking_widgets(instance){
                     }
                     code = "";
                 },100);
-            };
 
+            };
             $('body').on('keypress', this.handler);
 
         },

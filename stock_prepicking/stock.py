@@ -90,7 +90,7 @@ class stock_picking(models.Model):
             answer['move_id'] = mv_id
             return answer
         return answer
-    
+
     @api.model
     def process_barcode_from_ui(self, picking_id, barcode_str, visible_op_ids, prepicking=False):
         '''This function is called each time there barcode scanner reads an input'''
@@ -107,8 +107,25 @@ class stock_picking(models.Model):
     def process_product_id_from_ui(self, picking_id, product_id, op_id, increment=True, prepicking=False):
         if prepicking:
             return self.env['stock.pack.operation']._search_and_increment_prepick(picking_id, [('product_id', '=', product_id), ('id', '=', op_id)], increment=increment)
-            
         return self.env['stock.pack.operation']._search_and_increment(picking_id, [('product_id', '=', product_id), ('id', '=', op_id)], increment=increment)
+
+    @api.v7
+    def get_next_picking_for_ui(self, cr, uid, context=None):
+        """ returns the next pickings to process. Used in the barcode scanner UI"""
+        if context is None:
+            context = {}
+        employee_obj = self.pool.get('hr.employee')
+        picker = employee_obj.browse(cr, uid, employee_obj.search(cr, uid, [('user_id', '=', uid)], context=context)[0], context)
+        domain = [('state', 'in', ('assigned', 'partially_available'))]
+        if context.get('default_picking_type_id'):
+            domain.append(('picking_type_id', '=', context['default_picking_type_id']))
+        pickings = self.browse(cr, uid, self.search(cr, uid, domain, context=context), context)
+        my_pickings = []
+        for p in pickings:
+            if picker in p.employee_ids:
+                my_pickings.append(p.id)
+        #~ return self.search(cr, uid, domain, context=context)
+        return my_pickings
 
 class stock_move(models.Model):
     _inherit = "stock.move"
@@ -160,7 +177,7 @@ class stock_pack_operation(models.Model):
 
     waiting_to_be_packed = fields.Boolean('Waiting to be Packed', default=False)
     prepicked = fields.Float('Picked')
-    
+
     @api.model
     def _search_and_increment_prepick(self, picking_id, domain, filter_visible=False, visible_op_ids=False, increment=True):
         '''Search for an operation with given 'domain' in a picking, if it exists increment the prepicked (+1) otherwise create it
@@ -195,7 +212,7 @@ class stock_pack_operation(models.Model):
             values = {
                 'picking_id': picking_id,
                 'product_qty': 0,
-                'location_id': picking.location_id.id, 
+                'location_id': picking.location_id.id,
                 'location_dest_id': picking.location_dest_id.id,
                 'qty_done': 0,
                 'prepicked': 1,
@@ -209,7 +226,7 @@ class stock_pack_operation(models.Model):
                     values.update({var_name: value})
             operation_id = self.create(values)
         return operation_id
-    
+
     def action_waiting(self, cr, uid, ids, context=None):
         ''' Used by barcode interface to say that pack_operation has been moved from src location
             to destination location, if qty_done is less than product_qty than we have to split the

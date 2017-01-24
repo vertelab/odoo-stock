@@ -23,7 +23,7 @@
                 </t>
             </select>
         </t>
-        
+
         <t t-jquery=".js_op_table_todo" t-operation="replace">
             <table class='table table-condensed js_op_table_todo'>
                 <thead>
@@ -32,6 +32,7 @@
                         <th class="text-center prepick_title">Prepicked</th>
                         <th class='text-center' width="150">Scanned</th>
                         <th class='text-center'>Todo</th>
+                        <th class='text-center'>Package Type</th>
                         <th>From</th>
                         <th>To</th>
                     </tr>
@@ -79,6 +80,14 @@
                             </td>
                             <td class="brctbl-col3 text-center">
                                 <t t-esc="row.cols.qty"/> <t t-esc="row.cols.uom" />
+                            </td>
+                            <td class="brctbl-col3 text-center">
+                                <t t-if="row.cols.ul_name != -1">
+                                    <t t-esc="row.cols.ul_name"/>
+                                </t>
+                                <t t-if="row.cols.ul_name == -1">
+                                    <t t-esc="'Not configured'"/>
+                                </t>
                             </td>
                             <td class="brctbl-col4 js_loc">
                                 <t t-esc="row.cols.loc" />
