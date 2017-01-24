@@ -68,14 +68,9 @@ class stock_pack_operation(models.Model):
 class account_invoice(models.Model):
     _inherit = 'account.invoice'
 
-    #~ @api.model
-    #~ def do_print_invoice(self):
-        #~ '''This function prints the invoice created in barcode ui'''
-        #~ return self.env['report'].get_action(self, 'account.report_invoice')
-
-    def do_print_invoice(self, cr, uid, ids, context=None):
+    @api.model
+    def do_print_invoice(self, inv_id):
         '''This function prints the invoice created in barcode ui'''
-        context = dict(context or {}, active_ids=ids)
-        return self.pool.get("report").get_action(cr, uid, ids, 'account.report_invoice', context=context)
+        return self.env['report'].get_action(self.browse([int(i) for i in inv_id]), 'account.report_invoice')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

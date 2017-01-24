@@ -899,9 +899,9 @@ function openerp_picking_widgets(instance){
                     .then(function(data){
                         if(data != ''){
                             return new instance.web.Model('account.invoice').call('do_print_invoice', [[parseInt(data)]])
-                               .then(function(action){
-                                    return self.do_action(action);
-                               });
+                            .then(function(action){
+                                return self.do_action(action);
+                            });
                         }
                             return self.refresh_ui(self.picking.id).then(function(){
                                 if (self.picking_editor.check_done()){
