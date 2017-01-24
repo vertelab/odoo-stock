@@ -73,6 +73,7 @@ function openerp_picking_widgets(instance){
                             cols: { product: packopline.result_package_id[1],
                                     qty: '',
                                     rem: '',
+                                    prepicked: '',
                                     uom: undefined,
                                     lot: undefined,
                                     pack: undefined,
@@ -96,6 +97,7 @@ function openerp_picking_widgets(instance){
                         cols: { product: packopline.product_id[1] || packopline.package_id[1],
                                 qty: packopline.product_qty,
                                 rem: packopline.qty_done,
+                                prepicked: packopline.prepicked,
                                 uom: packopline.product_uom_id[1],
                                 lot: packopline.lot_id[1],
                                 pack: pack,
@@ -716,6 +718,7 @@ function openerp_picking_widgets(instance){
                 }).then(function(pack_op_ids){
                         return new instance.web.Model('stock.pack.operation').call('read',[pack_op_ids, [], new instance.web.CompoundContext()])
                 }).then(function(operations){
+                    console.log(operations);
                     self.packoplines = operations;
                     var package_ids = [];
 

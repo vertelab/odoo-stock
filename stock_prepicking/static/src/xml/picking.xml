@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template>
     <t t-extend="PickingEditorWidget">
-        <t t-jquery="#js_select_todo" t-operation="before">
-            <option value="Prepick" id="js_select_prepick">Prepick</option>
+        <t t-jquery="#js_select" t-operation="replace">
+            <select id="js_select" class="form-control">
+                <t t-if="widget.$('#js_select option:selected').attr('value') == 'Prepick'">
+                    <option value="Prepick" id="js_select_prepick" selected="1">Prepick</option>
+                </t>
+                <t t-if="widget.$('#js_select option:selected').attr('value') != 'Prepick'">
+                    <option value="Prepick" id="js_select_prepick">Prepick</option>
+                </t>
+                <t t-if="widget.$('#js_select option:selected').attr('value') == 'ToDo'">
+                    <option value="ToDo" id="js_select_todo" selected="1">Operations ToDo</option>
+                </t>
+                <t t-if="widget.$('#js_select option:selected').attr('value') != 'ToDo'">
+                    <option value="ToDo" id="js_select_todo">Operations ToDo</option>
+                </t>
+                <t t-if="widget.$('#js_select option:selected').attr('value') == 'Processed'">
+                    <option value="Processed" id="js_select_processed" selected="1">Operations Processed</option>
+                </t>
+                <t t-if="widget.$('#js_select option:selected').attr('value') != 'Processed'">
+                    <option value="Processed" id="js_select_processed">Operations Processed</option>
+                </t>
+            </select>
         </t>
         
         <t t-jquery=".js_op_table_todo" t-operation="replace">
@@ -29,7 +48,7 @@
                                 <div class="input-group">
                                     <span class="input-group-addon js_prepick_minus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-minus"></i></a></span>
                                     <form class="js_submit_value">
-                                        <input type="text" class="form-control text-center js_prepick_qty" t-att-value="row.cols.rem"></input>
+                                        <input type="text" class="form-control text-center js_prepick_qty" t-att-value="row.cols.prepicked"></input>
                                         <!-- <input type="submit" class="hidden"></input> -->
                                     </form>
                                     <span class="input-group-addon js_prepick_plus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-plus"></i></a></span>
