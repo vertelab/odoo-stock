@@ -38,34 +38,34 @@ var todo_ids = [];
     //~ }
 //~ });
 
-$("#js_select").live("change", function(){
-    var selection = $("#js_select").attr("value");
-    if (selection === "Prepick"){
-        $(".btn_prepick").removeClass("hidden");
-        $(".js_putinpack").addClass("hidden");
-        $(".js_drop_down").addClass("hidden");
-        $(".prepick_body").find(".js_prepick_minus, .js_prepick_qty, .js_prepick_plus").prop('disabled', false);
-        $(".js_row_qty").find(".js_minus, .js_qty, .js_plus").prop('disabled', true);
-        $.each($("table .js_pack_op_line:not(.processed)"), function(){
-            console.log($(this).attr("data-id"));
-            $(this).removeClass("hidden");
-            todo_ids.push(parseInt($(this).attr("data-id")));
-        });
-    }
-    if (selection === "ToDo"){
-        $(".btn_prepick").addClass("hidden");
-        $(".js_putinpack").removeClass("hidden");
-        $(".js_drop_down").removeClass("hidden");
-        $(".js_row_qty").find(".js_minus, .js_qty, .js_plus").prop('disabled', false);
-    }
-    if (selection === "Processed"){
-        $(".btn_prepick").addClass("hidden");
+//~ $("#js_select").live("change", function(){
+    //~ var selection = $("#js_select").attr("value");
+    //~ if (selection === "Prepick"){
+        //~ $(".btn_prepick").removeClass("hidden");
+        //~ $(".js_putinpack").addClass("hidden");
+        //~ $(".js_drop_down").addClass("hidden");
+        //~ $(".prepick_body").find(".js_prepick_minus, .js_prepick_qty, .js_prepick_plus").prop('disabled', false);
+        //~ $(".js_row_qty").find(".js_minus, .js_qty, .js_plus").prop('disabled', true);
+        //~ $.each($("table .js_pack_op_line:not(.processed)"), function(){
+            //~ console.log($(this).attr("data-id"));
+            //~ $(this).removeClass("hidden");
+            //~ todo_ids.push(parseInt($(this).attr("data-id")));
+        //~ });
+    //~ }
+    //~ if (selection === "ToDo"){
+        //~ $(".btn_prepick").addClass("hidden");
+        //~ $(".js_putinpack").removeClass("hidden");
+        //~ $(".js_drop_down").removeClass("hidden");
+        //~ $(".js_row_qty").find(".js_minus, .js_qty, .js_plus").prop('disabled', false);
+    //~ }
+    //~ if (selection === "Processed"){
+        //~ $(".btn_prepick").addClass("hidden");
         //~ $.each($("table .js_op_table_todo").find(".success"), function(){
             //~ console.log($(this).attr("data-id"));
             //~ pack_op_ids.push(parseInt($(this).attr("data-id")));
         //~ });
-    }
-});
+    //~ }
+//~ });
 
 $(".btn_prepick").live("click", function(){
     $.each($("table .js_pack_op_line"), function(){

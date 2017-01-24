@@ -13,7 +13,13 @@
                 <script type="text/javascript" src="/stock_prepicking/static/src/js/widgets.js"></script>
             </xpath>
         </template>
-
+        
+        <template id="barcode_index" inherit_id="stock.barcode_index">
+            <xpath expr="//link" position="after">
+                <link rel="stylesheet" href="/stock_prepicking/static/src/css/stock.css"/>
+            </xpath>
+        </template>
+        
         <template id="prepicking_index" name="Prepicking">&lt;!DOCTYPE html&gt;
             <html>
                 <head>

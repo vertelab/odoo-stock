@@ -63,9 +63,12 @@ function openerp_picking_widgets(instance){
             _.each( model.packoplines, function(packopline){
                     var pack = undefined;
                     var color = "";
+                    var color_prepick = "";
                     if (packopline.product_id[1] !== undefined){ pack = packopline.package_id[1];}
-                    if (packopline.product_qty == packopline.qty_done){ color = "success "; }
-                    if (packopline.product_qty < packopline.qty_done){ color = "danger "; }
+                    if (packopline.product_qty == packopline.qty_done){ color = "success_todo "; }
+                    if (packopline.product_qty < packopline.qty_done){ color = "danger_todo "; }
+                    if (packopline.product_qty == packopline.prepicked){ color_prepick = "success_prepick "; }
+                    if (packopline.product_qty < packopline.prepicked){ color_prepick = "danger_prepick "; }
                     //also check that we don't have a line already existing for that package
                     if (packopline.result_package_id[1] !== undefined && $.inArray(packopline.result_package_id[0], pack_created) === -1){
                         var myPackage = $.grep(model.packages, function(e){ return e.id == packopline.result_package_id[0]; })[0];
@@ -113,7 +116,7 @@ function openerp_picking_widgets(instance){
                                 package_id: undefined,
                                 ul_id: -1,
                         },
-                        classes: color + (packopline.result_package_id[1] !== undefined ? 'in_container_hidden ' : '') + (packopline.processed === "true" ? 'processed hidden ':''),
+                        classes: color + color_prepick + (packopline.result_package_id[1] !== undefined ? 'in_container_hidden ' : '') + (packopline.processed === "true" ? 'processed hidden ':''),
                     });
             });
             //sort element by things to do, then things done, then grouped by packages
@@ -163,20 +166,62 @@ function openerp_picking_widgets(instance){
                 });
             })
             this.$('#js_select').change(function(){
-                var selection = self.$('#js_select option:selected').attr('value');
-                if (selection === "ToDo"){
-                    self.getParent().$('.js_pick_pack').removeClass('hidden')
-                    self.getParent().$('.js_drop_down').removeClass('hidden')
-                    self.$('.js_pack_op_line.processed').addClass('hidden')
-                    self.$('.js_pack_op_line:not(.processed)').removeClass('hidden')
+                var selection = $("#js_select").attr("value");
+                console.log(selection);
+                if (selection === "Prepick"){
+                    self.getParent().$("table.js_op_table_todo > tbody").removeClass("js_op_table_body_todo");
+                    self.getParent().$("table.js_op_table_todo > tbody").addClass("js_op_table_body_prepick");
+                    self.getParent().$(".js_prepicked_static").addClass("hidden");
+                    self.getParent().$(".js_prepicked_input").removeClass("hidden");
+                    self.getParent().$(".js_todo_static").removeClass("hidden");
+                    self.getParent().$(".js_todo_input").addClass("hidden");
+                    self.getParent().$(".js_putinpack").addClass("hidden");
+                    self.getParent().$(".js_drop_down").addClass("hidden");
+                    //~ $.each(self.getParent().$("table .js_pack_op_line:not(.processed)"), function(){
+                        //~ console.log($(this).attr("data-id"));
+                        //~ $(this).removeClass("hidden");
+                        //~ todo_ids.push(parseInt($(this).attr("data-id")));
+                    //~ });
                 }
-                else{
-                    self.getParent().$('.js_pick_pack').addClass('hidden')
-                    self.getParent().$('.js_drop_down').addClass('hidden')
-                    self.$('.js_pack_op_line.processed').removeClass('hidden')
-                    self.$('.js_pack_op_line:not(.processed)').addClass('hidden')
+                if (selection === "ToDo"){
+                    self.getParent().$("table.js_op_table_todo > tbody").removeClass("js_op_table_body_prepick");
+                    self.getParent().$("table.js_op_table_todo > tbody").addClass("js_op_table_body_todo");
+                    self.getParent().$('.js_pick_pack').removeClass('hidden');
+                    self.getParent().$('.js_drop_down').removeClass('hidden');
+                    self.getParent().$(".js_todo_static").addClass("hidden");
+                    self.getParent().$(".js_todo_input").removeClass("hidden");
+                    self.$('.js_pack_op_line.processed').addClass('hidden');
+                    self.$('.js_pack_op_line:not(.processed)').removeClass('hidden');
+                    
+                    self.getParent().$(".js_prepicked_static").removeClass("hidden");
+                    self.getParent().$(".js_prepicked_input").addClass("hidden");
+                    self.getParent().$(".js_putinpack").removeClass("hidden");
+                    self.getParent().$(".js_drop_down").removeClass("hidden");
+                }
+                if (selection === "Processed"){
+                    self.getParent().$("table.js_op_table_todo > tbody").removeClass("js_op_table_body_prepick");
+                    self.getParent().$("table.js_op_table_todo > tbody").addClass("js_op_table_body_todo");
+                    self.getParent().$('.js_pick_pack').addClass('hidden');
+                    self.getParent().$('.js_drop_down').addClass('hidden');
+                    self.getParent().$(".js_todo_static").addClass("hidden");
+                    self.getParent().$(".js_todo_input").removeClass("hidden");
+                    self.$('.js_pack_op_line.processed').removeClass('hidden');
+                    self.$('.js_pack_op_line:not(.processed)').addClass('hidden');
+                    
+                    self.getParent().$(".js_prepicked_static").removeClass("hidden");
+                    self.getParent().$(".js_prepicked_input").addClass("hidden");
                 }
                 self.on_searchbox(self.search_filter);
+            });
+            this.$('.js_prepick_plus').click(function(){
+                var id = $(this).data('product-id');
+                var op_id = $(this).parents("[data-id]:first").data('id');
+                self.getParent().scan_product_id(id,true,op_id);
+            });
+            this.$('.js_prepick_minus').click(function(){
+                var id = $(this).data('product-id');
+                var op_id = $(this).parents("[data-id]:first").data('id');
+                self.getParent().scan_product_id(id,false,op_id);
             });
             this.$('.js_plus').click(function(){
                 var id = $(this).data('product-id');
@@ -875,7 +920,7 @@ function openerp_picking_widgets(instance){
         scan_product_id: function(product_id,increment,op_id){ //performs the same operation as a scan, but with product id instead
             var self = this;
             return new instance.web.Model('stock.picking')
-                .call('process_product_id_from_ui', [self.picking.id, product_id, op_id, increment])
+                .call('process_product_id_from_ui', [self.picking.id, product_id, op_id, increment, this.$('#js_select option:selected').attr('value') == "Prepick"])
                 .then(function(result){
                     return self.refresh_ui(self.picking.id);
                 });

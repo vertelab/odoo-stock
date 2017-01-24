@@ -102,7 +102,14 @@ class stock_picking(models.Model):
                 answer['operation_id'] = op_id
                 return answer
         return super(stock_picking, self).process_barcode_from_ui(picking_id, barcode_str, visible_op_ids)
-        
+    
+    @api.model
+    def process_product_id_from_ui(self, picking_id, product_id, op_id, increment=True, prepicking=False):
+        if prepicking:
+            return self.env['stock.pack.operation']._search_and_increment_prepick(picking_id, [('product_id', '=', product_id), ('id', '=', op_id)], increment=increment)
+            
+        return self.env['stock.pack.operation']._search_and_increment(picking_id, [('product_id', '=', product_id), ('id', '=', op_id)], increment=increment)
+
 class stock_move(models.Model):
     _inherit = "stock.move"
 

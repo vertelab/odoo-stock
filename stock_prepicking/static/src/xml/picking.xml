@@ -3,10 +3,10 @@
     <t t-extend="PickingEditorWidget">
         <t t-jquery="#js_select" t-operation="replace">
             <select id="js_select" class="form-control">
-                <t t-if="widget.$('#js_select option:selected').attr('value') == 'Prepick'">
+                <t t-if="widget.$('#js_select option:selected').attr('value') == null || widget.$('#js_select option:selected').attr('value') == 'Prepick'">
                     <option value="Prepick" id="js_select_prepick" selected="1">Prepick</option>
                 </t>
-                <t t-if="widget.$('#js_select option:selected').attr('value') != 'Prepick'">
+                <t t-if="widget.$('#js_select option:selected').attr('value') &amp;&amp; widget.$('#js_select option:selected').attr('value') != 'Prepick'">
                     <option value="Prepick" id="js_select_prepick">Prepick</option>
                 </t>
                 <t t-if="widget.$('#js_select option:selected').attr('value') == 'ToDo'">
@@ -37,15 +37,15 @@
                     </tr>
                 </thead>
 
-                <tbody>
+                <tbody t-att-class="(widget.$('#js_select option:selected').attr('value') != null &amp;&amp; widget.$('#js_select option:selected').attr('value') != 'Prepick') ? 'js_op_table_body_todo' : 'js_op_table_body_prepick'">
                     <t t-foreach="widget.get_rows()" t-as="row">
                         <tr t-att-class="row.classes + 'js_pack_op_line'" t-att-data-id="row.cols.id" t-att-data-container-id="row.cols.container_id" t-att-data-package-id="row.cols.package_id" t-att-data-ulid="row.cols.ul_id">
                             <td t-att-class="'brctbl-col1 text-left' + row.cols.head_container ? ' js_unfold' : ''">
                                 <t t-if="!row.cols.head_container &amp;&amp; row.cols.container"><span class="fa fa-level-up fa-rotate-90" style="margin-left:10px;margin-right:10px;"></span></t>
                                 <t t-esc="row.cols.product" />
                             </td>
-                            <td class="brctbl-col3 text-center prepick_body">
-                                <div class="input-group">
+                            <td class="brctbl-col6 text-center prepick_body">
+                                <div t-att-class="'input-group js_prepicked_input' + (((widget.$('#js_select option:selected').attr('value') != null &amp;&amp; widget.$('#js_select option:selected').attr('value') != 'Prepick') &amp;&amp; ' hidden') || '')">
                                     <span class="input-group-addon js_prepick_minus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-minus"></i></a></span>
                                     <form class="js_submit_value">
                                         <input type="text" class="form-control text-center js_prepick_qty" t-att-value="row.cols.prepicked"></input>
@@ -53,21 +53,29 @@
                                     </form>
                                     <span class="input-group-addon js_prepick_plus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-plus"></i></a></span>
                                 </div>
+                                <div t-att-class="'js_prepicked_static'  + (((widget.$('#js_select option:selected').attr('value') == null || widget.$('#js_select option:selected').attr('value') == 'Prepick') &amp;&amp; ' hidden') || '')">
+                                    <t t-esc="row.cols.prepicked" />
+                                </div>
                             </td>
                             <td class='brctbl-col2 text-center js_row_qty'>
-                                <t t-if="row.cols.processed == 'false' &amp;&amp; !row.cols.container">
-                                    <div class="input-group">
-                                        <span class="input-group-addon js_minus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-minus"></i></a></span>
-                                        <form class="js_submit_value">
-                                            <input type="text" class="form-control text-center js_qty" t-att-value="row.cols.rem"></input>
-                                            <!-- <input type="submit" class="hidden"></input> -->
-                                        </form>
-                                        <span class="input-group-addon js_plus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-plus"></i></a></span>
-                                    </div>
-                                </t>
-                                <t t-if="(row.cols.processed == 'true' || row.cols.container)">
+                                <div t-att-class="'js_todo_input'  + (((widget.$('#js_select option:selected').attr('value') != 'ToDo') &amp;&amp; ' hidden') || '')">
+                                    <t t-if="row.cols.processed == 'false' &amp;&amp; !row.cols.container">
+                                        <div class="input-group">
+                                            <span class="input-group-addon js_minus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-minus"></i></a></span>
+                                            <form class="js_submit_value">
+                                                <input type="text" class="form-control text-center js_qty" t-att-value="row.cols.rem"></input>
+                                                <!-- <input type="submit" class="hidden"></input> -->
+                                            </form>
+                                            <span class="input-group-addon js_plus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-plus"></i></a></span>
+                                        </div>
+                                    </t>
+                                    <t t-if="(row.cols.processed == 'true' || row.cols.container)">
+                                        <t t-esc="row.cols.rem" />
+                                    </t>
+                                </div>
+                                <div t-att-class="'js_todo_static'  + (((widget.$('#js_select option:selected').attr('value') == 'ToDo') &amp;&amp; ' hidden') || '')">
                                     <t t-esc="row.cols.rem" />
-                                </t>
+                                </div>
                             </td>
                             <td class="brctbl-col3 text-center">
                                 <t t-esc="row.cols.qty"/> <t t-esc="row.cols.uom" />
