@@ -600,6 +600,7 @@ function openerp_picking_widgets(instance){
         on_scan: function(barcode){
             if (barcode.indexOf('-') >= 0)
                 barcode = barcode.split('-').join('/');
+                console.log(barcode);
             var self = this;
             for(var i = 0, len = this.pickings.length; i < len; i++){
                 var picking = this.pickings[i];
@@ -694,7 +695,7 @@ function openerp_picking_widgets(instance){
             function load_picking_list(type_id){
                 var pickings = new $.Deferred();
                 new instance.web.Model('stock.picking')
-                    .call('get_next_picking_for_ui',[{'default_picking_type_id':parseInt(type_id)}])
+                    .call('get_next_picking_for_ui',[{'default_picking_type_id':parseInt(type_id), 'picking_id': picking_id}])
                     .then(function(picking_ids){
                         if(!picking_ids || picking_ids.length === 0){
                             (new instance.web.Dialog(self,{

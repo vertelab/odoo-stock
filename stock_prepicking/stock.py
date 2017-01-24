@@ -114,18 +114,18 @@ class stock_picking(models.Model):
         """ returns the next pickings to process. Used in the barcode scanner UI"""
         if context is None:
             context = {}
+        picking_id = context.get('picking_id')
         employee_obj = self.pool.get('hr.employee')
-        picker = employee_obj.browse(cr, uid, employee_obj.search(cr, uid, [('user_id', '=', uid)], context=context)[0], context)
+        _logger.warn(picking_id)
+        picker = employee_obj.search(cr, uid, [('user_id', '=', uid)], context=context)
         domain = [('state', 'in', ('assigned', 'partially_available'))]
+        _logger.warn(picker)
+        if not picking_id and picker:
+            domain.append(('move_lines.employee_id', '=', picker[0]))
+        _logger.warn(domain)
         if context.get('default_picking_type_id'):
             domain.append(('picking_type_id', '=', context['default_picking_type_id']))
-        pickings = self.browse(cr, uid, self.search(cr, uid, domain, context=context), context)
-        my_pickings = []
-        for p in pickings:
-            if picker in p.employee_ids:
-                my_pickings.append(p.id)
-        #~ return self.search(cr, uid, domain, context=context)
-        return my_pickings
+        return self.pool.get('stock.picking').search(cr, uid, domain, context=context)
 
 class stock_move(models.Model):
     _inherit = "stock.move"
