@@ -644,8 +644,6 @@ function openerp_picking_widgets(instance){
         // belonging to the category
         load: function(picking_id){
             var self = this;
-
-
             function load_picking_list(type_id){
                 var pickings = new $.Deferred();
                 new instance.web.Model('stock.picking')
@@ -668,7 +666,6 @@ function openerp_picking_widgets(instance){
                             pickings.resolve(picking_ids);
                         }
                     });
-
                 return pickings;
             }
 
