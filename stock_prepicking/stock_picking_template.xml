@@ -4,12 +4,6 @@
 
         <template id="stock_assets_backend" name="stock assets" inherit_id="stock.assets_backend">
             <xpath expr="//script[@src='/stock/static/src/js/widgets.js']" position="replace">
-                <script type="text/javascript" src="/stock_prepicking/static/src/js/widgets2.js"></script>
-            </xpath>
-        </template>
-
-        <template id="assets_backend" name="stock prepicking assets" inherit_id="web.assets_backend">
-            <xpath expr="." position="inside">
                 <script type="text/javascript" src="/stock_prepicking/static/src/js/widgets.js"></script>
             </xpath>
         </template>
