@@ -29,15 +29,6 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
-class PrepickingController(http.Controller):
-
-    @http.route(['/prepicking/<model("stock.picking"):picking>'], type='http', auth="user", website=True)
-    def prepicking(self, picking=None, **post):
-        #~ if not request.session.uid:
-            #~ return http.local_redirect('/web/login?redirect=/prepicking/web')
-        #~ pickings = request.env['stock.picking'].search([('employee_ids', 'in', request.env['hr.employee'].search([('user_id', '=', request.env.user.id)]))])
-        return request.render('stock_prepicking.prepicking_index', {'pickings': [picking]})
-
 class stock_picking(models.Model):
     _inherit = "stock.picking"
 
@@ -118,10 +109,8 @@ class stock_picking(models.Model):
         employee_obj = self.pool.get('hr.employee')
         picker = employee_obj.search(cr, uid, [('user_id', '=', uid)], context=context)
         domain = [('state', 'in', ('assigned', 'partially_available'))]
-        _logger.warn(picker)
         if prepick and picker:
             domain.append(('move_lines.employee_id', '=', picker[0]))
-        _logger.warn(domain)
         if context.get('default_picking_type_id'):
             domain.append(('picking_type_id', '=', context['default_picking_type_id']))
         return self.pool.get('stock.picking').search(cr, uid, domain, context=context)

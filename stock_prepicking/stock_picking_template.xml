@@ -13,103 +13,11 @@
                 <script type="text/javascript" src="/stock_prepicking/static/src/js/widgets.js"></script>
             </xpath>
         </template>
-        
+
         <template id="barcode_index" inherit_id="stock.barcode_index">
             <xpath expr="//link" position="after">
                 <link rel="stylesheet" href="/stock_prepicking/static/src/css/stock.css"/>
             </xpath>
-        </template>
-        
-        <template id="prepicking_index" name="Prepicking">&lt;!DOCTYPE html&gt;
-            <html>
-                <head>
-                    <title>Prepicking</title>
-
-                    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-                    <meta http-equiv="content-type" content="text/html, charset=utf-8" />
-
-                    <meta name="viewport" content=" width=1024, user-scalable=no"/>
-                    <meta name="apple-mobile-web-app-capable" content="yes"/>
-                    <meta name="mobile-web-app-capable" content="yes"/>
-
-                    <link rel="shortcut icon"    sizes="80x51" href="/stock/static/src/img/scan.png"/>
-                    <link rel="shortcut icon" href="/web/static/src/img/favicon.ico" type="image/x-icon"/>
-
-                    <link rel="stylesheet" href="/stock/static/src/css/barcode.css" />
-                    <link rel="stylesheet" href="/web/static/lib/bootstrap/css/bootstrap.css" />
-                    <link rel="stylesheet" href="/web/static/lib/jquery.ui/css/smoothness/jquery-ui-1.9.1.custom.css" />
-                    <link rel="stylesheet" href="/web/static/lib/fontawesome/css/font-awesome.css" />
-
-                    <t t-call-assets="web.assets_common" t-css="false" />
-                    <t t-call-assets="web.assets_backend" t-css="false" />
-
-                </head>
-                <body>
-                    <t t-call="stock_prepicking.prepicking_tmp"/>
-                </body>
-            </html>
-        </template>
-
-        <template id="prepicking_tmp" name="Prepicking Template">
-            <div class="navbar navbar-inverse navbar-static-top" role="navigation">
-                <div class="container">
-                    <div class="navbar-right">
-                        <button class="btn btn-default navbar-btn pp_prev" type="button">&lt; Föregående</button>
-                        <button class="btn btn-default navbar-btn pp_next" type="button">Next &gt;</button>
-                    </div>
-                </div>
-            </div>
-            <input id="current_picking" type="hidden" t-att-value="pickings[0].id"/>
-            <t t-set="picking" t-value="pickings[0]"/>
-            <div class="container">
-                <div>
-                    <div class="col-sm-4 col-xs-6">
-                        <h2 class=""><t t-esc="picking.name"/></h2>
-                    </div>
-                </div>
-                <table class="table table-condensed">
-                    <thead>
-                        <tr>
-                            <th class="text-left">Product</th>
-                            <th class="text-center" width="150">Scanned</th>
-                            <th class="text-center">To Do</th>
-                            <th>From</th>
-                            <th>To</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <t t-foreach="picking.move_lines" t-as="l">
-                            <tr t-att-id="'move_line_row_%s' %l.id" t-att-class="'success' if l.prepicked == l.product_uom_qty else ''">
-                                <td class="">
-                                    <t t-esc="l.product_id.name"/>
-                                </td>
-                                <td class="brctbl-col2 text-center">
-                                    <div class="input-group">
-                                        <span class="input-group-addon input-sm" t-att-onclick="'move_line_increment(&quot;%s&quot;,&quot;%s&quot;)' %(l.id, False)"><a href="#"><i class="fa fa-minus"></i></a></span>
-                                        <form class="">
-                                            <input t-att-id="'move_line_qty_%s' %l.id" class="form-control text-center move_line_qty_input" type="text" t-att-value="l.prepicked"/>
-                                        </form>
-                                        <span class="input-group-addon input-sm" t-att-onclick="'move_line_increment(&quot;%s&quot;,&quot;%s&quot;)' %(l.id, True)"><a href="#"><i class="fa fa-plus"></i></a></span>
-                                    </div>
-                                </td>
-                                <td class="brctbl-col3 text-center">
-                                    <t t-esc="l.product_uom_qty"/> <t t-esc="l.product_uom.name"/>
-                                </td>
-                                <td class="brctbl-col4">
-                                    <t t-if="len(l.reserved_quant_ids)">
-                                        <t t-esc="l.reserved_quant_ids[0].location_id.name"/>
-                                    </t>
-                                </td>
-                                <td class="brctbl-col4">
-                                    <t t-if="l.location_dest_id">
-                                        <t t-esc="l.location_dest_id.name"/>
-                                    </t>
-                                </td>
-                            </tr>
-                        </t>
-                    </tbody>
-                </table>
-            </div>
         </template>
 
     </data>
