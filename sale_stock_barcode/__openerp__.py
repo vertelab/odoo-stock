@@ -2,7 +2,7 @@
 ##############################################################################
 #
 # OpenERP, Open Source Management Solution, third party addon
-# Copyright (C) 2004-2015 Vertel AB (<http://vertel.se>).
+# Copyright (C) 2017- Vertel AB (<http://vertel.se>).
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -19,17 +19,16 @@
 #
 ##############################################################################
 {
-'name': 'stock_history_analysis',
+'name': 'Sale Stock Barcode',
 'version': '0.1',
-'summary': '',
+'summary': 'Create invoice after move depends on order policy',
 'category': 'stock',
-'description': """Extended stock history report with analysis.
-
-
-Report financed by Dermanord-Svensk Hudvård AB""",
+'description': """
+Financed by Dermanord-Svensk Hudvård AB
+""",
 'author': 'Vertel AB',
 'website': 'http://www.vertel.se',
-'depends': ['stock_account'],
-'data': [ 'stock_history_report_view.xml', 'wizard/stock_history_wizard_view.xml', 'security/ir.model.access.csv'],
+'depends': ['sale_stock', 'stock_account'],
+'data': [],
 'installable': True,
 }
