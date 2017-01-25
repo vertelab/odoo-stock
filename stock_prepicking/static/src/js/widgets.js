@@ -840,11 +840,11 @@ function openerp_picking_widgets(instance){
                 if (!self.show_lot){
                     self.$('.js_create_lot').addClass('hidden');
                 }
-                var selection = $("#js_select").attr("value");
-                if (selection == 'Prepick' && self.prepickings.length > 0) {
-                    $.bbq.pushState('picking_id='+self.prepickings[0]);
-                    self.refresh_ui(self.prepickings[0]);
-                }
+                //~ var selection = $("#js_select").attr("value");
+                //~ if (selection == 'Prepick' && self.prepickings.length > 0) {
+                    //~ $.bbq.pushState('picking_id='+self.prepickings[0]);
+                    //~ self.refresh_ui(self.prepickings[0]);
+                //~ }
 
             }).fail(function(error) {console.log(error);});
 
