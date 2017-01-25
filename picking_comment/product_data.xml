@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        <record id="account_products" model="account.analytic.account">
+            <field name="name">Products</field>
+        </record>
+        
+        <record id="account_kit_products" model="account.analytic.account">
+            <field name="name">Kit Products</field>
+        </record>
+        
+    </data>
+</openerp>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <report id="report_product_label_qweb" model="product.product" name="product_dermanord.product_label_qweb" string="Products Labels (Qweb)" report_type="qweb-pdf" file="product_dermanord.product_label_qweb"/>
+        <template id="product_label_qweb"><t t-call="product_dermanord.product_label"/></template>
+        <template id="product_label">
+            <t t-call="report.html_container">
+                <t t-call="report.external_layout">
+                    <div class="page">
+                        <div class="col-md-12">
+                            <t t-foreach="docs" t-as="doc">
+<!--
+                                 <t t-raw="translate_doc(doc.id, doc_model, 'company_id.partner_id.lang', 'ir_rule_logger.permission_document')" />
+-->
+                                <div class="col-md-6">
+                                    <table style="border: 1px solid #000;">
+                                        <thead>
+                                            <tr>
+                                                <td style="background: #f00;"><t t-esc="doc.code"/></td>
+                                                <td><t t-esc="doc.lst_price"/> <t t-esc="doc.company_id.currency_id.name"/></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', doc.ean13, 300, 50)" style="width:150px;height:25px"/></td>
+                                                <td><t t-esc="doc.name"/></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</openerp>
