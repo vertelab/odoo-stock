@@ -169,7 +169,6 @@ function openerp_picking_widgets(instance){
             })
             this.$('#js_select').change(function(){
                 var selection = $("#js_select").attr("value");
-                console.log(selection);
                 if (selection === "Prepick"){
                     self.getParent().$("table.js_op_table_todo > tbody").removeClass("js_op_table_body_todo");
                     self.getParent().$("table.js_op_table_todo > tbody").addClass("js_op_table_body_prepick");
@@ -194,7 +193,7 @@ function openerp_picking_widgets(instance){
                     self.getParent().$(".js_todo_input").removeClass("hidden");
                     self.$('.js_pack_op_line.processed').addClass('hidden');
                     self.$('.js_pack_op_line:not(.processed)').removeClass('hidden');
-                    
+
                     self.getParent().$(".js_prepicked_static").removeClass("hidden");
                     self.getParent().$(".js_prepicked_input").addClass("hidden");
                     self.getParent().$(".js_putinpack").removeClass("hidden");
@@ -209,7 +208,7 @@ function openerp_picking_widgets(instance){
                     self.getParent().$(".js_todo_input").removeClass("hidden");
                     self.$('.js_pack_op_line.processed').removeClass('hidden');
                     self.$('.js_pack_op_line:not(.processed)').addClass('hidden');
-                    
+
                     self.getParent().$(".js_prepicked_static").removeClass("hidden");
                     self.getParent().$(".js_prepicked_input").addClass("hidden");
                 }
@@ -674,6 +673,7 @@ function openerp_picking_widgets(instance){
             this.picking_id = init_hash.picking_id ? init_hash.picking_id:undefined;
             this.picking = null;
             this.pickings = [];
+            this.prepickings = [];
             this.packoplines = null;
             this.selected_operation = { id: null, picking_id: null};
             this.packages = null;
@@ -694,8 +694,9 @@ function openerp_picking_widgets(instance){
             var self = this;
             function load_picking_list(type_id){
                 var pickings = new $.Deferred();
+                var prepickings = new $.Deferred();
                 new instance.web.Model('stock.picking')
-                    .call('get_next_picking_for_ui',[{'default_picking_type_id':parseInt(type_id), 'picking_id': picking_id}])
+                    .call('get_next_picking_for_ui',[{'default_picking_type_id':parseInt(type_id)}])
                     .then(function(picking_ids){
                         if(!picking_ids || picking_ids.length === 0){
                             (new instance.web.Dialog(self,{
@@ -712,6 +713,15 @@ function openerp_picking_widgets(instance){
                         }else{
                             self.pickings = picking_ids;
                             pickings.resolve(picking_ids);
+                        }
+                    });
+                /* prepicking */
+                new instance.web.Model('stock.picking')
+                    .call('get_next_picking_for_ui',[{'default_picking_type_id':parseInt(type_id), 'prepick': true}])
+                    .then(function(prepickings_ids){
+                        if(prepickings_ids && prepickings_ids.length !== 0){
+                            self.prepickings = prepickings_ids;
+                            prepickings.resolve(prepickings_ids);
                         }
                     });
                 return pickings;
@@ -829,6 +839,11 @@ function openerp_picking_widgets(instance){
                 }
                 if (!self.show_lot){
                     self.$('.js_create_lot').addClass('hidden');
+                }
+                var selection = $("#js_select").attr("value");
+                if (selection == 'Prepick' && self.prepickings.length > 0) {
+                    $.bbq.pushState('picking_id='+self.prepickings[0]);
+                    self.refresh_ui(self.prepickings[0]);
                 }
 
             }).fail(function(error) {console.log(error);});
@@ -1015,23 +1030,62 @@ function openerp_picking_widgets(instance){
                 });
         },
         picking_next: function(){
-            for(var i = 0; i < this.pickings.length; i++){
-                if(this.pickings[i] === this.picking.id){
-                    if(i < this.pickings.length -1){
-                        $.bbq.pushState('picking_id='+this.pickings[i+1]);
-                        this.refresh_ui(this.pickings[i+1]);
-                        return;
+            var selection = $("#js_select").attr("value");
+            console.log(selection);
+            if (selection == 'Prepick' && this.prepickings.indexOf(this.picking.id) !== -1) {
+                for(var i = 0; i < this.prepickings.length; i++){
+                    if(this.prepickings[i] === this.picking.id){
+                        if(i < this.prepickings.length -1){
+                            $.bbq.pushState('picking_id='+this.prepickings[i+1]);
+                            this.refresh_ui(this.prepickings[i+1]);
+                            return;
+                        }
+                    }
+                }
+            }
+            else if(selection == 'Prepick' && this.prepickings.indexOf(this.picking.id) === -1) {
+                $.bbq.pushState('picking_id='+this.prepickings[0]);
+                this.refresh_ui(this.prepickings[0]);
+                return;
+            }
+            else{
+                for(var i = 0; i < this.pickings.length; i++){
+                    if(this.pickings[i] === this.picking.id){
+                        if(i < this.pickings.length -1){
+                            $.bbq.pushState('picking_id='+this.pickings[i+1]);
+                            this.refresh_ui(this.pickings[i+1]);
+                            return;
+                        }
                     }
                 }
             }
         },
         picking_prev: function(){
-            for(var i = 0; i < this.pickings.length; i++){
-                if(this.pickings[i] === this.picking.id){
-                    if(i > 0){
-                        $.bbq.pushState('picking_id='+this.pickings[i-1]);
-                        this.refresh_ui(this.pickings[i-1]);
-                        return;
+            var selection = $("#js_select").attr("value");
+            if (selection == 'Prepick' && this.prepickings.indexOf(this.picking.id) !== -1){
+                for(var i = 0; i < this.prepickings.length; i++){
+                    if(this.prepickings[i] === this.picking.id){
+                        if(i > 0){
+                            $.bbq.pushState('picking_id='+this.prepickings[i-1]);
+                            this.refresh_ui(this.prepickings[i-1]);
+                            return;
+                        }
+                    }
+                }
+            }
+            else if(selection == 'Prepick' && this.prepickings.indexOf(this.picking.id) === -1) {
+                $.bbq.pushState('picking_id='+this.prepickings[0]);
+                this.refresh_ui(this.prepickings[0]);
+                return;
+            }
+            else{
+                for(var i = 0; i < this.pickings.length; i++){
+                    if(this.pickings[i] === this.picking.id){
+                        if(i > 0){
+                            $.bbq.pushState('picking_id='+this.pickings[i-1]);
+                            this.refresh_ui(this.pickings[i-1]);
+                            return;
+                        }
                     }
                 }
             }

@@ -102,7 +102,7 @@ class stock_picking(models.Model):
                 answer['operation_id'] = op_id
                 return answer
         return super(stock_picking, self).process_barcode_from_ui(picking_id, barcode_str, visible_op_ids)
-    
+
     @api.model
     def process_product_id_from_ui(self, picking_id, product_id, op_id, increment=True, prepicking=False):
         if prepicking:
@@ -114,13 +114,12 @@ class stock_picking(models.Model):
         """ returns the next pickings to process. Used in the barcode scanner UI"""
         if context is None:
             context = {}
-        picking_id = context.get('picking_id')
+        prepick = context.get('prepick')
         employee_obj = self.pool.get('hr.employee')
-        _logger.warn(picking_id)
         picker = employee_obj.search(cr, uid, [('user_id', '=', uid)], context=context)
         domain = [('state', 'in', ('assigned', 'partially_available'))]
         _logger.warn(picker)
-        if not picking_id and picker:
+        if prepick and picker:
             domain.append(('move_lines.employee_id', '=', picker[0]))
         _logger.warn(domain)
         if context.get('default_picking_type_id'):
