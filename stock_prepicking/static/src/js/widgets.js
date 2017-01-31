@@ -1053,7 +1053,6 @@ function openerp_picking_widgets(instance){
         },
         picking_next: function(){
             var selection = $("#js_select").attr("value");
-            console.log(selection);
             if (selection == 'Prepick' && this.prepickings.indexOf(this.picking.id) !== -1) {
                 for(var i = 0; i < this.prepickings.length; i++){
                     if(this.prepickings[i] === this.picking.id){

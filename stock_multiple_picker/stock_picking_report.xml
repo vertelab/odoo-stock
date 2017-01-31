@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-      
+
       <report id="picking_operations_report" model="stock.picking" string="Picking with location" report_type="qweb-pdf" name="stock_multiple_picker.picking_operations_document" file="stock_picking_.picking_operations_document" />
-      
+
       <template id="picking_operations_document">
         <t t-call="report.html_container">
           <t t-foreach="docs" t-as="o">
@@ -325,6 +325,6 @@
           </t>
         </t>
       </template>
-      
+
     </data>
 </openerp>
