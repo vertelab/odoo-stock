@@ -60,7 +60,30 @@ function openerp_picking_widgets(instance){
             this.rows = [];
             var self = this;
             var pack_created = [];
-            _.each( model.packoplines, function(packopline){
+            var pack_operation_lines = model.packoplines;
+            var pack_operation_lines_dict = {}; // dictionary contains {operation_id: pack_op object}
+            var op_values = []; // array contains list of location names
+            var op_key_values = []; // array contains list of arrays [operation_id, location]
+            var packoplines = []; // final array contains list of pack_op object
+            for (i in pack_operation_lines) {
+                op_values.push(pack_operation_lines[i]['location_id'][1]);
+                op_key_values.push([pack_operation_lines[i]['id'], pack_operation_lines[i]['location_id'][1]]);
+                pack_operation_lines_dict[pack_operation_lines[i]['id']] = pack_operation_lines[i];
+            }
+            op_values.sort(); // sort location names with alphabet
+            dict_keys = []; // array contains operation_ids
+            for (i in op_values) {
+                for (j in op_key_values) {
+                    if (op_key_values[j][1] === op_values[i]){
+                        var dict_key = pack_operation_lines_dict[op_key_values[j][0]];
+                        if (dict_keys.indexOf(dict_key) === -1){ // must be unique
+                            packoplines.push(dict_key);
+                            dict_keys.push(dict_key);
+                        }
+                    }
+                }
+            }
+            _.each( packoplines, function(packopline){
                     var pack = undefined;
                     var color = "";
                     var color_prepick = "";
@@ -780,7 +803,6 @@ function openerp_picking_widgets(instance){
                 }).then(function(operations){
                     self.packoplines = operations;
                     var package_ids = [];
-
                     for(var i = 0; i < operations.length; i++){
                         if(!_.contains(package_ids,operations[i].result_package_id[0])){
                             if (operations[i].result_package_id[0]){
