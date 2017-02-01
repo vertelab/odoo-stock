@@ -1,3 +1,15 @@
+$( "#tooltipClick" )
+  .tooltip({
+    content: $( "#tooltipClick" ).attr( "title" ),
+    items: 'span'
+    })
+  .off( "mouseover" )
+  .on( "click", function(){
+      $( this ).tooltip( "open" );
+      return false;
+    })
+  .attr( "title", "" ).css({ cursor: "pointer" });
+
 function openerp_picking_widgets(instance){
 
     var module = instance.stock;
@@ -84,6 +96,7 @@ function openerp_picking_widgets(instance){
                 }
             }
             _.each( packoplines, function(packopline){
+                console.log(packopline);
                     var pack = undefined;
                     var color = "";
                     var color_prepick = "";
@@ -97,6 +110,7 @@ function openerp_picking_widgets(instance){
                         var myPackage = $.grep(model.packages, function(e){ return e.id == packopline.result_package_id[0]; })[0];
                         self.rows.push({
                             cols: { product: packopline.result_package_id[1],
+                                    picking_comment: false,
                                     qty: '',
                                     rem: '',
                                     prepicked: '',
@@ -122,6 +136,7 @@ function openerp_picking_widgets(instance){
                     }
                     self.rows.push({
                         cols: { product: packopline.product_id[1] || packopline.package_id[1],
+                                picking_comment: packopline.picking_comment,
                                 qty: packopline.product_qty,
                                 rem: packopline.qty_done,
                                 prepicked: packopline.prepicked,
@@ -236,6 +251,10 @@ function openerp_picking_widgets(instance){
                     self.getParent().$(".js_prepicked_input").addClass("hidden");
                 }
                 self.on_searchbox(self.search_filter);
+            });
+            this.$('.picking_comment').click(function(e){
+                $(this).parent().find('pre').toggle();
+                $(this).parent().find('pre').css({'top': e.pageY-50, 'left': e.pageX-250, 'position':'absolute', 'z-index': 200, 'background': '#ccff99'});
             });
             this.$('.js_prepick_plus').click(function(){
                 var id = $(this).data('product-id');

@@ -121,6 +121,11 @@ class stock_pack_operation(models.Model):
     waiting_to_be_packed = fields.Boolean('Waiting to be Packed', default=False)
     prepicked = fields.Float('Picked')
 
+    @api.one
+    def get_product_comment(self):
+        self.picking_comment = self.product_id.picking_comment
+    picking_comment = fields.Text(compute='get_product_comment')
+
     @api.model
     def _search_and_increment_prepick(self, picking_id, domain, filter_visible=False, visible_op_ids=False, increment=True):
         '''Search for an operation with given 'domain' in a picking, if it exists increment the prepicked (+1) otherwise create it

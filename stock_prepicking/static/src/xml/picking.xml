@@ -33,6 +33,12 @@
         <t t-jquery="tbody" t-operation="attributes">
             <attribute name="t-att-class">(widget.$('#js_select option:selected').attr('value') != null &amp;&amp; widget.$('#js_select option:selected').attr('value') != 'Prepick') ? 'js_op_table_body_todo' : 'js_op_table_body_prepick'</attribute>
         </t>
+        <t t-jquery="td:nth-child(1)" t-operation="append">
+            <t t-if="row.cols.picking_comment">
+                <i class="picking_comment fa fa-info" style="color: #009900;"/>
+                <pre style="display: none;"><t t-esc="row.cols.picking_comment"/></pre>
+            </t>
+        </t>
         <t t-jquery=".js_row_qty" t-operation="before">
             <td class="brctbl-col6 text-center prepick_body">
                 <div t-att-class="'input-group js_prepicked_input' + (((widget.$('#js_select option:selected').attr('value') != null &amp;&amp; widget.$('#js_select option:selected').attr('value') != 'Prepick') &amp;&amp; ' hidden') || '')">

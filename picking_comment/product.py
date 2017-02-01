@@ -29,7 +29,7 @@ _logger = logging.getLogger(__name__)
 class product_product(models.Model):
     _inherit="product.product"
 
-    picking_comment = fields.Text(String='Comment', translate=True,help="Add instructions for picking")
+    picking_comment = fields.Text(String='Comment', help="Add instructions for picking")
 
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
