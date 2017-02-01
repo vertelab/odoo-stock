@@ -256,7 +256,7 @@ function openerp_picking_widgets(instance){
                 $(this).parent().find('p').toggle();
                 $(this).parent().find('p').css({
                     'top': e.pageY-10,
-                    'left': e.pageX-250,
+                    'left': e.pageX+10,
                     'position':'absolute',
                     'border': 1 + 'px solid #aaa',
                     'border-radius': 10 + 'px',
