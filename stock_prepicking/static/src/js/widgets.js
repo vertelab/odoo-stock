@@ -253,8 +253,18 @@ function openerp_picking_widgets(instance){
                 self.on_searchbox(self.search_filter);
             });
             this.$('.picking_comment').click(function(e){
-                $(this).parent().find('pre').toggle();
-                $(this).parent().find('pre').css({'top': e.pageY-50, 'left': e.pageX-250, 'position':'absolute', 'z-index': 200, 'background': '#ccff99'});
+                $(this).parent().find('p').toggle();
+                $(this).parent().find('p').css({
+                    'top': e.pageY-10,
+                    'left': e.pageX-250,
+                    'position':'absolute',
+                    'border': 1 + 'px solid #aaa',
+                    'border-radius': 10 + 'px',
+                    'z-index': 200,
+                    'background': '#ccff99',
+                    'max-width': 230 + 'px',
+                    'padding': 10 + 'px'
+                    });
             });
             this.$('.js_prepick_plus').click(function(){
                 var id = $(this).data('product-id');

@@ -36,7 +36,7 @@
         <t t-jquery="td:nth-child(1)" t-operation="append">
             <t t-if="row.cols.picking_comment">
                 <i class="picking_comment fa fa-info" style="color: #009900;"/>
-                <pre style="display: none;"><t t-esc="row.cols.picking_comment"/></pre>
+                <p style="display: none;"><t t-esc="row.cols.picking_comment"/></p>
             </t>
         </t>
         <t t-jquery=".js_row_qty" t-operation="before">
