@@ -24,8 +24,6 @@
 'summary': 'Add extra picking step',
 'category': 'stock',
 'description': """
-
-
 Financed by Dermanord-Svensk Hudvård AB""",
 'author': 'Vertel AB',
 'website': 'http://www.vertel.se',

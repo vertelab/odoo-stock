@@ -115,6 +115,14 @@ class stock_picking(models.Model):
             domain.append(('picking_type_id', '=', context['default_picking_type_id']))
         return self.pool.get('stock.picking').search(cr, uid, domain, context=context)
 
+    @api.model
+    def go_to_invoice(self, inv_id):
+        url = self.env['ir.config_parameter'].get_param('web.base.url')
+        menu = self.env.ref('account.menu_action_invoice_tree1')
+        action = menu.action.id
+        return '%s/web#id=%s&view_type=form&model=account.invoice&menu_id=%s&action=%s' %(url, inv_id, menu.id, action)
+
+
 class stock_pack_operation(models.Model):
     _inherit = "stock.pack.operation"
 

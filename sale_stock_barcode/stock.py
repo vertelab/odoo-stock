@@ -50,7 +50,7 @@ class stock_pack_operation(models.Model):
               journal_id = self._get_journal(),
               group = True,
               type = {'sale':'out_invoice', 'purchase':'in_invoice', 'sale_refund':'out_refund', 'purchase_refund':'in_refund'}.get(self._get_journal_type(), 'out_invoice'))
-        self.env['account.invoice'].browse(res[0]).state = 'open'
+        self.env['account.invoice'].browse(res[0]).state = 'draft'
         return res
 
     @api.model
@@ -65,12 +65,12 @@ class stock_pack_operation(models.Model):
         return JOURNAL_TYPE_MAP.get((type, usage), ['sale'])[0]
 
 
-class account_invoice(models.Model):
-    _inherit = 'account.invoice'
+#~ class account_invoice(models.Model):
+    #~ _inherit = 'account.invoice'
 
-    @api.model
-    def do_print_invoice(self, inv_id):
-        '''This function prints the invoice created in barcode ui'''
-        return self.env['report'].get_action(self.browse([int(i) for i in inv_id]), 'account.report_invoice')
+    #~ @api.model
+    #~ def do_print_invoice(self, inv_id):
+        #~ '''This function prints the invoice created in barcode ui'''
+        #~ return self.env['report'].get_action(self.browse([int(i) for i in inv_id]), 'account.report_invoice')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -1016,10 +1016,16 @@ function openerp_picking_widgets(instance){
                     .call('action_drop_down', [pack_op_ids])
                     .then(function(data){
                         if(data != ''){
-                            return new instance.web.Model('account.invoice').call('do_print_invoice', [[parseInt(data)]])
-                            .then(function(action){
-                                return self.do_action(action);
+                            return new instance.web.Model('stock.picking').call('go_to_invoice', [parseInt(data)])
+                            .then(function(url){
+                                if (url != ''){
+                                    window.open(url, '_blank');
+                                }
                             });
+                            //~ return new instance.web.Model('account.invoice').call('do_print_invoice', [[parseInt(data)]])
+                            //~ .then(function(action){
+                                //~ return self.do_action(action);
+                            //~ });
                         }
                             return self.refresh_ui(self.picking.id).then(function(){
                                 if (self.picking_editor.check_done()){
