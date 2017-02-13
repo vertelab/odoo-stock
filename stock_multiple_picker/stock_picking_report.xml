@@ -228,23 +228,20 @@
                     <table class="table table-condensed" t-if="o.pack_operation_ids">
                       <thead>
                         <tr>
-                          <th>
-                            <strong>Product</strong>
-                          </th>
+                          <t t-if="o.picking_type_id.code != 'incoming'">
+                            <th>
+                              <strong>Source</strong>
+                            </th>
+                          </t>
                           <th class="text-right">
                             <strong>Quantity</strong>
                           </th>
                           <th class="text-right">
                             <strong>Weight</strong>
                           </th>
-                          <t t-if="o.picking_type_id.code != 'incoming'">
                             <th>
-                              <strong>Source</strong>
+                              <strong>Product</strong>
                             </th>
-                          </t>
-                          <th>
-                            <strong>Barcode</strong>
-                          </th>
                           <t t-if="o.picking_type_id.code != 'outgoing'">
                             <th>
                               <strong>Destination</strong>
@@ -259,19 +256,6 @@
                           <t t-set="total_quantity" t-value="total_quantity + pack_operation.product_qty" />
                           <t t-set="line_weight" t-value="pack_operation.product_id.weight * pack_operation.product_qty" />
                           <t t-set="total_weight" t-value="total_weight + line_weight" />
-                          <td>
-                            <span t-field="pack_operation.product_id" />
-                            <t t-if="not pack_operation.product_id and pack_operation.package_id">
-                              <span t-field="pack_operation.package_id" />
-                            </t>
-                          </td>
-                          <td class="text-right">
-                            <span t-field="pack_operation.product_qty" />
-                            <span t-field="pack_operation.product_uom_id" groups="product.group_uom" />
-                          </td>
-                          <td class="text-right">
-                            <span t-esc="line_weight" />
-                          </td>
                           <t t-if="o.picking_type_id.code != 'incoming'">
                             <td>
                               <span t-field="pack_operation.location_id" />
@@ -281,16 +265,18 @@
                               <span t-field="pack_operation.lot_id" />
                             </td>
                           </t>
+                          <td class="text-right">
+                            <span t-field="pack_operation.product_qty" />
+                            <span t-field="pack_operation.product_uom_id" groups="product.group_uom" />
+                          </td>
+                          <td class="text-right">
+                            <span t-esc="line_weight" />
+                          </td>
                           <td>
-                            <span t-if="pack_operation.lot_id">
-                              <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', pack_operation.lot_id.name, 600, 100)" style="width:300px;height:50px" />
-                            </span>
-                            <span t-if="pack_operation.product_id and not pack_operation.lot_id and pack_operation.product_id.ean13">
-                              <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', pack_operation.product_id.ean13, 600, 100)" style="width:300px;height:50px" />
-                            </span>
-                            <span t-if="pack_operation.package_id and not pack_operation.product_id">
-                              <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', pack_operation.package_id.name, 600, 100)" style="width:300px;height:50px" />
-                            </span>
+                            <span t-field="pack_operation.product_id" />
+                            <t t-if="not pack_operation.product_id and pack_operation.package_id">
+                              <span t-field="pack_operation.package_id" />
+                            </t>
                           </td>
                           <t t-if="o.picking_type_id.code != 'outgoing'">
                             <td>
