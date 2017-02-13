@@ -38,19 +38,18 @@ class stock_pack_operation(models.Model):
     @api.one
     def action_drop_down(self):
         super(stock_pack_operation, self).action_drop_down()
-        if self.picking_id.sale_id.order_policy == 'picking':
+        if self.picking_id.sale_id.order_policy == 'picking' and (self.picking_id.state == 'done' or self.picking_id.invoice_state == '2binvoiced'):
             return self.create_invoice_from_barcode_ui()
 
     @api.one
     def create_invoice_from_barcode_ui(self):
         '''
-            Create invoice from Barcode interface and validate
+            Create invoice from Barcode interface
         '''
         res = self.picking_id.action_invoice_create(
               journal_id = self._get_journal(),
               group = True,
               type = {'sale':'out_invoice', 'purchase':'in_invoice', 'sale_refund':'out_refund', 'purchase_refund':'in_refund'}.get(self._get_journal_type(), 'out_invoice'))
-        self.env['account.invoice'].browse(res[0]).state = 'draft'
         return res
 
     @api.model

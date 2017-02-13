@@ -96,7 +96,6 @@ function openerp_picking_widgets(instance){
                 }
             }
             _.each( packoplines, function(packopline){
-                console.log(packopline);
                     var pack = undefined;
                     var color = "";
                     var color_prepick = "";
@@ -651,7 +650,6 @@ function openerp_picking_widgets(instance){
         on_scan: function(barcode){
             if (barcode.indexOf('-') >= 0)
                 barcode = barcode.split('-').join('/');
-                console.log(barcode);
             var self = this;
             for(var i = 0, len = this.pickings.length; i < len; i++){
                 var picking = this.pickings[i];
@@ -1027,11 +1025,11 @@ function openerp_picking_widgets(instance){
                                 //~ return self.do_action(action);
                             //~ });
                         }
-                            return self.refresh_ui(self.picking.id).then(function(){
-                                if (self.picking_editor.check_done()){
-                                    return self.done();
-                                }
-                            });
+                        return self.refresh_ui(self.picking.id).then(function(){
+                            if (self.picking_editor.check_done()){
+                                return self.done();
+                            }
+                        });
                     });
             }
         },
