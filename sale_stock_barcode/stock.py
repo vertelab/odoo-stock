@@ -38,8 +38,11 @@ class stock_pack_operation(models.Model):
     @api.one
     def action_drop_down(self):
         super(stock_pack_operation, self).action_drop_down()
-        if self.picking_id.sale_id.order_policy == 'picking' and (self.picking_id.state == 'done' or self.picking_id.invoice_state == '2binvoiced'):
-            return self.create_invoice_from_barcode_ui()
+        if self.picking_id.sale_id.order_policy == 'picking':
+            if self.picking_id.state == 'done' or self.picking_id.invoice_state == '2binvoiced':
+                return self.create_invoice_from_barcode_ui()
+            elif self.picking_id.invoice_state == 'invoiced':
+                return [self.env['account.invoice'].search([('picking_id', '=', self.picking_id.id)])[0].id]
 
     @api.one
     def create_invoice_from_barcode_ui(self):
