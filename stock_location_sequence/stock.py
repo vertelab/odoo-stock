@@ -26,33 +26,10 @@ from openerp import models, fields, api, _
 import logging
 _logger = logging.getLogger(__name__)
 
-class stock_package(models.Model):
+class stock_location(models.Model):
+    _inherit = "stock.location"
+    _order = "sequence, parent_left"
     
-    _inherit = "stock.quant.package"
-    
-    parent_id = fields.Many2one('stock.quant.package', 'Parent Package', help="The package containing this item", ondelete='restrict', readonly=False)
-
-class product_ul(models.Model):
-    _inherit = 'product.ul'
-    
-    product_id = fields.Many2one('product.product', 'Packaging Product')
-
-class stock_picking(models.Model):
-    _inherit = 'stock.picking'
-    
-    parcel_ids = fields.One2many(comodel_name='stock.quant.package', string='Parcels', compute='_get_parcel_ids')
-    parcel_count = fields.Integer('# of Parcels', compute='_get_parcel_ids')
-    
-    @api.one
-    def _get_parcel_ids(self):
-        def get_top_package(package):
-            if package.parent_id:
-                return get_top_package(package.parent_id)
-            return package
-        parcels = self.env['stock.quant.package'].browse()
-        for package in self.package_ids:
-            parcels |= get_top_package(package)
-        self.parcel_ids = parcels
-        self.parcel_count = len(parcels)
+    sequence = fields.Integer('Sequence', default=10000)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
