@@ -42,7 +42,21 @@ class procurement_order(models.Model):
         #~ if procurement.rule_id.action == 'pick_by_bom' and procurement.production_id:
             #~ self.pool.get('mrp.production').action_cancel(cr, uid, [procurement.production_id.id], context=context)
         #~ return super(procurement_order, self).propagate_cancel(cr, uid, procurement, context=context)
-
+    
+    def _assign(self, cr, uid, procurement, context=None):
+        '''This method check what to do with the given procurement in order to complete its needs.
+        It returns False if no solution is found, otherwise it stores the matching rule (if any) and
+        returns True.
+            :param procurement: browse record
+            :rtype: boolean
+        '''
+        #if the procurement already has a rule assigned, we keep it (it has a higher priority as it may have been chosen manually)
+        if procurement.rule_id:
+            return True
+        elif procurement.product_id.type == 'kit':
+            procurement.rule_id = 1
+            return True
+        return super(procurement_order, self)._assign(procurement)
     @api.model
     def _run(self,procurement):
         if procurement.rule_id and procurement.rule_id.action == 'pick_by_bom':
@@ -80,15 +94,16 @@ class procurement_order(models.Model):
             else:
                 res[procurement.id] = False
                 procurement.message_post(body=_("No BoM exists for this product!"))
-            return res
+            #return res
         return super(procurement_order, self)._run(procurement)
 
     @api.model
     def _find_suitable_rule(procurement):
         product_route_ids = [x.id for x in procurement.product_id.route_ids + procurement.product_id.categ_id.total_route_ids]
-        if procurement.product_id.id == 29:
-            procurement.rule_id = 10
-            return None
+        raise Warning(product_route_ids)
+        if procurement.product_id.type == 'kit':
+            #procurement.rule_id = 10
+            return True
         return super(procurement_order, self)._find_suitable_rule(procurement)
     @api.model
     def _check(self,procurement):
@@ -176,8 +191,10 @@ class procurement_order(models.Model):
         }
         return vals
 
+class product_template(models.Model):
+    _inherit = "product.template"
 
-
+    type = fields.Selection(selection_add=[('kit','Kit')])
         
 
 
