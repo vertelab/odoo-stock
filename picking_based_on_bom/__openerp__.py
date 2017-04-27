@@ -26,7 +26,7 @@
 'description': """
     Picking a BOM-product instead of Manufacture 
   
-    * Adds a checkbox in product form
+    * Adds a new product type; 'kit'
     * Adds picking lines for BOM products
     
     

@@ -214,15 +214,15 @@ class product_template(models.Model):
 class product_product(models.Model):
     _inherit = "product.product"  
     @api.multi
-    def name_get(self):
-        res = super(product_product, self).name_get()
-        result = []
-        for r in res:
-            product = self.env['product.product'].browse(int(r[0]))
-            if product.type == 'kit':
-                result.append([product.id, "[%s] %s (kit)" % (product.default_code, product.name)])
-            else:
-                result.append(r)
-        return result
+    #~ def name_get(self):   Collides with odoo-website-sale-extra/product_attribute_search/product_attribute_search.py  line 38
+        #~ res = super(product_product, self).name_get()
+        #~ result = []
+        #~ for r in res:
+            #~ product = self.env['product.product'].browse(int(r[0]))
+            #~ if product.type == 'kit':
+                #~ result.append([product.id, "[%s] %s (kit)" % (product.default_code, product.name)])
+            #~ else:
+                #~ result.append(r)
+        #~ return result
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
