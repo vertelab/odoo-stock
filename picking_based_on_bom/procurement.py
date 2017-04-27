@@ -43,7 +43,7 @@ class procurement_order(models.Model):
             #~ self.pool.get('mrp.production').action_cancel(cr, uid, [procurement.production_id.id], context=context)
         #~ return super(procurement_order, self).propagate_cancel(cr, uid, procurement, context=context)
     
-    def _assign(self, cr, uid, procurement, context=None):
+    def X_assign(self, cr, uid, procurement, context=None):
         '''This method check what to do with the given procurement in order to complete its needs.
         It returns False if no solution is found, otherwise it stores the matching rule (if any) and
         returns True.
@@ -54,12 +54,25 @@ class procurement_order(models.Model):
         if procurement.rule_id:
             return True
         elif procurement.product_id.type == 'kit':
-            procurement.rule_id = 1
+            procurement.rule_id = 10
             return True
         return super(procurement_order, self)._assign(procurement)
+    
+    @api.model    
+    def Xrun(self,ids, autocommit=False):
+        new_ids = [x.id for x in self.env['procurement.order'].browse(ids) if x.state not in ('running', 'done', 'cancel')]
+        #~ raise Warning(new_ids,autocommit)
+        for procurement in self.env['procurement.order'].browse(new_ids):
+            if procurement.product_id.type == 'kit':
+                procurement.rule_id = 10
+        res = super(procurement_order, self).run(new_ids)
+        return res
+        
     @api.model
     def _run(self,procurement):
-        if procurement.rule_id and procurement.rule_id.action == 'pick_by_bom':
+        #~ if procurement.rule_id and procurement.rule_id.action == 'pick_by_bom':
+        res = super(procurement_order, self)._run(procurement)
+        if procurement.product_id and procurement.product_id.type == 'kit':
             #~ raise Warning(self,procurement)
             res = {}
             bom_id = self.env['mrp.bom']._bom_find(product_id=procurement.product_id.id,properties=[x.id for x in procurement.property_ids])
@@ -88,17 +101,18 @@ class procurement_order(models.Model):
                     })
                     _logger.warn('%s %s %s', (p.name,p.product_id.name, p.rule_id))
                     p.rule_id = self._find_suitable_rule(p) or False
+                    p.run()
                 res[procurement.id] = procurement.bom_id.id
                 procurement.message_post(body=_("Procurement Order for BOM <em>%s</em> created.") % (procurement.bom_id.name,))
   
             else:
                 res[procurement.id] = False
                 procurement.message_post(body=_("No BoM exists for this product!"))
-            #return res
-        return super(procurement_order, self)._run(procurement)
+        return res
+        
 
     @api.model
-    def _find_suitable_rule(procurement):
+    def X_find_suitable_rule(procurement):
         product_route_ids = [x.id for x in procurement.product_id.route_ids + procurement.product_id.categ_id.total_route_ids]
         raise Warning(product_route_ids)
         if procurement.product_id.type == 'kit':
@@ -107,7 +121,8 @@ class procurement_order(models.Model):
         return super(procurement_order, self)._find_suitable_rule(procurement)
     @api.model
     def _check(self,procurement):
-        if procurement.rule_id and procurement.rule_id.action == 'pick_by_bom':
+        if procurement.product_id and procurement.product_id.type == 'kit' and procurement.state in ['draft',]:
+            procurement.run_scheduler()
             return True
         return super(procurement_order, self)._check(procurement)
 
@@ -196,6 +211,18 @@ class product_template(models.Model):
 
     type = fields.Selection(selection_add=[('kit','Kit')])
         
-
+class product_product(models.Model):
+    _inherit = "product.product"  
+    @api.multi
+    def name_get(self):
+        res = super(product_product, self).name_get()
+        result = []
+        for r in res:
+            product = self.env['product.product'].browse(int(r[0]))
+            if product.type == 'kit':
+                result.append([product.id, "[%s] %s (kit)" % (product.default_code, product.name)])
+            else:
+                result.append(r)
+        return result
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
