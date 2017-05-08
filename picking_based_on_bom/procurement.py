@@ -53,7 +53,7 @@ class procurement_order(models.Model):
         #if the procurement already has a rule assigned, we keep it (it has a higher priority as it may have been chosen manually)
         if procurement.rule_id:
             return True
-        elif procurement.product_id.type == 'kit':
+        elif procurement.product_id.iskit:
             procurement.rule_id = 10
             return True
         return super(procurement_order, self)._assign(procurement)
@@ -63,7 +63,7 @@ class procurement_order(models.Model):
         new_ids = [x.id for x in self.env['procurement.order'].browse(ids) if x.state not in ('running', 'done', 'cancel')]
         #~ raise Warning(new_ids,autocommit)
         for procurement in self.env['procurement.order'].browse(new_ids):
-            if procurement.product_id.type == 'kit':
+            if procurement.product_id.iskit:
                 procurement.rule_id = 10
         res = super(procurement_order, self).run(new_ids)
         return res
@@ -72,7 +72,7 @@ class procurement_order(models.Model):
     def _run(self,procurement):
         #~ if procurement.rule_id and procurement.rule_id.action == 'pick_by_bom':
         res = super(procurement_order, self)._run(procurement)
-        if procurement.product_id and procurement.product_id.type == 'kit':
+        if procurement.product_id and procurement.product_id.iskit:
             #~ raise Warning(self,procurement)
             res = {}
             bom_id = self.env['mrp.bom']._bom_find(product_id=procurement.product_id.id,properties=[x.id for x in procurement.property_ids])
@@ -115,14 +115,16 @@ class procurement_order(models.Model):
     def X_find_suitable_rule(procurement):
         product_route_ids = [x.id for x in procurement.product_id.route_ids + procurement.product_id.categ_id.total_route_ids]
         raise Warning(product_route_ids)
-        if procurement.product_id.type == 'kit':
+        if procurement.product_id.iskit:
             #procurement.rule_id = 10
             return True
         return super(procurement_order, self)._find_suitable_rule(procurement)
     @api.model
     def _check(self,procurement):
-        if procurement.product_id and procurement.product_id.type == 'kit' and procurement.state in ['draft',]:
+        if procurement.product_id and procurement.product_id.iskit and procurement.state in ['draft',]:
             procurement.run_scheduler()
+            picking = self.env['stock.picking'].search([('group_id','=',procurement.id)])
+            raise Warning(self.env['stock.move'].search([('picking_id','=',picking.id),('product_id','=',procurement.product_id.id)]))
             return True
         return super(procurement_order, self)._check(procurement)
 
@@ -209,20 +211,88 @@ class procurement_order(models.Model):
 class product_template(models.Model):
     _inherit = "product.template"
 
-    type = fields.Selection(selection_add=[('kit','Kit')])
-        
+    #type = fields.Selection(selection_add=[('kit','Kit')])
+    #is_kit = fields.Boolean(string='Is Kit')
+    iskit = fields.Boolean(string='Is Kit')
+
 class product_product(models.Model):
     _inherit = "product.product"  
-    @api.multi
-    #~ def name_get(self):   Collides with odoo-website-sale-extra/product_attribute_search/product_attribute_search.py  line 38
-        #~ res = super(product_product, self).name_get()
-        #~ result = []
-        #~ for r in res:
-            #~ product = self.env['product.product'].browse(int(r[0]))
-            #~ if product.type == 'kit':
-                #~ result.append([product.id, "[%s] %s (kit)" % (product.default_code, product.name)])
-            #~ else:
-                #~ result.append(r)
-        #~ return result
+        
+    @api.model
+    def bom_account_create(self, line):
+        product = line.product_id
+        if product:
+            account = self.env.ref('product_dermanord.account_products')
+            move_line = line.invoice_id.move_id.line_id.filtered(lambda l: len(l.analytic_lines) > 0)
+            move_id = move_line[0].id if move_line else None
+            currency = line.invoice_id.currency_id.with_context(date=line.invoice_id.date_invoice)
+            self.env['account.analytic.line'].create({
+                'move_id': move_id,
+                'name': line.name,
+                'date': line.invoice_id.date_invoice,
+                'account_id': account.id,
+                'unit_amount': line.quantity,
+                'amount': currency.compute(line.price_subtotal, line.invoice_id.company_id.currency_id) * 1 if line.invoice_id.type in ('out_invoice', 'in_refund') else -1,
+                'product_id': line.product_id.id,
+                'product_uom_id': line.uos_id.id,
+                'general_account_id': line.account_id.id,
+                'journal_id': line.invoice_id.journal_id.analytic_journal_id.id,
+                'ref': line.invoice_id.reference if line.invoice_id.type in ('in_invoice', 'in_refund') else line.invoice_id.number,
+            })
+            if product.iskit and product.bom_ids:
+                account = self.env.ref('product_dermanord.account_kit_products')
+                total = 0
+                for bom_line in product.bom_ids[0].bom_line_ids:
+                    if bom_line.product_id.sale_ok:
+                        total += bom_line.product_id.lst_price * bom_line.product_qty
+                for bom_line in product.bom_ids[0].bom_line_ids:
+                    if bom_line.product_id.sale_ok:
+                        amount = line.price_subtotal * bom_line.product_id.lst_price * bom_line.product_qty / total
+                        self.env['account.analytic.line'].create({
+                            'move_id': move_id,
+                            'name': line.name,
+                            'date': line.invoice_id.date_invoice,
+                            'account_id': account.id,
+                            'unit_amount': line.quantity * bom_line.product_qty,
+                            'amount': currency.compute(amount, line.invoice_id.company_id.currency_id) * 1 if line.invoice_id.type in ('out_invoice', 'in_refund') else -1,
+                            'product_id': bom_line.product_id.id,
+                            'product_uom_id': bom_line.product_uos.id,
+                            'general_account_id': line.account_id.id,
+                            'journal_id': line.invoice_id.journal_id.analytic_journal_id.id,
+                            'ref': line.invoice_id.reference if line.invoice_id.type in ('in_invoice', 'in_refund') else line.invoice_id.number,
+                        })
+
+        
+class account_invoice_line(models.Model):
+    _inherit = 'account.invoice'
+
+    @api.one
+    def action_move_create(self):
+        res = super(account_invoice_line, self).action_move_create()
+        _logger.warn('invoice',self,'lines',self.invoice_line)
+        #raise Warning('kalle')
+        for l in self.invoice_line:
+            self.env['product.product'].bom_account_create(l)
+
+class stock_move(models.Model):
+    _inherit="stock.move"
+    iskit = fields.Boolean(related="product_id.iskit")
+
+
+class stock_picking(models.Model):
+    _inherit="stock.picking"
+    
+    @api.model
+    def _prepare_pack_ops(self,picking, quants, forced_qties):
+        recs = super(stock_picking, self)._prepare_pack_ops(picking, quants, forced_qties)
+        return recs
+        #~ res = []
+        #~ for r in recs:
+            #~ product = self.env['product.product'].browse(r['product_id'])
+            #~ if not product.iskit:
+                #~ res.append(r)
+        #~ return res
+        
+
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
