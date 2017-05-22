@@ -91,7 +91,7 @@ class procurement_order(models.Model):
                         'partner_dest_id': procurement.partner_dest_id.id if procurement.partner_dest_id else False,
 
                         'product_id': line.product_id.id,
-                        'product_qty': line.product_qty,
+                        'product_qty': line.product_qty * procurement.product_qty,
                         'product_uom': line.product_uom.id,
                         #~ 'product_uos_qty': (line.product_uos and line.product_uos_qty) or line.product_qty,
                         #~ 'product_uos': (line.product_uos and line.product_uos.id) or line.product_uom.id,
