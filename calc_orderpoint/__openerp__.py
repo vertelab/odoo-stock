@@ -39,9 +39,10 @@ Calculated orderpoint are displayed for reordering rules minimum quantity
 """,
     'author': 'Vertel AB',
     'website': 'http://www.vertel.se',
-    'depends': ['website_sale','stock'],
+    'depends': ['stock','mrp'],
     'data': [
         'product_view.xml',
+        'product_data.xml',
     ],
     'installable': True,
 }

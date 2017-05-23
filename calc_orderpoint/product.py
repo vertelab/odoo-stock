@@ -47,7 +47,7 @@ class product_template(models.Model):
     @api.one
     @api.depends('seller_ids','seller_ids.delay','produce_delay')
     def _instock_percent(self):
-        self.instock_percent = self.virtual_available / self.orderpoint_computed * 100
+        self.instock_percent = self.sudo().virtual_available / self.sudo().orderpoint_computed * 100
     instock_percent = fields.Integer(compute="_instock_percent",store=True,help='This is how much we have in stock in percent')
 
 
@@ -74,8 +74,8 @@ class product_product(models.Model):
     @api.one
     @api.depends('seller_ids','seller_ids.delay','produce_delay')
     def _instock_percent(self):
-        op = self.orderpoint_computed or 1.0
-        self.instock_percent = self.virtual_available / op * 100
+        op = self.sudo().orderpoint_computed or 1.0
+        self.instock_percent = self.sudo().virtual_available / op * 100
     instock_percent = fields.Integer(compute="_instock_percent",store=True)
     
 

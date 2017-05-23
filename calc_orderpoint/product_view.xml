@@ -30,13 +30,27 @@
           <label for="virtual_available" />
           <div>
             <field name="virtual_available" class="oe_inline" />
-            <span> (</span>
+            <span>(</span>
             <field name="virtual_available_days" class="oe_inline" />
-            <span> days </span>
+            <span>days</span>
             <field name="instock_percent" class="oe_inline" />
             <span>% )</span>
           </div>
           <field name="consumtion_per_day" />
+        </field>
+      </field>
+    </record>
+    <record id="product_template_search_view" model="ir.ui.view">
+      <field name="name">product.template.search.instock_percent</field>
+      <field name="model">product.template</field>
+      <field name="inherit_id" ref="product.product_template_search_view" />
+      <field name="arch" type="xml">
+        <field name="product_variant_ids" position="before">
+          <separator />
+          <filter name="instock_percent_extreme" string="Extreme High Stock Percent" domain="[('instock_percent','&gt;',500.0)]" />
+          <filter name="instock_percent_high" string="High Stock Percent" domain="[('instock_percent','&gt;',100.0),('instock_percent','&lt;',500.0)]" />
+          <filter name="instock_percent_low" string="Low Stock Percent" domain="[('instock_percent','&lt;',100.0),('instock_percent','&gt;',50.0)]" />
+          <filter name="instock_percent_shortage" string="Shortage Stock Percent" domain="[('instock_percent','&lt;',50.0)]" />
         </field>
       </field>
     </record>
@@ -50,9 +64,9 @@
           <label for="product_min_qty" />
           <div>
             <field name="product_min_qty" class="oe_inline" />
-            <span>( computed </span>
+            <span>( computed</span>
             <field name="orderpoint_computed" class="oe_inline" />
-            <span> )</span>
+            <span>)</span>
           </div>
         </field>
       </field>
