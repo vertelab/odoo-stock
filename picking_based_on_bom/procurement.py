@@ -25,8 +25,6 @@ from openerp import models, fields, api, _
 import logging
 _logger = logging.getLogger(__name__)
 
-
-
 class procurement_rule(models.Model):
     _inherit = 'procurement.rule'
 
@@ -53,7 +51,7 @@ class procurement_order(models.Model):
         #if the procurement already has a rule assigned, we keep it (it has a higher priority as it may have been chosen manually)
         if procurement.rule_id:
             return True
-        elif procurement.product_id.iskit:
+        elif procurement.product_id.is_offer:
             procurement.rule_id = 10
             return True
         return super(procurement_order, self)._assign(procurement)
@@ -63,7 +61,7 @@ class procurement_order(models.Model):
         new_ids = [x.id for x in self.env['procurement.order'].browse(ids) if x.state not in ('running', 'done', 'cancel')]
         #~ raise Warning(new_ids,autocommit)
         for procurement in self.env['procurement.order'].browse(new_ids):
-            if procurement.product_id.iskit:
+            if procurement.product_id.is_offer:
                 procurement.rule_id = 10
         res = super(procurement_order, self).run(new_ids)
         return res
@@ -72,7 +70,7 @@ class procurement_order(models.Model):
     def _run(self,procurement):
         #~ if procurement.rule_id and procurement.rule_id.action == 'pick_by_bom':
         res = super(procurement_order, self)._run(procurement)
-        if procurement.product_id and procurement.product_id.iskit:
+        if procurement.product_id and procurement.product_id.is_offer:
             #~ raise Warning(self,procurement)
             res = {}
             bom_id = self.env['mrp.bom']._bom_find(product_id=procurement.product_id.id,properties=[x.id for x in procurement.property_ids])
@@ -115,13 +113,13 @@ class procurement_order(models.Model):
     def X_find_suitable_rule(procurement):
         product_route_ids = [x.id for x in procurement.product_id.route_ids + procurement.product_id.categ_id.total_route_ids]
         raise Warning(product_route_ids)
-        if procurement.product_id.iskit:
+        if procurement.product_id.is_offer:
             #procurement.rule_id = 10
             return True
         return super(procurement_order, self)._find_suitable_rule(procurement)
     @api.model
     def _check(self,procurement):
-        if procurement.product_id and procurement.product_id.iskit and procurement.state in ['draft',]:
+        if procurement.product_id and procurement.product_id.is_offer and procurement.state in ['draft',]:
             procurement.run_scheduler()
             picking = self.env['stock.picking'].search([('group_id','=',procurement.id)])
             raise Warning(self.env['stock.move'].search([('picking_id','=',picking.id),('product_id','=',procurement.product_id.id)]))
@@ -213,7 +211,7 @@ class product_template(models.Model):
 
     #type = fields.Selection(selection_add=[('kit','Kit')])
     #is_kit = fields.Boolean(string='Is Kit')
-    iskit = fields.Boolean(string='Is Kit')
+    is_offer = fields.Boolean(string='Offer')
 
 class product_product(models.Model):
     _inherit = "product.product"  
@@ -239,7 +237,7 @@ class product_product(models.Model):
                 'journal_id': line.invoice_id.journal_id.analytic_journal_id.id,
                 'ref': line.invoice_id.reference if line.invoice_id.type in ('in_invoice', 'in_refund') else line.invoice_id.number,
             })
-            if product.iskit and product.bom_ids:
+            if product.is_offer and product.bom_ids:
                 account = self.env.ref('product_dermanord.account_kit_products')
                 total = 0
                 for bom_line in product.bom_ids[0].bom_line_ids:
@@ -276,7 +274,7 @@ class account_invoice_line(models.Model):
 
 class stock_move(models.Model):
     _inherit="stock.move"
-    iskit = fields.Boolean(related="product_id.iskit")
+    is_offer = fields.Boolean(related="product_id.is_offer")
 
 
 class stock_picking(models.Model):
@@ -289,7 +287,7 @@ class stock_picking(models.Model):
         #~ res = []
         #~ for r in recs:
             #~ product = self.env['product.product'].browse(r['product_id'])
-            #~ if not product.iskit:
+            #~ if not product.is_offer:
                 #~ res.append(r)
         #~ return res
         

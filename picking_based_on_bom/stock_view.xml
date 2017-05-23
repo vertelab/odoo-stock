@@ -3,17 +3,17 @@
     <data>
 <!--
         <record id="view_picking_form" model="ir.ui.view">
-            <field name="name">stock.picking.form.iskit</field>
+            <field name="name">stock.picking.form.is_offer</field>
             <field name="inherit_id" ref="stock.view_picking_form"/>
             <field name="model">stock.picking</field>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='move_lines']/field[@name='state']" position="before">
-                    <field name="iskit"/>                
+                    <field name="is_offer"/>                
                 </xpath>
             </field>
             
             <field name="move_lines" position="attributes">
-                    <attribute name="colors">"yellow:iskit==True;"</attribute>
+                    <attribute name="colors">"yellow:is_offer==True;"</attribute>
                 </field>
             
             
@@ -21,20 +21,20 @@
 -->
 
         <record id="view_move_picking_tree" model="ir.ui.view">
-            <field name="name">stock.move.tree.iskit</field>
+            <field name="name">stock.move.tree.is_offer</field>
             <field name="inherit_id" ref="stock.view_move_picking_tree"/>
             <field name="model">stock.move</field>
-            <field name="colors">yellow:iskit==True;grey:scrapped == True</field>
+            <field name="colors">yellow:is_offer==True;grey:scrapped == True</field>
             <field name="arch" type="xml">
                 <field name="state" position="before">
-                    <field name="iskit"/>                
+                    <field name="is_offer"/>                
                     
                 </field>
             </field>
             
 <!--
             <tree string="Moves" position="attributes">
-                    <attribute name="colors">"yellow:iskit==True;grey:state == 'cancel';red:(state not in ('cancel','done')) and date &gt; current_date"</attribute>
+                    <attribute name="colors">"yellow:is_offer==True;grey:state == 'cancel';red:(state not in ('cancel','done')) and date &gt; current_date"</attribute>
                 </tree>
 -->
             
