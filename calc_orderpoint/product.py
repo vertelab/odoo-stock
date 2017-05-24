@@ -22,62 +22,54 @@ from openerp import models, fields, api, _
 from datetime import timedelta,date
 import logging
 _logger = logging.getLogger(__name__)
-import timeit
+import time
 
 class product_template(models.Model):
     _inherit = 'product.template'
-    @api.one
-    def _sales_per_day(self):
-        if min(self.seller_ids.mapped('delay') or [0.0])>0.0:
-            delay = min(self.seller_ids.mapped('delay')) + self.company_id.po_lead
-        else:
-            delay = self.produce_delay + self.company_id.manufacturing_lead
-        first_sales = self.env['sale.order.line'].search([('product_id','=',self.id),('order_id.date_order','>',fields.Date.to_string(date.today() - timedelta(days=365)))],order='order_id asc',limit=1)
-        if len(first_sales)>0:
-            sale_nbr_days = (date.today() - fields.Date.from_string(first_sales.order_id.date_order)).days
-            res = self.env['sale.report'].read_group([('product_id','in',self.product_variant_ids.mapped('id')),('date_confirm','>',fields.Date.to_string(date.today() - timedelta(days=365)))],['product_id','product_uom_qty'],['product_id'])
-            if len(res)>0:
-                self.consumtion_per_day = res[0]['product_uom_qty'] / sale_nbr_days
-                self.orderpoint_computed =  self.consumtion_per_day * delay
-                self.virtual_available_days = self.virtual_available / self.consumtion_per_day        
-    consumtion_per_day = fields.Float(compute="_sales_per_day")
-    orderpoint_computed = fields.Float(compute="_sales_per_day")
-    virtual_available_days = fields.Float(compute="_sales_per_day")
 
     @api.one
-    @api.depends('seller_ids','seller_ids.delay','produce_delay')
-    def _instock_percent(self):
-        self.instock_percent = self.sudo().virtual_available / self.sudo().orderpoint_computed * 100
-    instock_percent = fields.Integer(compute="_instock_percent",store=True,help='This is how much we have in stock in percent')
-
+    @api.depends('product_variant_ids.sale_order_lines')
+    def _consumtion_per_day(self):
+        sales = self.env['sale.order.line'].search([('product_id','in',self.product_variant_ids.mapped('id')),('order_id.date_order','>',fields.Date.to_string(date.today() - timedelta(days=365)))],order='order_id desc')
+        if len(sales)>0:
+            sale_nbr_days = (date.today() - fields.Date.from_string(sales[0].order_id.date_order)).days
+            qty = sum(sales.mapped('product_uom_qty'))
+            self.consumtion_per_day = qty / sale_nbr_days
+            self.virtual_available_days = self.virtual_available / (self.consumtion_per_day or 1.0)
+            self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
+    consumtion_per_day = fields.Float(compute="_consumtion_per_day",store=True)
+    orderpoint_computed = fields.Float(compute="_consumtion_per_day",store=True)
+    virtual_available_days = fields.Float(compute="_consumtion_per_day",store=True)
+    instock_percent = fields.Integer(compute="_consumtion_per_day",store=True)
+   
 
 class product_product(models.Model):
     _inherit = 'product.product'
-    
+
     @api.one
-    def _sales_per_day(self):
-        if min(self.seller_ids.mapped('delay') or [0.0])>0.0:
-            delay = min(self.seller_ids.mapped('delay')) + self.company_id.po_lead
-        else:
-            delay = self.produce_delay + self.company_id.manufacturing_lead
-        first_sales = self.env['sale.order.line'].search([('product_id','=',self.id),('order_id.date_order','>',fields.Date.to_string(date.today() - timedelta(days=365)))],order='order_id asc',limit=1)
-        if len(first_sales)>0:
-            sale_nbr_days = (date.today() - fields.Date.from_string(first_sales.order_id.date_order)).days
-            res = self.env['sale.report'].read_group([('product_id','=',self.id),('date_confirm','>',fields.Date.to_string(date.today() - timedelta(days=365)))],['product_id','product_uom_qty'],['product_id'])
-            if len(res)>0:
-                self.consumtion_per_day = res[0]['product_uom_qty'] / sale_nbr_days
-                self.orderpoint_computed =  self.consumtion_per_day * delay
-                self.virtual_available_days = self.virtual_available / self.consumtion_per_day
-    consumtion_per_day = fields.Float(compute="_sales_per_day")
-    orderpoint_computed = fields.Float(compute="_sales_per_day")
-    virtual_available_days = fields.Float(compute="_sales_per_day")
-    @api.one
-    @api.depends('seller_ids','seller_ids.delay','produce_delay')
-    def _instock_percent(self):
-        op = self.sudo().orderpoint_computed or 1.0
-        self.instock_percent = self.sudo().virtual_available / op * 100
-    instock_percent = fields.Integer(compute="_instock_percent",store=True)
-    
+    @api.depends('sale_order_lines','seller_ids.delay','produce_delay')
+    def _consumtion_per_day(self):
+        sales = self.env['sale.order.line'].search([('product_id','=',self.id),('order_id.date_order','>',fields.Date.to_string(date.today() - timedelta(days=365)))],order='order_id desc')
+        if len(sales)>0:
+            sale_nbr_days = (date.today() - fields.Date.from_string(sales[0].order_id.date_order)).days
+            self.sales_count = sum(sales.mapped('product_uom_qty'))
+            self.consumtion_per_day = self.sales_count / sale_nbr_days
+            if min(self.seller_ids.mapped('delay') or [0.0])>0.0:
+                delay = min(self.seller_ids.mapped('delay')) + self.company_id.po_lead
+            else:
+                delay = self.produce_delay + self.company_id.manufacturing_lead
+            self.orderpoint_computed =  self.consumtion_per_day * delay
+            self.virtual_available_days = self.virtual_available / (self.consumtion_per_day or 1.0)
+            self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
+            
+    sales_count = fields.Integer(compute="_consumtion_per_day",string='# Sales',store=True)  # Initially defined in sale-module
+    consumtion_per_day = fields.Float(compute="_consumtion_per_day",store=True)
+    orderpoint_computed = fields.Float(compute="_consumtion_per_day",store=True)
+    virtual_available_days = fields.Float(compute="_consumtion_per_day",store=True)
+    instock_percent = fields.Integer(compute="_consumtion_per_day",store=True)
+
+    sale_order_lines = fields.One2many(comodel_name='sale.order.line',inverse_name="product_id")	
+        
 
 class stock_warehouse_orderpoint(models.Model):
     _inherit = "stock.warehouse.orderpoint"
