@@ -1017,7 +1017,13 @@ function openerp_picking_widgets(instance){
                             return new instance.web.Model('stock.picking').call('go_to_invoice', [parseInt(data)])
                             .then(function(url){
                                 if (url != ''){
-                                    window.open(url, '_blank');
+                                    $("#go_to_invoice").attr('href', url);
+                                    $("#go_to_invoice").removeClass("hidden");
+                                    $(".js_drop_down").addClass("hidden");
+                                    $("#go_to_invoice").on('click', function(e){
+                                        e.preventDefault();
+                                        window.open(url, '_blank');
+                                    });
                                 }
                             });
                             //~ return new instance.web.Model('account.invoice').call('do_print_invoice', [[parseInt(data)]])

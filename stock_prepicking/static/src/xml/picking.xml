@@ -91,6 +91,7 @@
 -->
         <t t-jquery=".js_drop_down" t-operation="replace">
             <button type="button" class='btn btn-danger js_drop_down fa fa-download'> Finish Picking </button>
+            <a id="go_to_invoice" href="/" type="button" class='hidden btn btn-danger fa fa-angle-right '> Open Invoice </a>
         </t>
     </t>
 </template>
