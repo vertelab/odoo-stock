@@ -36,7 +36,7 @@
             <field name="instock_percent" class="oe_inline" />
             <span>% )</span>
           </div>
-          <field name="consumtion_per_day" />
+          <field name="consumption_per_day" />
         </field>
       </field>
     </record>

@@ -22,5 +22,15 @@ for o in obj:
     <record model="ir.actions.server" id="product_instock_percent">
       <field name="menu_ir_values_id" ref="product_instock_percent_action_menu" />
     </record>
+    <record model="ir.cron" id="cron_compute_fields">
+      <field name="name">Compute Product Consumption Fields</field>
+      <field name="user_id" ref="base.user_root"/>
+      <field name="interval_number">1</field>
+      <field name="interval_type">days</field>
+      <field name="doall" eval="True"/>
+      <field name="numbercall">-1</field>
+      <field name="model">product.template</field>
+      <field name="function">compute_consumption_per_day</field>
+    </record>
   </data>
 </openerp>
