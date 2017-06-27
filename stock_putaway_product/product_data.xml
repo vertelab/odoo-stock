@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data noupdate="1">
+    <record model="ir.actions.server" id="product_instock_percent">
+      <field name="name">Calc Instock Percent</field>
+      <field name="state">code</field>
+      <field name="condition" eval="True" />
+      <field name="model_id" ref="product.model_product_product" />
+      <field name="code">
+obj = object.browse(context.get('active_ids', []))
+for o in obj:
+    o.produce_delay = o.produce_delay
+      </field>
+    </record>
+    <record model="ir.values" id="product_instock_percent_action_menu">
+      <field name="name">Calc Instock Percent</field>
+      <field name="model">product.product</field>
+      <field name="model_id" ref="product.model_product_product" />
+      <field name="key2">client_action_multi</field>
+      <field name="value" eval="'ir.actions.server,%d' % product_instock_percent" />
+    </record>
+    <record model="ir.actions.server" id="product_instock_percent">
+      <field name="menu_ir_values_id" ref="product_instock_percent_action_menu" />
+    </record>
+    <record model="ir.cron" id="cron_compute_fields">
+      <field name="name">Compute Product Consumption Fields</field>
+      <field name="user_id" ref="base.user_root"/>
+      <field name="interval_number">1</field>
+      <field name="interval_type">days</field>
+      <field name="doall" eval="True"/>
+      <field name="numbercall">-1</field>
+      <field name="model">product.template</field>
+      <field name="function">compute_consumption_per_day</field>
+    </record>
+  </data>
+</openerp>
