@@ -217,26 +217,26 @@ class product_product(models.Model):
     _inherit = "product.product"  
         
     @api.model
-    def bom_account_create(self, line):
+    def offer_bom_account_create(self, line):
         product = line.product_id
         if product:
-            account = self.env.ref('product_dermanord.account_products')
-            move_line = line.invoice_id.move_id.line_id.filtered(lambda l: len(l.analytic_lines) > 0)
-            move_id = move_line[0].id if move_line else None
-            currency = line.invoice_id.currency_id.with_context(date=line.invoice_id.date_invoice)
-            self.env['account.analytic.line'].create({
-                'move_id': move_id,
-                'name': line.name,
-                'date': line.invoice_id.date_invoice,
-                'account_id': account.id,
-                'unit_amount': line.quantity,
-                'amount': currency.compute(line.price_subtotal, line.invoice_id.company_id.currency_id) * 1 if line.invoice_id.type in ('out_invoice', 'in_refund') else -1,
-                'product_id': line.product_id.id,
-                'product_uom_id': line.uos_id.id,
-                'general_account_id': line.account_id.id,
-                'journal_id': line.invoice_id.journal_id.analytic_journal_id.id,
-                'ref': line.invoice_id.reference if line.invoice_id.type in ('in_invoice', 'in_refund') else line.invoice_id.number,
-            })
+            #~ account = self.env.ref('product_dermanord.account_products')
+            #~ move_line = line.invoice_id.move_id.line_id.filtered(lambda l: len(l.analytic_lines) > 0)
+            #~ move_id = move_line[0].id if move_line else None
+            #~ currency = line.invoice_id.currency_id.with_context(date=line.invoice_id.date_invoice)
+            #~ self.env['account.analytic.line'].create({
+                #~ 'move_id': move_id,
+                #~ 'name': line.name,
+                #~ 'date': line.invoice_id.date_invoice,
+                #~ 'account_id': account.id,
+                #~ 'unit_amount': line.quantity,
+                #~ 'amount': currency.compute(line.price_subtotal, line.invoice_id.company_id.currency_id) * 1 if line.invoice_id.type in ('out_invoice', 'in_refund') else -1,
+                #~ 'product_id': line.product_id.id,
+                #~ 'product_uom_id': line.uos_id.id,
+                #~ 'general_account_id': line.account_id.id,
+                #~ 'journal_id': line.invoice_id.journal_id.analytic_journal_id.id,
+                #~ 'ref': line.invoice_id.reference if line.invoice_id.type in ('in_invoice', 'in_refund') else line.invoice_id.number,
+            #~ })
             if product.is_offer and product.bom_ids:
                 account = self.env.ref('product_dermanord.account_kit_products')
                 total = 0
@@ -270,7 +270,7 @@ class account_invoice_line(models.Model):
         _logger.warn('invoice',self,'lines',self.invoice_line)
         #raise Warning('kalle')
         for l in self.invoice_line:
-            self.env['product.product'].bom_account_create(l)
+            self.env['product.product'].offer_bom_account_create(l)
 
 class stock_move(models.Model):
     _inherit="stock.move"
