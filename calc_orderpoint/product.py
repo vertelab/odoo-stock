@@ -60,7 +60,7 @@ class product_template(models.Model):
     def compute_consumption_per_day(self):
         """Compute sales_count and its dependant fields. This can be a
         very taxing computation if there are many sale order lines.
-        Split into many smaller batches to aliveate the problem. Default
+        Split into many smaller batches to alleviate the problem. Default
         settings are made for 5 minute interval cron jobs. Schedule can
         be configured with the calc_orderpoint.schedule parameter.
         """
@@ -76,7 +76,19 @@ class product_template(models.Model):
         if run:
             limit = timedelta(minutes=float(self.env['ir.config_parameter'].get_param('calc_orderpoint.time_limit', '4')))
             _logger.warn('Starting compute_consumption_per_day.')
-            products = self.env['product.template'].search(['|', ('product_variant_ids.sale_ok', '=', True), ('sale_ok', '=', True)], order='last_sales_count asc', limit=int(self.env['ir.config_parameter'].get_param('calc_orderpoint.product_limit', '30')))
+            products = self.env['product.template'].search(
+                ['|', ('product_variant_ids.sale_ok', '=', True),
+                    ('sale_ok', '=', True),
+                    ('last_sales_count', '=', False)],
+                limit=int(self.env['ir.config_parameter'].get_param(
+                    'calc_orderpoint.product_limit', '30')))
+            if not products:
+                products = self.env['product.template'].search(
+                    ['|', ('product_variant_ids.sale_ok', '=', True),
+                        ('sale_ok', '=', True)],
+                    order='last_sales_count asc',
+                    limit=int(self.env['ir.config_parameter'].get_param(
+                        'calc_orderpoint.product_limit', '30')))
             _logger.warn('Computing compute_consumption_per_day for the following products: %s' % products)
             for product in products:
                 product._consumption_per_day()
@@ -85,30 +97,6 @@ class product_template(models.Model):
                 if (datetime.now() - start) > limit:
                     break
             _logger.warn('Finished compute_consumption_per_day.')
-        
-        #~ if target == None:
-            #~ target = date.today().weekday()
-        #~ _logger.warn('Starting compute_consumption_per_day. order = %s, target = %s, max = %s' % (order, target, max))
-        #~ products = self.env['product.template'].browse([])
-        #~ i = 0
-        #~ for p in self.env['product.template'].search([('sale_ok', '=', True)], order=order):
-            #~ if i % max == target:
-                #~ products |= p
-            #~ i += 1
-        #~ _logger.warn('Computing compute_consumption_per_day for the following products: %s' % products)
-        #~ products._consumption_per_day()
-        #~ products.write({'last_sales_count': fields.Datetime.now()})
-        #~ if max_age:
-            #~ dt = datetime.now() - timedelta(days=max_age)
-            #~ products = self.env['product.template'].search(
-                #~ [('sale_ok', '=', True), '|',
-                #~ ('last_sales_count', '=', False),
-                #~ ('last_sales_count', '<', fields.Datetime.to_string(dt))])
-            #~ if products:
-                #~ _logger.warn('Found products with sales_count older than %s days. Will compute sales_count for: %s' % (max_age, products))
-                #~ products._consumption_per_day()
-                #~ products.write({'last_sales_count': fields.Datetime.now()})
-        #~ _logger.warn('Finished compute_consumption_per_day.')
 
 class product_product(models.Model):
     _inherit = 'product.product'

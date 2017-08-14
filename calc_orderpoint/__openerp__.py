@@ -35,7 +35,21 @@ produce_delay + the company manufacturing lead.
 Consumtion per day are calculated from number of days the product has
 been sold (up to a year) and how many items sold during the same period.
 
-Calculated orderpoint are displayed for reordering rules minimum quantity
+Calculated orderpoint are displayed for reordering rules minimum quantity.
+
+The calculations are performed by a cron job. They can be very taxing if
+there are many sale order lines. To avoid timeouts and other issues, the
+job is set to run on 5 minute intervals, calculating up to 30 products,
+or for a maximum duration of 4 minutes. A simple schedule is also
+implemented, defaulting to between 00:00 and 06:00 in admin's timezone.
+All three of these values can be configured through system parameters.
+
+System Parameters
+ * calc_orderpoint.schedule - A simple schedule. Space separated list of
+ start and stop hours, e.g. "0 4 18 24" (between 00:00 and 04:00, and
+ 18:00 and 00:00)
+ * calc_orderpoint.time_limit - The time limit in minutes. Float value.
+ * calc_orderpoint.product_limit - The max number of products. Integer.
 """,
     'author': 'Vertel AB',
     'website': 'http://www.vertel.se',
