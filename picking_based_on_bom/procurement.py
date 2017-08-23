@@ -209,8 +209,6 @@ class procurement_order(models.Model):
 class product_template(models.Model):
     _inherit = "product.template"
 
-    #type = fields.Selection(selection_add=[('kit','Kit')])
-    #is_kit = fields.Boolean(string='Is Kit')
     is_offer = fields.Boolean(string='Offer')
 
 class product_product(models.Model):
@@ -219,48 +217,33 @@ class product_product(models.Model):
     @api.model
     def offer_bom_account_create(self, line):
         product = line.product_id
-        if product:
-            #~ account = self.env.ref('product_dermanord.account_products')
-            #~ move_line = line.invoice_id.move_id.line_id.filtered(lambda l: len(l.analytic_lines) > 0)
-            #~ move_id = move_line[0].id if move_line else None
-            #~ currency = line.invoice_id.currency_id.with_context(date=line.invoice_id.date_invoice)
-            #~ self.env['account.analytic.line'].create({
-                #~ 'move_id': move_id,
-                #~ 'name': line.name,
-                #~ 'date': line.invoice_id.date_invoice,
-                #~ 'account_id': account.id,
-                #~ 'unit_amount': line.quantity,
-                #~ 'amount': currency.compute(line.price_subtotal, line.invoice_id.company_id.currency_id) * 1 if line.invoice_id.type in ('out_invoice', 'in_refund') else -1,
-                #~ 'product_id': line.product_id.id,
-                #~ 'product_uom_id': line.uos_id.id,
-                #~ 'general_account_id': line.account_id.id,
-                #~ 'journal_id': line.invoice_id.journal_id.analytic_journal_id.id,
-                #~ 'ref': line.invoice_id.reference if line.invoice_id.type in ('in_invoice', 'in_refund') else line.invoice_id.number,
-            #~ })
-            if product.is_offer and product.bom_ids:
-                account = self.env.ref('product_dermanord.account_kit_products')
-                total = 0
-                for bom_line in product.bom_ids[0].bom_line_ids:
-                    if bom_line.product_id.sale_ok:
-                        total += bom_line.product_id.lst_price * bom_line.product_qty
-                for bom_line in product.bom_ids[0].bom_line_ids:
-                    if bom_line.product_id.sale_ok:
-                        amount = line.price_subtotal * bom_line.product_id.lst_price * bom_line.product_qty / total
-                        self.env['account.analytic.line'].create({
-                            'move_id': move_id,
-                            'name': line.name,
-                            'date': line.invoice_id.date_invoice,
-                            'account_id': account.id,
-                            'unit_amount': line.quantity * bom_line.product_qty,
-                            'amount': currency.compute(amount, line.invoice_id.company_id.currency_id) * 1 if line.invoice_id.type in ('out_invoice', 'in_refund') else -1,
-                            'product_id': bom_line.product_id.id,
-                            'product_uom_id': bom_line.product_uos.id,
-                            'general_account_id': line.account_id.id,
-                            'journal_id': line.invoice_id.journal_id.analytic_journal_id.id,
-                            'ref': line.invoice_id.reference if line.invoice_id.type in ('in_invoice', 'in_refund') else line.invoice_id.number,
-                        })
+        if product and product.is_offer and product.bom_ids:
+            account = self.env.ref('product_dermanord.account_products')
+            move_line = line.invoice_id.move_id.line_id.filtered(lambda l: len(l.analytic_lines) > 0)
+            move_id = move_line[0].id if move_line else None
+            currency = line.invoice_id.currency_id.with_context(date=line.invoice_id.date_invoice)
+            account = self.env.ref('product_dermanord.account_kit_products')
+            total = 0
+            for bom_line in product.bom_ids[0].bom_line_ids:
+                if bom_line.product_id.sale_ok:
+                    total += bom_line.product_id.lst_price * bom_line.product_qty
+            for bom_line in product.bom_ids[0].bom_line_ids:
+                if bom_line.product_id.sale_ok:
+                    amount = line.price_subtotal * bom_line.product_id.lst_price * bom_line.product_qty / total
+                    self.env['account.analytic.line'].create({
+                        'move_id': move_id,
+                        'name': line.name,
+                        'date': line.invoice_id.date_invoice,
+                        'account_id': account.id,
+                        'unit_amount': line.quantity * bom_line.product_qty,
+                        'amount': currency.compute(amount, line.invoice_id.company_id.currency_id) * 1 if line.invoice_id.type in ('out_invoice', 'in_refund') else -1,
+                        'product_id': bom_line.product_id.id,
+                        'product_uom_id': bom_line.product_uos.id,
+                        'general_account_id': line.account_id.id,
+                        'journal_id': line.invoice_id.journal_id.analytic_journal_id.id,
+                        'ref': line.invoice_id.reference if line.invoice_id.type in ('in_invoice', 'in_refund') else line.invoice_id.number,
+                    })
 
-        
 class account_invoice_line(models.Model):
     _inherit = 'account.invoice'
 
@@ -268,7 +251,6 @@ class account_invoice_line(models.Model):
     def action_move_create(self):
         res = super(account_invoice_line, self).action_move_create()
         _logger.warn('invoice',self,'lines',self.invoice_line)
-        #raise Warning('kalle')
         for l in self.invoice_line:
             self.env['product.product'].offer_bom_account_create(l)
 
@@ -284,12 +266,6 @@ class stock_picking(models.Model):
     def _prepare_pack_ops(self,picking, quants, forced_qties):
         recs = super(stock_picking, self)._prepare_pack_ops(picking, quants, forced_qties)
         return recs
-        #~ res = []
-        #~ for r in recs:
-            #~ product = self.env['product.product'].browse(r['product_id'])
-            #~ if not product.is_offer:
-                #~ res.append(r)
-        #~ return res
         
 
 

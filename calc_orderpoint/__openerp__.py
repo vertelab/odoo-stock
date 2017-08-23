@@ -46,8 +46,8 @@ All three of these values can be configured through system parameters.
 
 System Parameters
  * calc_orderpoint.schedule - A simple schedule. Space separated list of
- start and stop hours, e.g. "0 4 18 24" (between 00:00 and 04:00, and
- 18:00 and 00:00)
+start and stop hours, e.g. "0 4 18 24" (between 00:00 and 04:00, and
+18:00 and 00:00)
  * calc_orderpoint.time_limit - The time limit in minutes. Float value.
  * calc_orderpoint.product_limit - The max number of products. Integer.
 """,
