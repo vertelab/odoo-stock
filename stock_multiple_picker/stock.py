@@ -30,19 +30,16 @@ _logger = logging.getLogger(__name__)
 class stock_picking(models.Model):
     _inherit = "stock.picking"
 
-
-    #~ employee_id = fields.Many2one(string='Picking employee', comodel_name='hr.employee')
-    #~ @api.one
-    #~ def _get_employee_id_readonly(self):
-        #~ self.employee_id_readonly = self.env.user not in self.env.ref('stock.group_stock_manager').users
-    #~ employee_id_readonly = fields.Boolean(compute='_get_employee_id_readonly')
     qc_id = fields.Many2one(string='Controlled by', comodel_name='hr.employee')
+    employee_ids = fields.Many2many(string="Pickers",comodel_name="hr.employee", compute='_employee_ids', search='_search_employee_ids')
 
     @api.one
     def _employee_ids(self):
         self.employee_ids = [(6,0,self.move_lines.mapped('employee_id.id'))]
-    employee_ids = fields.Many2many(string="Pickers",comodel_name="hr.employee", compute='_employee_ids')
 
+    @api.model
+    def _search_employee_ids(self, operator, value):
+        return [('move_lines.employee_id', operator, value)]
 
 class stock_move(models.Model):
     _inherit = "stock.move"
