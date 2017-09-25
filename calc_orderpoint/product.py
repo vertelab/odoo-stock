@@ -49,7 +49,10 @@ class product_template(models.Model):
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
         self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
 
-    sales_count = fields.Integer('# Sales', default=0)
+    def _get_sales_count(self):
+        pass
+
+    sales_count = fields.Integer('# Sales', compute='_get_sales_count', store=True, readonly=True, default=0)  # Initially defined in sale-module
     consumption_per_day = fields.Float('Consumption per Day', default=0)
     orderpoint_computed = fields.Float('Orderpoint', default=0)
     virtual_available_days = fields.Float('Virtual Available Days', default=0)
@@ -125,8 +128,11 @@ class product_product(models.Model):
         self.orderpoint_computed =  self.consumption_per_day * delay
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
         self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
-            
-    sales_count = fields.Integer('# Sales', default=0)  # Initially defined in sale-module
+
+    def _get_sales_count(self):
+        pass
+
+    sales_count = fields.Integer('# Sales', compute='_get_sales_count', store=True, readonly=True, default=0)  # Initially defined in sale-module
     consumption_per_day = fields.Float('Consumption per Day', default=0)
     orderpoint_computed = fields.Float('Orderpoint', default=0)
     virtual_available_days = fields.Float('Virtual Available Days', default=0)
