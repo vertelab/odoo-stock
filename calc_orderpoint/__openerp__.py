@@ -53,7 +53,7 @@ start and stop hours, e.g. "0 4 18 24" (between 00:00 and 04:00, and
 """,
     'author': 'Vertel AB',
     'website': 'http://www.vertel.se',
-    'depends': ['stock','mrp'],
+    'depends': ['stock','mrp', 'sale'],
     'data': [
         'product_view.xml',
         'product_data.xml',
