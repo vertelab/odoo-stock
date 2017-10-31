@@ -21,6 +21,7 @@
 
 import openerp.exceptions
 from openerp import models, fields, api, _
+from openerp.exceptions import Warning
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -217,30 +218,32 @@ class product_product(models.Model):
     @api.model
     def offer_bom_account_create(self, line):
         product = line.product_id
-        if product and product.is_offer and product.bom_ids:
-            account = self.env.ref('product_dermanord.account_products')
+        if product and product.is_offer and not product.iskit and product.bom_ids:
             currency = line.invoice_id.currency_id.with_context(date=line.invoice_id.date_invoice)
             account = self.env.ref('product_dermanord.account_kit_products')
             total = 0
-            for bom_line in product.bom_ids[0].bom_line_ids:
-                if bom_line.product_id.sale_ok:
-                    total += bom_line.product_id.lst_price * bom_line.product_qty
-            for bom_line in product.bom_ids[0].bom_line_ids:
-                if bom_line.product_id.sale_ok:
-                    amount = line.price_subtotal * bom_line.product_id.lst_price * bom_line.product_qty / total
-                    self.env['account.analytic.line'].create({
-                        'move_id': line.invoice_id.move_id.id,
-                        'name': line.name,
-                        'date': line.invoice_id.date_invoice,
-                        'account_id': account.id,
-                        'unit_amount': line.quantity * bom_line.product_qty * (1 if line.invoice_id.type in ('out_invoice', 'in_refund') else -1),
-                        'amount': currency.compute(amount, line.invoice_id.company_id.currency_id) * 1 if line.invoice_id.type in ('out_invoice', 'in_refund') else -1,
-                        'product_id': bom_line.product_id.id,
-                        'product_uom_id': bom_line.product_uos.id,
-                        'general_account_id': line.account_id.id,
-                        'journal_id': line.invoice_id.journal_id.analytic_journal_id.id,
-                        'ref': line.invoice_id.reference if line.invoice_id.type in ('in_invoice', 'in_refund') else line.invoice_id.number,
-                    })
+            bom = product.bom_ids.filtered(lambda r: r.product_id == product) or product.bom_ids.filtered(lambda r: not r.product_id)
+            if bom:
+                bom = bom[0]
+                for bom_line in bom.bom_line_ids:
+                    if bom_line.product_id.sale_ok:
+                        total += bom_line.product_id.lst_price * bom_line.product_qty
+                for bom_line in bom.bom_line_ids:
+                    if bom_line.product_id.sale_ok:
+                        amount = line.price_subtotal * bom_line.product_id.lst_price * bom_line.product_qty / total
+                        self.env['account.analytic.line'].create({
+                            'move_id': line.invoice_id.move_id.id,
+                            'name': line.name,
+                            'date': line.invoice_id.date_invoice,
+                            'account_id': account.id,
+                            'unit_amount': line.quantity * bom_line.product_qty * (1 if line.invoice_id.type in ('out_invoice', 'in_refund') else -1),
+                            'amount': currency.compute(amount, line.invoice_id.company_id.currency_id) * 1 if line.invoice_id.type in ('out_invoice', 'in_refund') else -1,
+                            'product_id': bom_line.product_id.id,
+                            'product_uom_id': bom_line.product_uos.id,
+                            'general_account_id': line.account_id.id,
+                            'journal_id': line.invoice_id.journal_id.analytic_journal_id.id,
+                            'ref': line.invoice_id.reference if line.invoice_id.type in ('in_invoice', 'in_refund') else line.invoice_id.number,
+                        })
 
 class account_invoice_line(models.Model):
     _inherit = 'account.invoice'
