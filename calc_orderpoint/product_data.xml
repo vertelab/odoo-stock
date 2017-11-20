@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
   <data noupdate="1">
+<!--
     <record model="ir.actions.server" id="product_instock_percent">
       <field name="name">Calc Instock Percent</field>
       <field name="state">code</field>
@@ -9,7 +10,7 @@
       <field name="code">
 obj = object.browse(context.get('active_ids', []))
 for o in obj:
-    o.produce_delay = o.produce_delay
+    o._consumption_per_day()
       </field>
     </record>
     <record model="ir.values" id="product_instock_percent_action_menu">
@@ -19,6 +20,7 @@ for o in obj:
       <field name="key2">client_action_multi</field>
       <field name="value" eval="'ir.actions.server,%d' % product_instock_percent" />
     </record>
+-->
     <record model="ir.actions.server" id="product_instock_percent">
       <field name="menu_ir_values_id" ref="product_instock_percent_action_menu" />
     </record>
@@ -28,7 +30,9 @@ for o in obj:
       <field name="interval_number">1</field>
       <field name="interval_type">days</field>
       <field name="doall" eval="True"/>
+<!--
       <field name="nextcall" eval="(datetime.datetime.now() + datetime.timedelta(hours=12)).strftime('%Y-%m-%d %H:%M:%S')"/>
+-->
       <field name="numbercall">-1</field>
       <field name="model">product.template</field>
       <field name="function">compute_consumption_per_day</field>

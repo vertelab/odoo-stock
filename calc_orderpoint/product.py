@@ -45,9 +45,13 @@ class product_template(models.Model):
             delay = min(self.seller_ids.mapped('delay')) + self.company_id.po_lead
         else:
             delay = self.produce_delay + self.company_id.manufacturing_lead
+
+        self.virtual_available_delay = delay
         self.orderpoint_computed = self.consumption_per_day * delay
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
-        self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
+        self.instock_percent = self.sudo().virtual_available_days / (self.virtual_available_delay or 1.0) * 100
+        self.last_sales_count = fields.Datetime.now()
+
 
     sales_count = fields.Integer('# Sales', default=0)
     consumption_per_day = fields.Float('Consumption per Day', default=0)
@@ -55,6 +59,8 @@ class product_template(models.Model):
     virtual_available_days = fields.Float('Virtual Available Days', default=0)
     instock_percent = fields.Integer('Instock Percent', default=0)
     last_sales_count = fields.Datetime('Last Sales Compute', help="The last point in time when # Sales, Consumption per Day, Orderpoint, Virtual Available Days, and Instock Percent were computed.")
+    virtual_available_delay = fields.Float('Delay', default=0,help="Number of days before refill of stock")
+
 
     @api.model
     def compute_consumption_per_day(self):
@@ -98,6 +104,11 @@ class product_template(models.Model):
                     break
             _logger.warn('Finished compute_consumption_per_day.')
 
+        @api.one
+        def calc_orderpoint(self):
+            for product in self.product_variant_ids:
+                product._consumption_per_day()
+            
 class product_product(models.Model):
     _inherit = 'product.product'
 
@@ -122,17 +133,24 @@ class product_product(models.Model):
             delay = min(self.seller_ids.mapped('delay')) + self.company_id.po_lead
         else:
             delay = self.produce_delay + self.company_id.manufacturing_lead
+        self.virtual_available_delay = delay
         self.orderpoint_computed =  self.consumption_per_day * delay
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
         self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
+        self.last_sales_count = fields.Datetime.now()
             
     sales_count = fields.Integer('# Sales', default=0)  # Initially defined in sale-module
-    consumption_per_day = fields.Float('Consumption per Day', default=0)
-    orderpoint_computed = fields.Float('Orderpoint', default=0)
-    virtual_available_days = fields.Float('Virtual Available Days', default=0)
-    instock_percent = fields.Integer('Instock Percent', default=0)
+    consumption_per_day = fields.Float('Consumption per Day', default=0,help="Number of items that is consumed per day")
+    orderpoint_computed = fields.Float('Orderpoint', default=0,help="Delay * Consumption per day, delay is sellers delay or produce delay")
+    virtual_available_days = fields.Float('Virtual Available Days', default=0,help="Number of days that Forcast Quantity will last with this Consumtion per day")
+    virtual_available_delay = fields.Float('Delay', default=0,help="Number of days before refill of stock")
+    instock_percent = fields.Integer('Instock Percent', default=0,help="Forcast Quantity / Computed Order point * 100")
 
     sale_order_lines = fields.One2many(comodel_name='sale.order.line', inverse_name="product_id")	
+
+    @api.one
+    def calc_orderpoint(self):
+        self._consumption_per_day()
 
 
 class stock_warehouse_orderpoint(models.Model):

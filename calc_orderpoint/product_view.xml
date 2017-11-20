@@ -30,11 +30,17 @@
           <label for="virtual_available" />
           <div>
             <field name="virtual_available" class="oe_inline" />
-            <span>(</span>
+            <span> ( </span>
             <field name="virtual_available_days" class="oe_inline" />
-            <span>days</span>
+            <span>days / </span>
+    
+            <field name="virtual_available_delay" class="oe_inline" />
+            <span>days delay ⇒ </span>
+
             <field name="instock_percent" class="oe_inline" />
-            <span>% )</span>
+            <span> % )</span>
+            <field name="last_sales_count" class="oe_inline" />
+            <button name="calc_orderpoint" type='object' string="Calc Orderpoint" class="oe_inline" />
           </div>
           <field name="consumption_per_day" />
         </field>
