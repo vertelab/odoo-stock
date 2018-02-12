@@ -56,6 +56,9 @@ class product_template(models.Model):
     def _get_sales_count(self):
         pass
 
+    def _sales_count(self, cr, uid, ids, field_name, arg, context=None):
+        pass
+
     sales_count = fields.Integer('# Sales', compute='_get_sales_count', store=True, readonly=True, default=0)  # Initially defined in sale-module
     consumption_per_day = fields.Float('Consumption per Day', default=0)
     orderpoint_computed = fields.Float('Orderpoint', default=0)
@@ -111,7 +114,7 @@ class product_template(models.Model):
         def calc_orderpoint(self):
             for product in self.product_variant_ids:
                 product._consumption_per_day()
-            
+
 class product_product(models.Model):
     _inherit = 'product.product'
 
@@ -141,7 +144,7 @@ class product_product(models.Model):
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
         self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
         self.last_sales_count = fields.Datetime.now()
-            
+
     sales_count = fields.Integer('# Sales', default=0)  # Initially defined in sale-module
     consumption_per_day = fields.Float('Consumption per Day', default=0,help="Number of items that is consumed per day")
     orderpoint_computed = fields.Float('Orderpoint', default=0,help="Delay * Consumption per day, delay is sellers delay or produce delay")
@@ -150,7 +153,7 @@ class product_product(models.Model):
     instock_percent = fields.Integer('Instock Percent', default=0,help="Forcast Quantity / Computed Order point * 100")
 
 
-    sale_order_lines = fields.One2many(comodel_name='sale.order.line', inverse_name="product_id")	
+    sale_order_lines = fields.One2many(comodel_name='sale.order.line', inverse_name="product_id")
 
     @api.one
     def calc_orderpoint(self):
