@@ -28,6 +28,7 @@ Implements a putaway strategy with location per template and/or variant.
 Stock locations are defined on products.
 """,
     'author': 'Vertel AB',
+    'license': 'AGPL-3',
     'website': 'http://www.vertel.se',
     'depends': ['stock'],
     'data': [

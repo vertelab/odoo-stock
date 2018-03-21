@@ -28,6 +28,7 @@
 
 Report financed by Dermanord-Svensk Hudvård AB""",
 'author': 'Vertel AB',
+    'license': 'AGPL-3',
 'website': 'http://www.vertel.se',
 'depends': ['stock','delivery','sale_stock'],
 'data': [ 'stock_picking_report_view.xml','security/ir.model.access.csv'],

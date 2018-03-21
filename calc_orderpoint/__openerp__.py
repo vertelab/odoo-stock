@@ -52,6 +52,7 @@ start and stop hours, e.g. "0 4 18 24" (between 00:00 and 04:00, and
  * calc_orderpoint.product_limit - The max number of products. Integer.
 """,
     'author': 'Vertel AB',
+    'license': 'AGPL-3',
     'website': 'http://www.vertel.se',
     'depends': ['stock','mrp', 'sale'],
     'data': [
