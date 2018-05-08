@@ -24,6 +24,11 @@ import pytz
 import logging
 _logger = logging.getLogger(__name__)
 
+#~ 20,00       sales_count
+#~ 1,981039 	so_line_ids
+#~ 1,022867 	sale_order_lines
+#~ 0,390086 	code
+
 class product_template(models.Model):
     _inherit = 'product.template'
 
@@ -148,7 +153,11 @@ class product_product(models.Model):
             self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
         self.last_sales_count = fields.Datetime.now()
 
-    sales_count = fields.Integer('# Sales', default=0)  # Initially defined in sale-module
+
+    def _get_sales_count(self):
+        pass
+
+    sales_count = fields.Integer('# Sales', compute='_get_sales_count', store=True, readonly=True, default=0)  # Initially defined in sale-module
     consumption_per_day = fields.Float('Consumption per Day', default=0,help="Number of items that is consumed per day")
     orderpoint_computed = fields.Float('Orderpoint', default=0,help="Delay * Consumption per day, delay is sellers delay or produce delay")
     virtual_available_days = fields.Float('Virtual Available Days', default=0,help="Number of days that Forcast Quantity will last with this Consumtion per day")
@@ -156,7 +165,7 @@ class product_product(models.Model):
     instock_percent = fields.Integer('Instock Percent', default=0,help="Forcast Quantity / Computed Order point * 100")
 
 
-    sale_order_lines = fields.One2many(comodel_name='sale.order.line', inverse_name="product_id")
+    #~ sale_order_lines = fields.One2many(comodel_name='sale.order.line', inverse_name="product_id")  # performance hog, do we need it?
 
     @api.one
     def calc_orderpoint(self):

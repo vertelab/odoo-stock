@@ -2,7 +2,7 @@
 ##############################################################################
 #
 # OpenERP, Open Source Management Solution, third party addon
-# Copyright (C) 2016- Vertel AB (<http://vertel.se>).
+# Copyright (C) 2018- Vertel AB (<http://vertel.se>).
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -19,20 +19,15 @@
 #
 ##############################################################################
 {
-'name': 'Stock Multiple Pickers',
-'version': '0.1',
-'summary': 'Extends Picking list with pickers',
-'category': 'stock',
-'description': """
-    Wizard that distributes one or many pickers on a picking. Multiple persons can pick
-    in parallell.
-
-
-Financed by Dermanord-Svensk Hudvård AB""",
-'author': 'Vertel AB',
+    'name': 'Stock Account - Scrap Fix',
+    'version': '1.0',
+    'summary': 'Corrects Invoice Control on scrapped move lines',
+    'category': 'stock',
+    'description': """""",
+    'author': 'Vertel AB',
     'license': 'AGPL-3',
-'website': 'http://www.vertel.se',
-'depends': ['stock', 'hr'],
-'data': ['stock_view.xml', 'stock_picking_report.xml', 'wizard/stock_picking_view.xml'],
-'installable': True,
+    'website': 'http://www.vertel.se',
+    'depends': ['stock_account'],
+    'data': [],
+    'installable': True,
 }

@@ -2,7 +2,7 @@
 ##############################################################################
 #
 # OpenERP, Open Source Management Solution, third party addon
-# Copyright (C) 2016- Vertel AB (<http://vertel.se>).
+# Copyright (C) 2018- Vertel AB (<http://vertel.se>).
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -18,21 +18,20 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-{
-'name': 'Stock Multiple Pickers',
-'version': '0.1',
-'summary': 'Extends Picking list with pickers',
-'category': 'stock',
-'description': """
-    Wizard that distributes one or many pickers on a picking. Multiple persons can pick
-    in parallell.
 
+from openerp import models, fields, api, _
 
-Financed by Dermanord-Svensk Hudvård AB""",
-'author': 'Vertel AB',
-    'license': 'AGPL-3',
-'website': 'http://www.vertel.se',
-'depends': ['stock', 'hr'],
-'data': ['stock_view.xml', 'stock_picking_report.xml', 'wizard/stock_picking_view.xml'],
-'installable': True,
-}
+import logging
+_logger = logging.getLogger(__name__)
+
+class StockMove(models.Model):
+    _inherit = "stock.move"
+
+    @api.multi
+    def action_scrap(self, quantity, location_id, restrict_lot_id=False, restrict_partner_id=False):
+        res = super(StockMove, self).action_scrap(quantity, location_id, restrict_lot_id=restrict_lot_id, restrict_partner_id=restrict_partner_id)
+        if res:
+            self.browse(res).write({'invoice_state': 'none'})
+        return res
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
