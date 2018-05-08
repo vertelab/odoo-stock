@@ -142,7 +142,10 @@ class product_product(models.Model):
         self.virtual_available_delay = delay
         self.orderpoint_computed =  self.consumption_per_day * delay
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
-        self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
+        if self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
+            self.instock_percent = 100
+        else:
+            self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
         self.last_sales_count = fields.Datetime.now()
 
     sales_count = fields.Integer('# Sales', default=0)  # Initially defined in sale-module
