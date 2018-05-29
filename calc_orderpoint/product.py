@@ -54,7 +54,12 @@ class product_template(models.Model):
         self.virtual_available_delay = delay
         self.orderpoint_computed = self.consumption_per_day * delay
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
-        self.instock_percent = self.sudo().virtual_available_days / (self.virtual_available_delay or 1.0) * 100
+        if self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
+            self.instock_percent = 100
+        elif self.type == 'consu': # Consumables are always in stock
+            self.instock_percent = 100
+        else:
+            self.instock_percent = self.sudo().virtual_available_days / (self.virtual_available_delay or 1.0) * 100
         self.last_sales_count = fields.Datetime.now()
 
 
@@ -115,10 +120,9 @@ class product_template(models.Model):
                     break
             _logger.warn('Finished compute_consumption_per_day.')
 
-        @api.one
-        def calc_orderpoint(self):
-            for product in self.product_variant_ids:
-                product._consumption_per_day()
+    @api.one
+    def calc_orderpoint(self):
+        self._consumption_per_day()
 
 class product_product(models.Model):
     _inherit = 'product.product'
@@ -148,6 +152,8 @@ class product_product(models.Model):
         self.orderpoint_computed =  self.consumption_per_day * delay
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
         if self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
+            self.instock_percent = 100
+        elif self.type == 'consu': # Consumables are always in stock
             self.instock_percent = 100
         else:
             self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
