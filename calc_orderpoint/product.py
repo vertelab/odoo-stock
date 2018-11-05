@@ -56,7 +56,11 @@ class product_template(models.Model):
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
         self.instock_percent = self.sudo().virtual_available_days / (self.virtual_available_delay or 1.0) * 100
         self.last_sales_count = fields.Datetime.now()
-
+ 
+        if self.is_out_of_stock:
+            self.instock_percent = 0
+        elif self.type == 'consu' or self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
+            self.instock_percent = 100
 
     def _get_sales_count(self):
         pass
@@ -71,7 +75,7 @@ class product_template(models.Model):
     instock_percent = fields.Integer('Instock Percent', default=0)
     last_sales_count = fields.Datetime('Last Sales Compute', help="The last point in time when # Sales, Consumption per Day, Orderpoint, Virtual Available Days, and Instock Percent were computed.")
     virtual_available_delay = fields.Float('Delay', default=0,help="Number of days before refill of stock")
-
+    is_out_of_stock = fields.Boolean(string='Is out of stock',help='Check this box to ensure not to sell this product due to stock outage (instock_percent = 0)')
 
     @api.model
     def compute_consumption_per_day(self):
@@ -140,6 +144,8 @@ class product_product(models.Model):
             sale_nbr_days = 0
             self.sales_count = 0
         self.consumption_per_day = self.sales_count / (sale_nbr_days or 1.0)
+        self.consumption_per_month = self.consumption_per_day * 30.5
+        self.consumption_per_year = self.consumption_per_day * 365
         if min(self.seller_ids.mapped('delay') or [0.0])>0.0:
             delay = min(self.seller_ids.mapped('delay')) + self.company_id.po_lead
         else:
@@ -158,7 +164,9 @@ class product_product(models.Model):
         pass
 
     sales_count = fields.Integer('# Sales', compute='_get_sales_count', store=True, readonly=True, default=0)  # Initially defined in sale-module
-    consumption_per_day = fields.Float('Consumption per Day', default=0,help="Number of items that is consumed per day")
+    consumption_per_day = fields.Float(string='Consumption per Day', default=0,help="Number of items that is consumed per day")
+    consumption_per_month = fields.Float(string='Consumption per Month', default=0,help="Number of items that is consumed per month")
+    consumption_per_year = fields.Float(string='Consumption per Year', default=0,help="Number of items that is consumed per year")
     orderpoint_computed = fields.Float('Orderpoint', default=0,help="Delay * Consumption per day, delay is sellers delay or produce delay")
     virtual_available_days = fields.Float('Virtual Available Days', default=0,help="Number of days that Forcast Quantity will last with this Consumtion per day")
     virtual_available_delay = fields.Float('Delay', default=0,help="Number of days before refill of stock")

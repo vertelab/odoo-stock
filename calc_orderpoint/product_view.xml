@@ -30,19 +30,19 @@
           <label for="virtual_available" />
           <div>
             <field name="virtual_available" class="oe_inline" />
-            <span> ( </span>
+            <span>(</span>
             <field name="virtual_available_days" class="oe_inline" />
-            <span>days / </span>
-    
+            <span>days /</span>
             <field name="virtual_available_delay" class="oe_inline" />
-            <span>days delay ⇒ </span>
-
+            <span>days delay ⇒</span>
             <field name="instock_percent" class="oe_inline" />
-            <span> % )</span>
+            <span>% )</span>
             <field name="last_sales_count" class="oe_inline" />
             <button name="calc_orderpoint" type='object' string="Calc Orderpoint" class="oe_inline" />
           </div>
           <field name="consumption_per_day" />
+          <field name="consumption_per_month" />
+          <field name="consumption_per_year" />
         </field>
       </field>
     </record>
@@ -74,6 +74,27 @@
             <field name="orderpoint_computed" class="oe_inline" />
             <span>)</span>
           </div>
+        </field>
+      </field>
+    </record>
+    <record id="product_product_tree_view" model="ir.ui.view">
+      <field name="name">product.product.tree.cpd</field>
+      <field name="model">product.product</field>
+      <field name="arch" type="xml">
+        <field name="ean13" position="after">
+          <field name="consumtion_per_day" string='CpD' />
+          <field name="consumtion_per_month" string='CpM' />
+          <field name="consumtion_per_year" string='CpY' />
+        </field>
+      </field>
+    </record>
+    <record id="view_stock_product_tree" model="ir.ui.view">
+      <field name="name">product.stock.tree.instock_percent</field>
+      <field name="model">product.product</field>
+      <field name="inherit_id" ref="stock.view_stock_product_tree" />
+      <field name="arch" type="xml">
+        <field name="virtual_available" position="after">
+          <field name="instock_percent" />
         </field>
       </field>
     </record>
