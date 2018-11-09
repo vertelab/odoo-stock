@@ -19,7 +19,7 @@
 #
 ##############################################################################
 from odoo import models, fields, api, _
-
+from odoo.exceptions import Warning
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -27,11 +27,27 @@ _logger = logging.getLogger(__name__)
 class StockPickingOrderBasedWizard(models.TransientModel):
     _name = 'stock.picking.order.based.wizard'
 
-    source_location_id = fields.Many2one(comodel_name='stock.location', string='Source Location Zone')
-    dest_location_id = fields.Many2one(comodel_name='stock.location', string='Destination Location Zone')
-    period_start = fields.Date(string='Period Start')
-    period_stop = fields.Date(string='Period Stop')
+    source_location_id = fields.Many2one(comodel_name='stock.location', string='Source Location Zone', required=True)
+    dest_location_id = fields.Many2one(comodel_name='stock.location', string='Destination Location Zone', required=True)
+    period_start = fields.Date(string='Period Start', required=True)
+    period_stop = fields.Date(string='Period Stop', required=True)
 
-    @api.model
+    @api.multi
     def make_picking(self):
-        pass
+        picking_type = self.env['stock.picking.type'].search([('default_location_src_id', '=', self.source_location_id.id), ('default_location_dest_id', '=', self.dest_location_id.id)])
+        if len(picking_type) == 0:
+            raise Warning(_('Sorry, picking type from "%s" to "%s" is not defined.' %(self.source_location_id.name, self.dest_location_id.name)))
+        orders = self.env['sale.order'].search([('confirmation_date', '>=', self.period_start + ' 00:00:00'), ('confirmation_date', '<=', self.period_stop + ' 23:59:59'), ('state', '=', 'sale')])
+        move_lines_dic = {
+            'name': _('Move: %s -> %s' %(self.source_location_id.name, self.dest_location_id.name)),
+            'location_id': self.source_location_id.id,
+            'location_dest_id': self.dest_location_id.id,
+            'move_type': 'one',
+            'picking_type_id': picking_type[0].id,
+        }
+        picking = self.env['stock.picking'].create(move_lines_dic)
+        products = []
+        for product in orders.mapped('order_line').mapped('product_id'):
+            self.env['stock.move'].create({'product_id': product.id, 'name': product.partner_ref, 'product_uom_qty': sum(orders.mapped('order_line').with_context(pro_id=product).filtered(lambda l: l.product_id == l._context.get('pro_id')).mapped('product_uom_qty')), 'product_uom': product.uom_id.id, 'location_id': self.source_location_id.id, 'location_dest_id': self.dest_location_id.id, 'picking_id': picking.id})
+        picking.action_confirm()
+        picking.action_assign() # TODO: is this action necessary?
