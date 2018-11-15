@@ -51,3 +51,13 @@ class StockPickingOrderBasedWizard(models.TransientModel):
             self.env['stock.move'].create({'product_id': product.id, 'name': product.partner_ref, 'product_uom_qty': sum(orders.mapped('order_line').with_context(pro_id=product).filtered(lambda l: l.product_id == l._context.get('pro_id')).mapped('product_uom_qty')), 'product_uom': product.uom_id.id, 'location_id': self.source_location_id.id, 'location_dest_id': self.dest_location_id.id, 'picking_id': picking.id})
         picking.action_confirm()
         picking.action_assign() # TODO: is this action necessary?
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'stock.picking',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'view_id': self.env.ref('stock.view_picking_form').id,
+            'res_id': picking.id,
+            'target': 'current',
+            'context': {},
+        }
