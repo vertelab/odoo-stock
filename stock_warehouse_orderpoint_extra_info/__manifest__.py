@@ -20,19 +20,19 @@
 ##############################################################################
 
 {
-    'name': 'Stock Picking Order Based',
+    'name': 'Orderpoint Extra info',
     'version': '0.1',
     'category': 'stock',
     'description': """
-Sale Order based stock picking
-==============================
+Extra info on orderpoint
+========================
 """,
     'author': 'Vertel AB',
     'license': 'AGPL-3',
     'website': 'http://www.vertel.se',
-    'depends': ['stock'],
+    'depends': ['stock', 'website_sale'],
     'data': [
-        'wizard/wizard_view.xml',
+        'views/stock_warehouse_orderpoint_view.xml',
     ],
     'installable': True,
 }
