@@ -54,7 +54,10 @@ class product_template(models.Model):
         self.virtual_available_delay = delay
         self.orderpoint_computed = self.consumption_per_day * delay
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
-        if self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
+
+        if self.is_out_of_stock:
+            self.instock_percent = 0
+        elif self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
             self.instock_percent = 100
         elif self.type == 'consu': # Consumables are always in stock
             self.instock_percent = 100
@@ -62,11 +65,6 @@ class product_template(models.Model):
             self.instock_percent = self.sudo().virtual_available_days / (self.virtual_available_delay or 1.0) * 100
         self.last_sales_count = fields.Datetime.now()
  
-        if self.is_out_of_stock:
-            self.instock_percent = 0
-        elif self.type == 'consu' or self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
-            self.instock_percent = 100
-
     def _get_sales_count(self):
         pass
 
@@ -157,7 +155,10 @@ class product_product(models.Model):
         self.virtual_available_delay = delay
         self.orderpoint_computed =  self.consumption_per_day * delay
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
-        if self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
+        
+        if self.is_out_of_stock:
+            self.instock_percent = 0
+        elif self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
             self.instock_percent = 100
         elif self.type == 'consu': # Consumables are always in stock
             self.instock_percent = 100
@@ -177,6 +178,7 @@ class product_product(models.Model):
     virtual_available_days = fields.Float('Virtual Available Days', default=0,help="Number of days that Forcast Quantity will last with this Consumtion per day")
     virtual_available_delay = fields.Float('Delay', default=0,help="Number of days before refill of stock")
     instock_percent = fields.Integer('Instock Percent', default=0,help="Forcast Quantity / Computed Order point * 100")
+    is_out_of_stock = fields.Boolean(string='Is out of stock',help='Check this box to ensure not to sell this product due to stock outage (instock_percent = 0)')
 
 
     #~ sale_order_lines = fields.One2many(comodel_name='sale.order.line', inverse_name="product_id")  # performance hog, do we need it?
