@@ -24,7 +24,8 @@
     'version': '0.1',
     'category': 'stock',
     'description': """
-
+* Sum of number of products in a picking.
+* Search not greater than / greater than number of products
 """,
     'author': 'Vertel AB',
     'license': 'AGPL-3',
