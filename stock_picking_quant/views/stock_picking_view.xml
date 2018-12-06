@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="vpicktree" model="ir.ui.view">
+            <field name="name">stock.picking.tree.inherited.stock_picking_quant</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.vpicktree" />
+            <field name="arch" type="xml">
+                <field name="state" position="before">
+                    <field name="picking_quant" />
+                </field>
+            </field>
+        </record>
+        <record id="view_picking_internal_search" model="ir.ui.view">
+            <field name="name">stock.picking.internal.search.inherited.stock_picking_quant</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+            <field name="arch" type="xml">
+                <field name="group_id" position="after">
+                    <field name="picking_quant" string="Not greater than" filter_domain="[('picking_quant', '&lt;=', self)]" />
+                    <field name="picking_quant" string="Greater than" filter_domain="[('picking_quant', '&gt;', self)]" />
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
