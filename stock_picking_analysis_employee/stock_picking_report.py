@@ -66,19 +66,19 @@ Plockning per rad?
 class stock_picking(models.Model):
     _inherit = 'stock.picking'
     
-    picking_starts = fields.DateTime(string="Picking Starts")
-    picking_stops = fields.DateTime(string="Picking Stops")
-    wraping_starts = fields.DateTime(string="Wraping Starts",compute="_wraping_starts")
-    wraping_stops = fields.DateTime(string="Wraping Stops")
+    picking_starts = fields.Datetime(string="Picking Starts")
+    picking_stops = fields.Datetime(string="Picking Stops")
+    wraping_starts = fields.Datetime(string="Wraping Starts",compute="_wraping_starts")
+    wraping_stops = fields.Datetime(string="Wraping Stops")
 
     @api.one
     @api.depends('qc_id',)
     def _wraping_starts(self):
-        self.wraping_starts = fields.DateTime.now()
+        self.wraping_starts = fields.Datetime.now()
 
     @api.one
     def stop_picking(self):
-        self.picking_stops = fields.DateTime.now()
+        self.picking_stops = fields.Datetime.now()
 
 class stock_picking_wizard(models.TransientModel):
     _inherit = 'stock.picking.multiple'
@@ -86,14 +86,14 @@ class stock_picking_wizard(models.TransientModel):
     @api.multi
     def set_picking_employee(self):
         super(stock_picking_wizard, self).set_picking_employee()
-        self.picking_id.picking_starts = fields.DateTime.now()
+        self.picking_id.picking_starts = fields.Datetime.now()
 
 class stock_invoice_onshipping(models.TransientModel):
     _inherit = 'stock.invoice.onshipping'
 
     @api.multi
     def open_invoice():
-        self.wraping_stops = fields.DateTime.now()
+        self.wraping_stops = fields.Datetime.now()
         return super(stock_invoice_onshipping, self).open_invoice()
 
 
