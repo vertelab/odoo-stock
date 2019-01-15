@@ -25,6 +25,38 @@ from openerp import models, fields, api, _
 import logging
 _logger = logging.getLogger(__name__)
 
+
+"""
+
+Vi behöver kunna mäta hur vi presterar vad gäller plockning och emballering. Och vi vill mäta tiden det tar att plocka en order resp emballera den samma.
+
+Så här tänker vi loggningen:
+
+Plocktid:
+
+När man sätter plockare på en order så sätts en tidsstäpel med datum och tid. När plockningen är klar skall plockaren markera order som plockad. Detta skall sätta en tidstämpel när detta inträffar. På så sätt kan vi sedan redovisa per order hur lång plocktid vi haft. Denna information vill vi sedan bygga en rapport för under Rapporter i BI.
+
+Emballeringstid:
+
+När det på en order sätts kontrollerad av så sätts en tidsstämpel (nu börjar emballeringstiden). När användaren klickar på skapa faktura på ordern/plockningen så skall en tidstämpel sättas för detta. Tiden för emballering är från att kontrollerat av sätts till dess att man klickar på skapa faktura. Denna information vill vi sedan bygga en rapport för under Rapporter i BI.
+
+Rapport i BI:
+
+Vi vill kunna se:
+
+Tid per plocking. Snittid per plockare, dag, månad, år.
+
+Tid per emballering. Snittid per kontrollerare, dag, månad, år.
+
+Tid per order. Snittid vi lägger per order. Tiden för en order är från tidsstämpeln när vi sätter plockar till tidstämpeln då skapa faktura sker. Snitt tid per dag, månad, år.
+
+picking_time
+wrap_time
+
+Plockning per rad?
+
+"""
+
 class stock_picking(models.Model):
     _inherit = 'stock.picking'
     
@@ -91,6 +123,9 @@ class stock_picking_report(models.Model):
                     sp.company_id as company_id,
                     extract(epoch from avg(date_trunc('day',sp.date_done)-date_trunc('day',sp.min_date)))/(24*60*60)::decimal(16,2) as delay,
                     extract(epoch from avg(date_trunc('day',sp.date_done)-date_trunc('day',sp.date)))/(24*60*60)::decimal(16,2) as leadtime,
+                    
+
+                    
                     sp.state,
                     sp.picking_type_id as picking_type_id,
                     sp.move_type as move_type

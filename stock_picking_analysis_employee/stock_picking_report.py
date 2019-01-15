@@ -31,6 +31,71 @@ from openerp import models, fields, api, _
 import logging
 _logger = logging.getLogger(__name__)
 
+"""
+
+Vi behöver kunna mäta hur vi presterar vad gäller plockning och emballering. Och vi vill mäta tiden det tar att plocka en order resp emballera den samma.
+
+Så här tänker vi loggningen:
+
+Plocktid:
+
+När man sätter plockare på en order så sätts en tidsstäpel med datum och tid. När plockningen är klar skall plockaren markera order som plockad. Detta skall sätta en tidstämpel när detta inträffar. På så sätt kan vi sedan redovisa per order hur lång plocktid vi haft. Denna information vill vi sedan bygga en rapport för under Rapporter i BI.
+
+Emballeringstid:
+
+När det på en order sätts kontrollerad av så sätts en tidsstämpel (nu börjar emballeringstiden). När användaren klickar på skapa faktura på ordern/plockningen så skall en tidstämpel sättas för detta. Tiden för emballering är från att kontrollerat av sätts till dess att man klickar på skapa faktura. Denna information vill vi sedan bygga en rapport för under Rapporter i BI.
+
+Rapport i BI:
+
+Vi vill kunna se:
+
+Tid per plocking. Snittid per plockare, dag, månad, år.
+
+Tid per emballering. Snittid per kontrollerare, dag, månad, år.
+
+Tid per order. Snittid vi lägger per order. Tiden för en order är från tidsstämpeln när vi sätter plockar till tidstämpeln då skapa faktura sker. Snitt tid per dag, månad, år.
+
+picking_time
+wrap_time
+
+Plockning per rad?
+
+"""
+
+
+class stock_picking(models.Model):
+    _inherit = 'stock.picking'
+    
+    picking_starts = fields.DateTime(string="Picking Starts")
+    picking_stops = fields.DateTime(string="Picking Stops")
+    wraping_starts = fields.DateTime(string="Wraping Starts",compute="_wraping_starts")
+    wraping_stops = fields.DateTime(string="Wraping Stops")
+
+    @api.one
+    @api.depends('qc_id',)
+    def _wraping_starts(self):
+        self.wraping_starts = fields.DateTime.now()
+
+    @api.one
+    def stop_picking(self):
+        self.picking_stops = fields.DateTime.now()
+
+class stock_picking_wizard(models.TransientModel):
+    _inherit = 'stock.picking.multiple'
+        
+    @api.multi
+    def set_picking_employee(self):
+        super(stock_picking_wizard, self).set_picking_employee()
+        self.picking_id.picking_starts = fields.DateTime.now()
+
+class stock_invoice_onshipping(models.TransientModel):
+    _inherit = 'stock.invoice.onshipping'
+
+    @api.multi
+    def open_invoice():
+        self.wraping_stops = fields.DateTime.now()
+        return super(stock_invoice_onshipping, self).open_invoice()
+
 
 class stock_picking_report(models.Model):
     _inherit = "stock_picking.report"
@@ -39,8 +104,16 @@ class stock_picking_report(models.Model):
     legacy_employee_id =  fields.Many2one("hr.employee", "Picking Employee (legacy)", readonly=True)
     qc_id =  fields.Many2one("hr.employee", "Controlled by", readonly=True)
 
+    picking_time = fields.Float(string='Picking Time', digits=(16,2), readonly=True)
+    wraping_time = fields.Float(string='Warping Time', digits=(16,2), readonly=True)
+    order_time = fields.Float(string='Order Time', digits=(16,2), readonly=True)
+
     def _select(self):
-        return  super(stock_picking_report, self)._select() + ", sp.employee_id as legacy_employee_id, move.employee_id as employee_id, sp.qc_id as qc_id"
+        return  super(stock_picking_report, self)._select() + """
+                    , sp.employee_id as legacy_employee_id, move.employee_id as employee_id, sp.qc_id as qc_id
+                    , extract(epoch from avg(date_trunc('day',sp.picking_stop)-date_trunc('day',sp.picking_start)))/(24*60*60)::decimal(16,2) as picking_time
+                    , extract(epoch from avg(date_trunc('day',sp.wraping_stop)-date_trunc('day',sp.wraping_start)))/(24*60*60)::decimal(16,2) as wraping_time
+                    , extract(epoch from avg(date_trunc('day',sp.wraping_stop)-date_trunc('day',sp.picking_start)))/(24*60*60)::decimal(16,2) as order_time"""
 
     def _group_by(self):
         return super(stock_picking_report, self)._group_by() + ", sp.employee_id, move.employee_id, sp.qc_id"

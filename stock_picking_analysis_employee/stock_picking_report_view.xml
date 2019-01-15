@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 <data>
+    
+        <record id="view_picking_form" model="ir.ui.view">
+            <field name="name">stock.picking.form.employee</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='do_unreserve']" position="after">
+                    <button name="stop_picking" string="Picking stops" attrs="{'invisible': ['|',('state','&lt;&gt;','done'),]}" type="action" class="oe_highlight" groups="base.group_user"/>
+                </xpath>
+            </field>
+        </record>
 
         <record id="view_stock_picking_analysis_search" model="ir.ui.view">
             <field name="name">stock.picking.analysis.search</field>
