@@ -46,15 +46,15 @@ class product_template(models.Model):
         else:
             sale_nbr_days = 0
         self.consumption_per_day = self.sales_count / (sale_nbr_days or 1.0)
+        self.consumption_per_month = self.consumption_per_day * 30.5
+        self.consumption_per_year = self.consumption_per_day * 365
         if min(self.seller_ids.mapped('delay') or [0.0])>0.0:
             delay = min(self.seller_ids.mapped('delay')) + self.company_id.po_lead
         else:
             delay = self.produce_delay + self.company_id.manufacturing_lead
-
         self.virtual_available_delay = delay
         self.orderpoint_computed = self.consumption_per_day * delay
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
-
         if self.is_out_of_stock:
             self.instock_percent = 0
         elif self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
@@ -73,6 +73,8 @@ class product_template(models.Model):
 
     sales_count = fields.Integer('# Sales', compute='_get_sales_count', store=True, readonly=True, default=0)  # Initially defined in sale-module
     consumption_per_day = fields.Float('Consumption per Day', default=0)
+    consumption_per_month = fields.Float(string='Consumption per Month', default=0,help="Number of items that is consumed per month")
+    consumption_per_year = fields.Float(string='Consumption per Year', default=0,help="Number of items that is consumed per year")
     orderpoint_computed = fields.Float('Orderpoint', default=0)
     virtual_available_days = fields.Float('Virtual Available Days', default=0)
     instock_percent = fields.Integer('Instock Percent', default=0)

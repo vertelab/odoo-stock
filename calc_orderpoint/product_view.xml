@@ -80,11 +80,13 @@
     <record id="product_product_tree_view" model="ir.ui.view">
       <field name="name">product.product.tree.cpd</field>
       <field name="model">product.product</field>
+      <field name="type">tree</field>
+      <field name="inherit_id" ref="product.product_product_tree_view" />
       <field name="arch" type="xml">
         <field name="ean13" position="after">
-          <field name="consumtion_per_day" string='CpD' />
-          <field name="consumtion_per_month" string='CpM' />
-          <field name="consumtion_per_year" string='CpY' />
+          <field name="consumption_per_day" string="CpD" />
+          <field name="consumption_per_month" string='CpM' />
+          <field name="consumption_per_year" string='CpY' />
         </field>
       </field>
     </record>

@@ -21,9 +21,11 @@ for o in obj:
       <field name="value" eval="'ir.actions.server,%d' % product_instock_percent" />
     </record>
 -->
+<!--
     <record model="ir.actions.server" id="product_instock_percent">
       <field name="menu_ir_values_id" ref="product_instock_percent_action_menu" />
     </record>
+-->
     <record model="ir.cron" id="cron_compute_fields">
       <field name="name">Compute Product Consumption Fields</field>
       <field name="user_id" ref="base.user_root"/>
