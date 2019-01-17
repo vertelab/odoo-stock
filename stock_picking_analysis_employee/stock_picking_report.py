@@ -110,10 +110,10 @@ class stock_picking_report(models.Model):
 
     def _select(self):
         return  super(stock_picking_report, self)._select() + """
-                    , sp.employee_id as legacy_employee_id, move.employee_id as employee_id, sp.qc_id as qc_id
-                    , extract(epoch from avg(date_trunc('day',sp.picking_stop)-date_trunc('day',sp.picking_start)))/(24*60*60)::decimal(16,2) as picking_time
-                    , extract(epoch from avg(date_trunc('day',sp.wraping_stop)-date_trunc('day',sp.wraping_start)))/(24*60*60)::decimal(16,2) as wraping_time
-                    , extract(epoch from avg(date_trunc('day',sp.wraping_stop)-date_trunc('day',sp.picking_start)))/(24*60*60)::decimal(16,2) as order_time"""
+                    , sp.employee_id as legacy_employee_id, move.employee_id as employee_id, sp.qc_id as qc_id"""
+                    # ~ , extract(epoch from avg(date_trunc('day',sp.picking_stops)-date_trunc('day',sp.picking_starts)))/(24*60*60)::decimal(16,2) as picking_time
+                    # ~ , extract(epoch from avg(date_trunc('day',sp.wraping_stops)-date_trunc('day',sp.wraping_starts)))/(24*60*60)::decimal(16,2) as wraping_time
+                    # ~ , extract(epoch from avg(date_trunc('day',sp.wraping_stops)-date_trunc('day',sp.picking_starts)))/(24*60*60)::decimal(16,2) as order_time"""
 
     def _group_by(self):
         return super(stock_picking_report, self)._group_by() + ", sp.employee_id, move.employee_id, sp.qc_id"
