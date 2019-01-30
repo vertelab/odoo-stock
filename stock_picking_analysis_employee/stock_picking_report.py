@@ -80,30 +80,6 @@ class stock_picking(models.Model):
     @api.one
     def stop_picking(self):
         self.picking_stops = fields.Datetime.now()
-    
-    @api.model
-    def get_wrapping_time_date(self,date):
-        wrap_tot = 0.0
-        wrap_nbr = 0
-        for pickning in self.env['stock.picking'].search([('date','=',date)]):
-            wrap_tot = picking.wrapping_stops.from_string() - picking.wrapping_starts.from_string()
-            wrap_nbr += 1
-        return wrap_tot / wrap_nbr if wrap_nbr > 0 else 1
-        
-    @api.model
-    def get_wrapping_time_lastweek(self):
-        today = fields.Date.today()
-        days = []
-        times = []
-        for day in range(-1,-8,-1):
-            this_day = fields.Date.from_string(today) + timedelta(days=day)
-            if this_day.weekday() in range(0,5):
-                days.append(this_day.strftime('%A'))
-                times.append(self.get_wrapping_time_date(fields.Date.to_string(this_day)))
-        days.reverse()
-        times.reverse()
-        return days,times
-
 
     @api.model
     def get_wrapping_time_date(self, date):
@@ -124,6 +100,52 @@ class stock_picking(models.Model):
             if this_day.weekday() in range(0,5):
                 days.append(this_day.strftime('%A'))
                 times.append(self.get_wrapping_time_date(fields.Date.to_string(this_day)))
+        days.reverse()
+        times.reverse()
+        return days, times
+
+    @api.model
+    def get_picking_time_date(self, date):
+        pick_tot = 0.0
+        pick_nbr = 0
+        for picking in self.env['stock.picking'].search([('date', '>=', '%s 00:00:00' %date), ('date', '<=', '%s 23:59:59' %date)]):
+            pick_tot = picking.picking_stops.from_string() - picking.picking_starts.from_string()
+            pick_nbr += 1
+        return pick_tot / pick_nbr if pick_nbr > 0 else 1
+
+    @api.model
+    def get_picking_time_lastweek(self):
+        today = fields.Date.today()
+        days = []
+        times = []
+        for day in range(-1,-8,-1):
+            this_day = fields.Date.from_string(today) + timedelta(days=day)
+            if this_day.weekday() in range(0,5):
+                days.append(this_day.strftime('%A'))
+                times.append(self.get_picking_time_date(fields.Date.to_string(this_day)))
+        days.reverse()
+        times.reverse()
+        return days, times
+
+    @api.model
+    def get_order_time_date(self, date):
+        pick_tot = 0.0
+        pick_nbr = 0
+        for picking in self.env['stock.picking'].search([('date', '>=', '%s 00:00:00' %date), ('date', '<=', '%s 23:59:59' %date)]):
+            pick_tot = picking.wrapping_stops.from_string() - picking.picking_starts.from_string()
+            pick_nbr += 1
+        return pick_tot / pick_nbr if pick_nbr > 0 else 1
+
+    @api.model
+    def get_order_time_lastweek(self):
+        today = fields.Date.today()
+        days = []
+        times = []
+        for day in range(-1,-8,-1):
+            this_day = fields.Date.from_string(today) + timedelta(days=day)
+            if this_day.weekday() in range(0,5):
+                days.append(this_day.strftime('%A'))
+                times.append(self.get_order_time_date(fields.Date.to_string(this_day)))
         days.reverse()
         times.reverse()
         return days, times
