@@ -65,7 +65,7 @@ Plockning per rad?
 
 class stock_picking(models.Model):
     _inherit = 'stock.picking'
-    
+
     picking_starts = fields.Datetime(string="Picking Starts")
     picking_stops = fields.Datetime(string="Picking Stops")
     wraping_starts = fields.Datetime(string="Wraping Starts",compute="_wraping_starts")
@@ -80,9 +80,32 @@ class stock_picking(models.Model):
     def stop_picking(self):
         self.picking_stops = fields.Datetime.now()
 
+    @api.model
+    def get_wrapping_time_date(self, date):
+        wrap_tot = 0.0
+        wrap_nbr = 0
+        for picking in self.env['stock.picking'].search([('date', '>=', '%s 00:00:00' %date), ('date', '<=', '%s 23:59:59' %date)]):
+            wrap_tot = picking.wraping_stops.from_string() - picking.wraping_starts.from_string()
+            wrap_nbr += 1
+        return wrap_tot / wrap_nbr if wrap_nbr > 0 else 1
+
+    @api.model
+    def get_wrapping_time_lastweek(self):
+        today = fields.Date.today()
+        days = []
+        times = []
+        for day in range(-1,-8,-1):
+            this_day = fields.Date.from_string(today) + timedelta(days=day)
+            if this_day.weekday() in range(0,5):
+                days.append(this_day.strftime('%A'))
+                times.append(self.get_wrapping_time_date(fields.Date.to_string(this_day)))
+        days.reverse()
+        times.reverse()
+        return days, times
+
 class stock_picking_wizard(models.TransientModel):
     _inherit = 'stock.picking.multiple'
-        
+
     @api.multi
     def set_picking_employee(self):
         super(stock_picking_wizard, self).set_picking_employee()
