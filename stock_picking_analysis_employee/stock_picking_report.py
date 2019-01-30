@@ -24,6 +24,7 @@ import openerp.addons.decimal_precision as dp
 import pytz
 import dateutil.relativedelta
 import datetime
+from datetime import datetime, timedelta
 
 import openerp.exceptions
 from openerp import models, fields, api, _
@@ -61,14 +62,14 @@ wrap_time
 Plockning per rad?
 
 """
-
+from datetime import datetime, timedelta
 
 class stock_picking(models.Model):
     _inherit = 'stock.picking'
 
     picking_starts = fields.Datetime(string="Picking Starts")
     picking_stops = fields.Datetime(string="Picking Stops")
-    wraping_starts = fields.Datetime(string="Wraping Starts",compute="_wraping_starts")
+    wraping_starts = fields.Datetime(string="Wraping Starts",compute="_wraping_starts",stored=True)
     wraping_stops = fields.Datetime(string="Wraping Stops")
 
     @api.one
@@ -79,6 +80,30 @@ class stock_picking(models.Model):
     @api.one
     def stop_picking(self):
         self.picking_stops = fields.Datetime.now()
+    
+    @api.model
+    def get_wrapping_time_date(self,date):
+        wrap_tot = 0.0
+        wrap_nbr = 0
+        for pickning in self.env['stock.picking'].search([('date','=',date)]):
+            wrap_tot = picking.wrapping_stops.from_string() - picking.wrapping_starts.from_string()
+            wrap_nbr += 1
+        return wrap_tot / wrap_nbr if wrap_nbr > 0 else 1
+        
+    @api.model
+    def get_wrapping_time_lastweek(self):
+        today = fields.Date.today()
+        days = []
+        times = []
+        for day in range(-1,-8,-1):
+            this_day = fields.Date.from_string(today) + timedelta(days=day)
+            if this_day.weekday() in range(0,5):
+                days.append(this_day.strftime('%A'))
+                times.append(self.get_wrapping_time_date(fields.Date.to_string(this_day)))
+        days.reverse()
+        times.reverse()
+        return days,times
+
 
     @api.model
     def get_wrapping_time_date(self, date):
@@ -133,10 +158,11 @@ class stock_picking_report(models.Model):
 
     def _select(self):
         return  super(stock_picking_report, self)._select() + """
-                    , sp.employee_id as legacy_employee_id, move.employee_id as employee_id, sp.qc_id as qc_id"""
-                    # ~ , extract(epoch from avg(date_trunc('day',sp.picking_stops)-date_trunc('day',sp.picking_starts)))/(24*60*60)::decimal(16,2) as picking_time
-                    # ~ , extract(epoch from avg(date_trunc('day',sp.wraping_stops)-date_trunc('day',sp.wraping_starts)))/(24*60*60)::decimal(16,2) as wraping_time
-                    # ~ , extract(epoch from avg(date_trunc('day',sp.wraping_stops)-date_trunc('day',sp.picking_starts)))/(24*60*60)::decimal(16,2) as order_time"""
+                    , sp.employee_id as legacy_employee_id, move.employee_id as employee_id, sp.qc_id as qc_id
+                    , extract(epoch from avg(date_trunc('day',sp.picking_stops)-date_trunc('day',sp.picking_starts)))/(24*60*60)::decimal(16,2) as picking_time
+                    , extract(epoch from avg(date_trunc('day',sp.wraping_stops)-date_trunc('day',sp.wraping_starts)))/(24*60*60)::decimal(16,2) as wraping_time
+                    , extract(epoch from avg(date_trunc('day',sp.wraping_stops)-date_trunc('day',sp.picking_starts)))/(24*60*60)::decimal(16,2) as order_time"""
+
 
     def _group_by(self):
         return super(stock_picking_report, self)._group_by() + ", sp.employee_id, move.employee_id, sp.qc_id"
