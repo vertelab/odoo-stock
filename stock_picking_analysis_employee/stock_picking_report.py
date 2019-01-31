@@ -69,13 +69,14 @@ class stock_picking(models.Model):
 
     picking_starts = fields.Datetime(string="Picking Starts")
     picking_stops = fields.Datetime(string="Picking Stops")
-    wraping_starts = fields.Datetime(string="Wraping Starts",compute="_wraping_starts",stored=True)
+    wraping_starts = fields.Datetime(string="Wraping Starts",compute="_wraping_starts",store=True)
     wraping_stops = fields.Datetime(string="Wraping Stops")
 
     @api.one
     @api.depends('qc_id',)
     def _wraping_starts(self):
-        self.wraping_starts = fields.Datetime.now()
+        if self.qc_id:
+            self.wraping_starts = fields.Datetime.now()
 
     @api.one
     def stop_picking(self):
