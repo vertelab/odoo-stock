@@ -27,7 +27,7 @@
                 </form>
             </field>
         </record>
-        <act_window id="action_stock_picking_order_based" key2="client_action_multi" name="Make Picking" res_model="stock.picking.order.based.wizard" groups="base.group_no_one" view_mode="form" target="new" view_type="form" />
-        <menuitem id="menu_stock_picking_order_based" action="stock_picking_order_based.action_stock_picking_order_based" parent="stock.menu_stock_sched" sequence="3" groups="base.group_no_one"/>
+        <act_window id="action_stock_picking_order_based" key2="client_action_multi" name="Make Picking" res_model="stock.picking.order.based.wizard" view_mode="form" target="new" view_type="form" />
+        <menuitem id="menu_stock_picking_order_based" name="Make Picking" action="stock_picking_order_based.action_stock_picking_order_based" parent="stock.menu_stock_sched" />
     </data>
 </odoo>
