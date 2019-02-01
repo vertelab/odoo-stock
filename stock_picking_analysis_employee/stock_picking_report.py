@@ -24,6 +24,7 @@ import openerp.addons.decimal_precision as dp
 import pytz
 import dateutil.relativedelta
 import datetime
+from datetime import datetime, timedelta
 
 import openerp.exceptions
 from openerp import models, fields, api, _
@@ -61,24 +62,94 @@ wrap_time
 Plockning per rad?
 
 """
-
+from datetime import datetime, timedelta
 
 class stock_picking(models.Model):
     _inherit = 'stock.picking'
 
     picking_starts = fields.Datetime(string="Picking Starts")
     picking_stops = fields.Datetime(string="Picking Stops")
-    wraping_starts = fields.Datetime(string="Wraping Starts",compute="_wraping_starts")
+    wraping_starts = fields.Datetime(string="Wraping Starts",compute="_wraping_starts",store=True)
     wraping_stops = fields.Datetime(string="Wraping Stops")
 
     @api.one
     @api.depends('qc_id',)
     def _wraping_starts(self):
-        self.wraping_starts = fields.Datetime.now()
+        if self.qc_id:
+            self.wraping_starts = fields.Datetime.now()
 
     @api.one
     def stop_picking(self):
         self.picking_stops = fields.Datetime.now()
+
+    @api.model
+    def get_wraping_time_date(self, date):
+        wrap_tot = 0.0
+        wrap_nbr = 0
+        for picking in self.env['stock.picking'].sudo().search([('date', '>=', '%s 00:00:00' %date), ('date', '<=', '%s 23:59:59' %date),('wraping_starts','>','1970-01-01 00:00:00'),('wraping_stops','>','1970-01-01 00:00:00')]):
+            wrap_tot = (fields.Datetime.from_string(picking.wraping_stops) - fields.Datetime.from_string(picking.wraping_starts)).total_seconds() / 60.0
+            wrap_nbr += 1
+        return wrap_tot / wrap_nbr if wrap_nbr > 0 else 0
+
+    @api.model
+    def get_wraping_time_lastweek(self):
+        today = fields.Date.today()
+        days = []
+        times = []
+        for day in range(-1,-8,-1):
+            this_day = fields.Date.from_string(today) + timedelta(days=day)
+            if this_day.weekday() in range(0,5):
+                days.append(this_day.strftime('%A'))
+                times.append(self.get_wraping_time_date(fields.Date.to_string(this_day)))
+        days.reverse()
+        times.reverse()
+        return days, times
+
+    @api.model
+    def get_picking_time_date(self, date):
+        pick_tot = 0.0
+        pick_nbr = 0
+        for picking in self.env['stock.picking'].sudo().search([('date', '>=', '%s 00:00:00' %date), ('date', '<=', '%s 23:59:59' %date),('picking_starts','>','1970-01-01 00:00:00'),('picking_stops','>','1970-01-01 00:00:00')]):
+            pick_tot = (fields.Datetime.from_string(picking.picking_stops) - fields.Datetime.from_string(picking.picking_starts)).total_seconds() / 60.0
+            pick_nbr += 1
+        return pick_tot / pick_nbr if pick_nbr > 0 else 0
+
+    @api.model
+    def get_picking_time_lastweek(self):
+        today = fields.Date.today()
+        days = []
+        times = []
+        for day in range(-1,-8,-1):
+            this_day = fields.Date.from_string(today) + timedelta(days=day)
+            if this_day.weekday() in range(0,5):
+                days.append(this_day.strftime('%A'))
+                times.append(self.get_picking_time_date(fields.Date.to_string(this_day)))
+        days.reverse()
+        times.reverse()
+        return days, times
+
+    @api.model
+    def get_order_time_date(self, date):
+        pick_tot = 0.0
+        pick_nbr = 0
+        for picking in self.env['stock.picking'].sudo().search([('date', '>=', '%s 00:00:00' %date), ('date', '<=', '%s 23:59:59' %date),('picking_starts','>','1970-01-01 00:00:00'),('wraping_stops','>','1970-01-01 00:00:00')]):
+            pick_tot = (fields.Datetime.from_string(picking.wraping_stops) - fields.Datetime.from_string(picking.picking_starts)).total_seconds() / 60.0
+            pick_nbr += 1
+        return pick_tot / pick_nbr if pick_nbr > 0 else 0
+
+    @api.model
+    def get_order_time_lastweek(self):
+        today = fields.Date.today()
+        days = []
+        times = []
+        for day in range(-1,-8,-1):
+            this_day = fields.Date.from_string(today) + timedelta(days=day)
+            if this_day.weekday() in range(0,5):
+                days.append(this_day.strftime('%A'))
+                times.append(self.get_order_time_date(fields.Date.to_string(this_day)))
+        days.reverse()
+        times.reverse()
+        return days, times
 
 class stock_picking_wizard(models.TransientModel):
     _inherit = 'stock.picking.multiple'
@@ -110,10 +181,11 @@ class stock_picking_report(models.Model):
 
     def _select(self):
         return  super(stock_picking_report, self)._select() + """
-                    , sp.employee_id as legacy_employee_id, move.employee_id as employee_id, sp.qc_id as qc_id"""
-                    # ~ , extract(epoch from avg(date_trunc('day',sp.picking_stops)-date_trunc('day',sp.picking_starts)))/(24*60*60)::decimal(16,2) as picking_time
-                    # ~ , extract(epoch from avg(date_trunc('day',sp.wraping_stops)-date_trunc('day',sp.wraping_starts)))/(24*60*60)::decimal(16,2) as wraping_time
-                    # ~ , extract(epoch from avg(date_trunc('day',sp.wraping_stops)-date_trunc('day',sp.picking_starts)))/(24*60*60)::decimal(16,2) as order_time"""
+                    , sp.employee_id as legacy_employee_id, move.employee_id as employee_id, sp.qc_id as qc_id
+                    , extract(epoch from avg(date_trunc('day',sp.picking_stops)-date_trunc('day',sp.picking_starts)))/(24*60*60)::decimal(16,2) as picking_time
+                    , extract(epoch from avg(date_trunc('day',sp.wraping_stops)-date_trunc('day',sp.wraping_starts)))/(24*60*60)::decimal(16,2) as wraping_time
+                    , extract(epoch from avg(date_trunc('day',sp.wraping_stops)-date_trunc('day',sp.picking_starts)))/(24*60*60)::decimal(16,2) as order_time"""
+
 
     def _group_by(self):
         return super(stock_picking_report, self)._group_by() + ", sp.employee_id, move.employee_id, sp.qc_id"

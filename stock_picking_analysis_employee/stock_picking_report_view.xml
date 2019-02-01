@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 <data>
-    
+
         <record id="view_picking_form" model="ir.ui.view">
             <field name="name">stock.picking.form.employee</field>
             <field name="model">stock.picking</field>
@@ -10,6 +10,12 @@
                 <xpath expr="//button[@name='do_unreserve']" position="after">
                     <button name="stop_picking" string="Picking stops" attrs="{'invisible': ['|',('state','&lt;&gt;','done'),]}" type="action" class="oe_highlight" groups="base.group_user"/>
                 </xpath>
+                <field name="picking_type_id" position="after">
+                    <field name="picking_starts"/>
+                    <field name="picking_stops"/>
+                    <field name="wraping_starts"/>
+                    <field name="wraping_stops"/>
+                </field>
             </field>
         </record>
 
