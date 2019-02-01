@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="stock.view_picking_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='do_unreserve']" position="after">
-                    <button name="stop_picking" string="Picking stops" attrs="{'invisible': ['|',('state','&lt;&gt;','done'),]}" type="action" class="oe_highlight" groups="base.group_user"/>
+                    <button name="stop_picking" string="Picking stops" attrs="{'invisible': ['|', ('state','&lt;&gt;','done'), ('picking_stops','!=',False)]}" type="object" class="oe_highlight" groups="base.group_user"/>
                 </xpath>
                 <field name="picking_type_id" position="after">
                     <field name="picking_starts"/>

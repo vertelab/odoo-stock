@@ -164,7 +164,7 @@ class stock_invoice_onshipping(models.TransientModel):
 
     @api.multi
     def open_invoice(self):
-        self.wraping_stops = fields.Datetime.now()
+        self.env['stock.picking'].browse(self._context.get('active_ids', [])).write({'wraping_stops': fields.Datetime.now()})
         return super(stock_invoice_onshipping, self).open_invoice()
 
 
