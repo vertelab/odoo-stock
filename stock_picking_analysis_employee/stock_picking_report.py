@@ -65,7 +65,7 @@ Plockning per rad?
 
 class stock_picking(models.Model):
     _inherit = 'stock.picking'
-    
+
     picking_starts = fields.Datetime(string="Picking Starts")
     picking_stops = fields.Datetime(string="Picking Stops")
     wraping_starts = fields.Datetime(string="Wraping Starts",compute="_wraping_starts")
@@ -82,7 +82,7 @@ class stock_picking(models.Model):
 
 class stock_picking_wizard(models.TransientModel):
     _inherit = 'stock.picking.multiple'
-        
+
     @api.multi
     def set_picking_employee(self):
         super(stock_picking_wizard, self).set_picking_employee()
@@ -92,7 +92,7 @@ class stock_invoice_onshipping(models.TransientModel):
     _inherit = 'stock.invoice.onshipping'
 
     @api.multi
-    def open_invoice():
+    def open_invoice(self):
         self.wraping_stops = fields.Datetime.now()
         return super(stock_invoice_onshipping, self).open_invoice()
 
