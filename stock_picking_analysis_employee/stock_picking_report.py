@@ -23,7 +23,6 @@ from openerp import tools
 import openerp.addons.decimal_precision as dp
 import pytz
 import dateutil.relativedelta
-import datetime
 from datetime import datetime, timedelta
 
 import openerp.exceptions
@@ -62,7 +61,6 @@ wrap_time
 Plockning per rad?
 
 """
-from datetime import datetime, timedelta
 
 class stock_picking(models.Model):
     _inherit = 'stock.picking'
@@ -229,7 +227,7 @@ class stock_picking_report(models.Model):
             time_intervals = {
                 'hour': dateutil.relativedelta.relativedelta(hours=1),
                 'day': dateutil.relativedelta.relativedelta(days=1),
-                'week': datetime.timedelta(days=7),
+                'week': timedelta(days=7),
                 'month': dateutil.relativedelta.relativedelta(months=1),
                 'quarter': dateutil.relativedelta.relativedelta(months=3),
                 'year': dateutil.relativedelta.relativedelta(years=1)
