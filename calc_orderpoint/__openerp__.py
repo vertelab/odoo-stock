@@ -24,12 +24,12 @@
     'version': '0.1',
     'category': 'stock',
     'description': """
-Calculates 
+Calculates
  * consumtion_per_day  (How many items consumes per day)
  * orderpoint_computed (consumtion_per_day * delay)
  * virtual_available_days  (How many days will stock be available)
 
-delay is calculated by sellers delay + po lead for the company or 
+delay is calculated by sellers delay + po lead for the company or
 produce_delay + the company manufacturing lead.
 
 Consumtion per day are calculated from number of days the product has
@@ -54,7 +54,7 @@ start and stop hours, e.g. "0 4 18 24" (between 00:00 and 04:00, and
     'author': 'Vertel AB',
     'license': 'AGPL-3',
     'website': 'http://www.vertel.se',
-    'depends': ['stock','mrp', 'sale'],
+    'depends': ['stock','mrp', 'sale', 'point_of_sale'],
     'data': [
         'product_view.xml',
         'product_data.xml',

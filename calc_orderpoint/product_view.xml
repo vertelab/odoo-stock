@@ -89,8 +89,8 @@
       <field name="arch" type="xml">
         <field name="ean13" position="after">
           <field name="consumption_per_day" string="CpD" />
-          <field name="consumption_per_month" string='CpM' />
-          <field name="consumption_per_year" string='CpY' />
+          <field name="consumption_per_month" string="CpM" />
+          <field name="consumption_per_year" string="CpY" />
         </field>
       </field>
     </record>
@@ -104,5 +104,37 @@
         </field>
       </field>
     </record>
+    <record id="product_product_consumption_tree_view" model="ir.ui.view">
+        <field name="name">product.product.tree.consumption</field>
+        <field name="model">product.product</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <field name="default_code" />
+            <field name="name" />
+            <field name="virtual_available" />
+            <field name="instock_percent" />
+            <field name="orderpoint_computed" />
+            <field name="virtual_available_days" />
+            <field name="virtual_available_delay" />
+            <field name="consumption_per_day" />
+            <field name="consumption_per_month" />
+            <field name="consumption_per_year" />
+        </field>
+    </record>
+    <record id="action_product_product_consumption" model="ir.actions.act_window">
+        <field name="name">Variant (Consumption)</field>
+        <field name="res_model">product.product</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_id" ref="product_product_consumption_tree_view"/>
+        <field name="domain"></field>
+        <field name="context">{
+            'search_default_filter_to_sell': 1,
+        }
+        </field>
+        <field name="search_view_id" ref="product.product_search_form_view"/>
+    </record>
+    <menuitem id="menu_product_product_consumption" name="Variant (Consumption)" action="action_product_product_consumption" parent="stock.menu_stock_product" sequence="5"/>
   </data>
 </openerp>

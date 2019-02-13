@@ -25,9 +25,9 @@ import logging
 _logger = logging.getLogger(__name__)
 
 #~ 20,00       sales_count
-#~ 1,981039 	so_line_ids
-#~ 1,022867 	sale_order_lines
-#~ 0,390086 	code
+#~ 1,981039     so_line_ids
+#~ 1,022867     sale_order_lines
+#~ 0,390086     code
 
 class product_template(models.Model):
     _inherit = 'product.template'
@@ -35,23 +35,41 @@ class product_template(models.Model):
     @api.one
     def _consumption_per_day(self):
         _logger.warn('Computing _consumption_per_day for product.template %s, %s' % (self.id, self.name))
-        self.product_variant_ids._consumption_per_day()
-        self.sales_count = sum([p.sales_count for p in self.product_variant_ids])
-        sale = self.env['sale.order'].search(
-            [('order_line.product_id','in',self.product_variant_ids.mapped('id')),
-            ('date_order','>',fields.Date.to_string(date.today() - timedelta(days=365)))],
-            order='date_order asc', limit=1)
-        if sale:
-            sale_nbr_days = (date.today() - fields.Date.from_string(sale.date_order)).days
+        locations = self.env.ref('stock.picking_type_out').default_location_dest_id
+        locations |= self.env.ref('point_of_sale.picking_type_posout').default_location_dest_id
+        locations |= self.env.ref('stock.location_production')
+        stocks_year = self.env['stock.move'].search_read(
+            [('product_id', 'in', self.product_variant_ids.mapped('id')),
+            ('date', '>', fields.Date.to_string(date.today() - timedelta(days=365))),
+            ('location_dest_id', 'in', locations.mapped('id'))],
+            ['product_uom_qty', 'date'], order='date asc')
+        stocks_month = self.env['stock.move'].search_read(
+            [('product_id', '=', self.product_variant_ids.mapped('id')),
+            ('date', '>', fields.Date.to_string(date.today() - timedelta(days=31))),
+            ('location_dest_id', 'in', locations.mapped('id'))],
+            ['product_uom_qty', 'date'], order='date asc')
+        if len(stocks_year) > 0:
+            stock_nbr_days_year = (date.today() - fields.Date.from_string(stocks_year[0]['date'])).days
+            year_count = sum([r['product_uom_qty'] for r in stocks_year])
+            self.sales_count = year_count
+            self.consumption_per_year = year_count / stock_nbr_days_year * 365
+            if len(stocks_month) > 0:
+                stock_nbr_days_month = (date.today() - fields.Date.from_string(stocks_month[0]['date'])).days
+                month_count = sum([r['product_uom_qty'] for r in stocks_month])
+                self.consumption_per_month = month_count / stock_nbr_days_month * 30.5
+                self.consumption_per_day = month_count / stock_nbr_days_month
+            else:
+                self.consumption_per_month = self.consumption_per_year / 30.5
+                self.consumption_per_day = self.consumption_per_year / 365
         else:
-            sale_nbr_days = 0
-        self.consumption_per_day = self.sales_count / (sale_nbr_days or 1.0)
-        self.consumption_per_month = self.consumption_per_day * 30.5
-        self.consumption_per_year = self.consumption_per_day * 365
+            self.consumption_per_day = 0
+            self.consumption_per_month = 0
+            self.consumption_per_year = 0
+            self.sales_count = 0
         if min(self.seller_ids.mapped('delay') or [0.0])>0.0:
-            delay = min(self.seller_ids.mapped('delay')) + self.company_id.po_lead
+            delay = min(self.seller_ids.mapped('delay')) + (self.company_id.po_lead if self.company_id else self.env.user.company_id.po_lead)
         else:
-            delay = self.produce_delay + self.company_id.manufacturing_lead
+            delay = self.produce_delay + (self.company_id.manufacturing_lead if self.company_id else self.env.user.company_id.manufacturing_lead)
         self.virtual_available_delay = delay
         self.orderpoint_computed = self.consumption_per_day * delay
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
@@ -64,7 +82,7 @@ class product_template(models.Model):
         else:
             self.instock_percent = self.sudo().virtual_available_days / (self.virtual_available_delay or 1.0) * 100
         self.last_sales_count = fields.Datetime.now()
- 
+
     def _get_sales_count(self):
         pass
 
@@ -134,30 +152,45 @@ class product_product(models.Model):
     @api.one
     def _consumption_per_day(self):
         _logger.warn('Computing _consumption_per_day for product.product %s, %s' % (self.id, self.name))
-        sales = self.env['sale.order.line'].search_read(
-            [('product_id','=',self.id),
-            ('order_id.date_order','>',fields.Date.to_string(date.today() - timedelta(days=365)))],
-            ['product_uom_qty'], order='order_id desc')
-        if len(sales)>0:
-            #~ sale_nbr_days = (date.today() - fields.Date.from_string(sales[0].order_id.date_order)).days
-            sale_nbr_days = (date.today() - fields.Date.from_string(self.env['sale.order'].search_read(
-                [('order_line', 'in', [r['id'] for r in sales])],
-                ['date_order'], order='date_order asc', limit=0)[0]['date_order'])).days
-            self.sales_count = sum([r['product_uom_qty'] for r in sales])
+        locations = self.env.ref('stock.picking_type_out').default_location_dest_id
+        locations |= self.env.ref('point_of_sale.picking_type_posout').default_location_dest_id
+        locations |= self.env.ref('stock.location_production')
+        stocks_year = self.env['stock.move'].search_read(
+            [('product_id', '=', self.id),
+            ('date', '>', fields.Date.to_string(date.today() - timedelta(days=365))),
+            ('location_dest_id', 'in', locations.mapped('id'))],
+            ['product_uom_qty', 'date'], order='date asc')
+        stocks_month = self.env['stock.move'].search_read(
+            [('product_id', '=', self.id),
+            ('date', '>', fields.Date.to_string(date.today() - timedelta(days=31))),
+            ('location_dest_id', 'in', locations.mapped('id'))],
+            ['product_uom_qty', 'date'], order='date asc')
+        if len(stocks_year) > 0:
+            stock_nbr_days_year = (date.today() - fields.Date.from_string(stocks_year[0]['date'])).days
+            year_count = sum([r['product_uom_qty'] for r in stocks_year])
+            self.sales_count = year_count
+            self.consumption_per_year = year_count / stock_nbr_days_year * 365
+            if len(stocks_month) > 0:
+                stock_nbr_days_month = (date.today() - fields.Date.from_string(stocks_month[0]['date'])).days
+                month_count = sum([r['product_uom_qty'] for r in stocks_month])
+                self.consumption_per_month = month_count / stock_nbr_days_month * 30.5
+                self.consumption_per_day = month_count / stock_nbr_days_month
+            else:
+                self.consumption_per_month = self.consumption_per_year / 30.5
+                self.consumption_per_day = self.consumption_per_year / 365
         else:
-            sale_nbr_days = 0
+            self.consumption_per_day = 0
+            self.consumption_per_month = 0
+            self.consumption_per_year = 0
             self.sales_count = 0
-        self.consumption_per_day = self.sales_count / (sale_nbr_days or 1.0)
-        self.consumption_per_month = self.consumption_per_day * 30.5
-        self.consumption_per_year = self.consumption_per_day * 365
         if min(self.seller_ids.mapped('delay') or [0.0])>0.0:
-            delay = min(self.seller_ids.mapped('delay')) + self.company_id.po_lead
+            delay = min(self.seller_ids.mapped('delay')) + (self.company_id.po_lead if self.company_id else self.env.user.company_id.po_lead)
         else:
-            delay = self.produce_delay + self.company_id.manufacturing_lead
+            delay = self.produce_delay + (self.company_id.manufacturing_lead if self.company_id else self.env.user.company_id.manufacturing_lead)
         self.virtual_available_delay = delay
         self.orderpoint_computed =  self.consumption_per_day * delay
         self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
-        
+
         if self.is_out_of_stock:
             self.instock_percent = 0
         elif self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
