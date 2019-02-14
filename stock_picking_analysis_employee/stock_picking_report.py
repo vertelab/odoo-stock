@@ -94,10 +94,10 @@ class stock_picking(models.Model):
         today = fields.Date.today()
         days = []
         times = []
-        for day in range(-1,-8,-1):
+        for day in range(-1,-31,-1):
             this_day = fields.Date.from_string(today) + timedelta(days=day)
             if this_day.weekday() in range(0,5):
-                days.append(this_day.strftime('%A'))
+                days.append(this_day.strftime('%d'))
                 times.append(self.get_wraping_time_date(fields.Date.to_string(this_day)))
         days.reverse()
         times.reverse()
@@ -117,10 +117,10 @@ class stock_picking(models.Model):
         today = fields.Date.today()
         days = []
         times = []
-        for day in range(-1,-8,-1):
+        for day in range(-1,-31,-1):
             this_day = fields.Date.from_string(today) + timedelta(days=day)
             if this_day.weekday() in range(0,5):
-                days.append(this_day.strftime('%A'))
+                days.append(this_day.strftime('%d'))
                 times.append(self.get_picking_time_date(fields.Date.to_string(this_day)))
         days.reverse()
         times.reverse()
@@ -140,10 +140,10 @@ class stock_picking(models.Model):
         today = fields.Date.today()
         days = []
         times = []
-        for day in range(-1,-8,-1):
+        for day in range(-1,-31,-1):
             this_day = fields.Date.from_string(today) + timedelta(days=day)
             if this_day.weekday() in range(0,5):
-                days.append(this_day.strftime('%A'))
+                days.append(this_day.strftime('%d'))
                 times.append(self.get_order_time_date(fields.Date.to_string(this_day)))
         days.reverse()
         times.reverse()
