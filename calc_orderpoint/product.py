@@ -35,6 +35,7 @@ class product_template(models.Model):
     @api.one
     def _consumption_per_day(self):
         _logger.warn('Computing _consumption_per_day for product.template %s, %s' % (self.id, self.name))
+        self.product_variant_ids._consumption_per_day()
         locations = self.env.ref('stock.picking_type_out').default_location_dest_id
         locations |= self.env.ref('point_of_sale.picking_type_posout').default_location_dest_id
         locations |= self.env.ref('stock.location_production')
