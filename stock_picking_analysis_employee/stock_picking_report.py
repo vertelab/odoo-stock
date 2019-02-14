@@ -85,7 +85,7 @@ class stock_picking(models.Model):
         wrap_tot = 0.0
         wrap_nbr = 0
         for picking in self.env['stock.picking'].sudo().search([('date', '>=', '%s 00:00:00' %date), ('date', '<=', '%s 23:59:59' %date),('wraping_starts','>','1970-01-01 00:00:00'),('wraping_stops','>','1970-01-01 00:00:00')]):
-            wrap_tot = (fields.Datetime.from_string(picking.wraping_stops) - fields.Datetime.from_string(picking.wraping_starts)).total_seconds() / 60.0
+            wrap_tot += (fields.Datetime.from_string(picking.wraping_stops) - fields.Datetime.from_string(picking.wraping_starts)).total_seconds() / 60.0
             wrap_nbr += 1
         return int(round(wrap_tot / wrap_nbr)) if wrap_nbr > 0 else 0
 
@@ -108,7 +108,7 @@ class stock_picking(models.Model):
         pick_tot = 0.0
         pick_nbr = 0
         for picking in self.env['stock.picking'].sudo().search([('date', '>=', '%s 00:00:00' %date), ('date', '<=', '%s 23:59:59' %date),('picking_starts','>','1970-01-01 00:00:00'),('picking_stops','>','1970-01-01 00:00:00')]):
-            pick_tot = (fields.Datetime.from_string(picking.picking_stops) - fields.Datetime.from_string(picking.picking_starts)).total_seconds() / 60.0
+            pick_tot += (fields.Datetime.from_string(picking.picking_stops) - fields.Datetime.from_string(picking.picking_starts)).total_seconds() / 60.0
             pick_nbr += 1
         return int(round(pick_tot / pick_nbr)) if pick_nbr > 0 else 0
 
@@ -131,7 +131,7 @@ class stock_picking(models.Model):
         pick_tot = 0.0
         pick_nbr = 0
         for picking in self.env['stock.picking'].sudo().search([('date', '>=', '%s 00:00:00' %date), ('date', '<=', '%s 23:59:59' %date),('picking_starts','>','1970-01-01 00:00:00'),('wraping_stops','>','1970-01-01 00:00:00')]):
-            pick_tot = (fields.Datetime.from_string(picking.wraping_stops) - fields.Datetime.from_string(picking.picking_starts)).total_seconds() / 60.0
+            pick_tot += (fields.Datetime.from_string(picking.wraping_stops) - fields.Datetime.from_string(picking.picking_starts)).total_seconds() / 60.0
             pick_nbr += 1
         return int(round(pick_tot / pick_nbr)) if pick_nbr > 0 else 0
 
