@@ -111,6 +111,7 @@
         <field name="arch" type="xml">
             <field name="default_code" />
             <field name="name" />
+            <field name="attribute_value_ids" widget="many2many_tags"/>
             <field name="virtual_available" />
             <field name="instock_percent" />
             <field name="orderpoint_computed" />
