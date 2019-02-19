@@ -24,7 +24,7 @@
     'version': '0.1',
     'category': 'stock',
     'description': u"""
-Daniel är bäst
+Adds a button to check stock levels on sale orders.
 """,
     'author': 'Vertel AB',
     'license': 'AGPL-3',
