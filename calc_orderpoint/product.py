@@ -35,6 +35,8 @@ class product_template(models.Model):
     @api.one
     def _consumption_per_day(self):
         _logger.warn('Computing _consumption_per_day for product.template %s, %s' % (self.id, self.name))
+        self.product_variant_ids._consumption_per_day()
+        self.sales_count = sum([p.sales_count for p in self.product_variant_ids])
         locations = self.env.ref('stock.picking_type_out').default_location_dest_id
         locations |= self.env.ref('point_of_sale.picking_type_posout').default_location_dest_id
         locations |= self.env.ref('stock.location_production')
@@ -51,7 +53,6 @@ class product_template(models.Model):
         if len(stocks_year) > 0:
             stock_nbr_days_year = (date.today() - fields.Date.from_string(stocks_year[0]['date'])).days
             year_count = sum([r['product_uom_qty'] for r in stocks_year])
-            self.sales_count = year_count
             self.consumption_per_year = year_count / stock_nbr_days_year * 365
             if len(stocks_month) > 0:
                 stock_nbr_days_month = (date.today() - fields.Date.from_string(stocks_month[0]['date'])).days
@@ -65,7 +66,6 @@ class product_template(models.Model):
             self.consumption_per_day = 0
             self.consumption_per_month = 0
             self.consumption_per_year = 0
-            self.sales_count = 0
         if min(self.seller_ids.mapped('delay') or [0.0])>0.0:
             delay = min(self.seller_ids.mapped('delay')) + (self.company_id.po_lead if self.company_id else self.env.user.company_id.po_lead)
         else:
@@ -159,20 +159,20 @@ class product_product(models.Model):
             [('product_id', '=', self.id),
             ('date', '>', fields.Date.to_string(date.today() - timedelta(days=365))),
             ('location_dest_id', 'in', locations.mapped('id'))],
-            ['product_uom_qty', 'date'], order='date asc')
+            ['product_qty', 'date'], order='date asc')
         stocks_month = self.env['stock.move'].search_read(
             [('product_id', '=', self.id),
             ('date', '>', fields.Date.to_string(date.today() - timedelta(days=31))),
             ('location_dest_id', 'in', locations.mapped('id'))],
-            ['product_uom_qty', 'date'], order='date asc')
+            ['product_qty', 'date'], order='date asc')
         if len(stocks_year) > 0:
             stock_nbr_days_year = (date.today() - fields.Date.from_string(stocks_year[0]['date'])).days
-            year_count = sum([r['product_uom_qty'] for r in stocks_year])
+            year_count = sum([r['product_qty'] for r in stocks_year])
             self.sales_count = year_count
             self.consumption_per_year = year_count / stock_nbr_days_year * 365
             if len(stocks_month) > 0:
                 stock_nbr_days_month = (date.today() - fields.Date.from_string(stocks_month[0]['date'])).days
-                month_count = sum([r['product_uom_qty'] for r in stocks_month])
+                month_count = sum([r['product_qty'] for r in stocks_month])
                 self.consumption_per_month = month_count / stock_nbr_days_month * 30.5
                 self.consumption_per_day = month_count / stock_nbr_days_month
             else:
