@@ -174,7 +174,7 @@ class stock_picking_report(models.Model):
     qc_id =  fields.Many2one("hr.employee", "Controlled by", readonly=True)
 
     picking_time = fields.Float(string='Picking Time', digits=(16,2), readonly=True)
-    wraping_time = fields.Float(string='Warping Time', digits=(16,2), readonly=True)
+    wraping_time = fields.Float(string='Wrapping Time', digits=(16,2), readonly=True)
     order_time = fields.Float(string='Order Time', digits=(16,2), readonly=True)
 
     def _select(self):
