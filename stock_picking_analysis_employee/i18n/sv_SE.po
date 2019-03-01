@@ -105,4 +105,4 @@ msgstr "Embalering slut"
 #. module: stock_picking_analysis_employee
 #: field:stock_picking.report,wraping_time:0
 msgid "Wrapping Time"
-msgstr "Plocktid"
+msgstr "Emballeringstid"
