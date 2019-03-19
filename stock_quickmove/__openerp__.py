@@ -33,5 +33,6 @@ Implements a fast way to move products between locations.
     'data': [
         'stock_template.xml',
     ],
+    'qweb': ['static/src/xml/picking.xml'],
     'installable': True,
 }

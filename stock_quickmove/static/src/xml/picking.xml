@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-extend="PickingMenuWidget">
+        <t t-jquery="div[t-att-data-id='type.id']" t-operation="before">
+            <t t-if="type.code == 'internal'">
+                <a t-att-href="'/stock/quickmove/?picking_type=' + type.id" class="quickmove-btn label label-primary pull-right">Quick Move</a>
+            </t>
+        </t>
+    </t>
+    <t t-name="quickmove_product_id">
+        <t t-foreach="product_ids" t-as="product">
+            <option t-att-value="product[0]" t-att-selected="product[2]"><t t-esc="product[1]"/></option>
+        </t>
+    </t>
+    <t t-name="quickmove_location_src_id">
+        <input type="hidden" class="form-control" name="location_src_id" t-attf-value="#{location_src_id or ''}" />
+        <input type="text" class="form-control" name="location_src_id" t-attf-value="#{location_src_name or ''}" disabled="disabled" required="1" />
+    </t>
+    <t t-name="quickmove_location_dest_id">
+        <input type="hidden" class="form-control" name="location_dest_id" t-attf-value="#{location_dest_id or ''}" />
+        <input type="text" class="form-control" name="location_dest_id" t-attf-value="#{location_dest_name or ''}" disabled="disabled" required="1" />
+    </t>
+</templates>

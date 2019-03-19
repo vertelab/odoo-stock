@@ -1,67 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-  <data>
-    <!--
-         <template id="stock_assets_backend" name="stock assets" inherit_id="stock.assets_backend">
-         <xpath expr="//script[@src='/stock/static/src/js/widgets.js']" position="replace">
-         <script type="text/javascript" src="/stock_prepicking/static/src/js/widgets.js"></script>
-         </xpath>
-         </template>
-    -->
-    <template id="stock_quickmove.webapp">
-      <t t-call="website.layout">
-        <div id="wrap" class="oe_structure oe_empty">
-          <section class="mt16 mb16">
-            <div class="container">
-              <div class="row">
-                <div class="col-md-12 text-center mt16 mb32">
-                  <form action="/stock/quickmove" method="post" class="form-horizontal mt32" enctype="multipart/form-data">
-                    
-                    <div t-attf-class="form-group #{error and 'product_id' in error and 'has-error' or ''}">
-                      <label class="col-md-3 col-sm-4 control-label" for="product_id">Product</label>
-                      <div class="col-md-7 col-sm-8">
-                        <input type="text" class="form-control" name="product_id" required="True" t-attf-value="#{product_id or ''}" />
-                      </div>
-                    </div>
-                    <div t-attf-class="form-group #{error and 'location_id' in error and 'has-error' or ''}">
-                      <label class="col-md-3 col-sm-4 control-label" for="location_id">From</label>
-                      <div class="col-md-7 col-sm-8">
-                        <input type="text" class="form-control" name="location_id" t-attf-value="#{location_id or ''}" />
-                      </div>
-                    </div>
-                    
-                    <div t-attf-class="form-group #{error and 'location_dest_id' in error and 'has-error' or ''}">
-                      <label class="col-md-3 col-sm-4 control-label" for="location_dest_id">To</label>
-                      <div class="col-md-7 col-sm-8">
-                        <input type="text" class="form-control" name="location_dest_id" t-attf-value="#{location_dest_id or ''}" />
-                      </div>
-                    </div>
-                    <div name="product_oum_quantity_container" t-attf-class="form-group #{error and 'product_oum_quantity' in error and 'has-error' or ''}">
-                      <label class="col-md-3 col-sm-4 control-label" for="product_oum_quantity">Quantity</label>
-                      <div class="col-md-7 col-sm-8">
-                        <input type="number" class="form-control" name="product_oum_quantity" required="True" t-attf-value="#{product_oum_quantity or ''}" />
-                      </div>
-                    </div>
-                    
-                    <div t-attf-class="form-group #{error and 'name' in error and 'has-error' or ''}">
-                      <label class="col-md-3 col-sm-4 control-label" for="name">Description</label>
-                      <div class="col-md-7 col-sm-8">
-                        <input type="text" class="form-control" name="name" t-attf-value="#{name or ''}" />
-                      </div>
-                    </div>
-                    
-                    <div class="form-group">
-                      <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
-                        <button class="btn btn-primary btn-lg">Send</button>
-                      </div>
-                    </div>
-                  </form>
+    <data>
+        <template id="stock_quickmove.webapp">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure oe_empty">
+                    <section class="mt16 mb16">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12 text-center mt16 mb32">
+                                    <form action="/stock/quickmove" method="post" class="form-horizontal mt32" enctype="multipart/form-data">
+                                        <input name="picking_type" type="hidden" t-att-value="picking_type"/>
+                                        <div t-attf-class="form-group #{error and 'product_id' in error and 'has-error' or ''}">
+                                            <label class="col-md-3 col-sm-4 control-label" for="product_id">Product</label>
+                                            <div class="col-md-7 col-sm-8">
+                                                <select id="quickmove_product_id" class="form-control" name="product_id">
+                                                    <option/>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div name="product_oum_quantity_container" t-attf-class="form-group #{error and 'product_oum_quantity' in error and 'has-error' or ''}">
+                                            <label class="col-md-3 col-sm-4 control-label" for="product_oum_quantity">Quantity</label>
+                                            <div class="col-md-7 col-sm-8">
+                                                <input type="number" class="form-control" name="product_oum_quantity" required="1" t-attf-value="#{product_oum_quantity or ''}" />
+                                            </div>
+                                        </div>
+                                        <div t-attf-class="form-group #{error and 'location_src_id' in error and 'has-error' or ''}">
+                                            <label class="col-md-3 col-sm-4 control-label" for="location_src_id">From</label>
+                                            <div class="col-md-7 col-sm-8">
+                                                <div id="quickmove_location_src_id"/>
+                                            </div>
+                                        </div>
+                                        <div t-attf-class="form-group #{error and 'location_dest_id' in error and 'has-error' or ''}">
+                                            <label class="col-md-3 col-sm-4 control-label" for="location_dest_id">To</label>
+                                            <div class="col-md-7 col-sm-8">
+                                                <div id="quickmove_location_dest_id"/>
+                                            </div>
+                                        </div>
+                                        <div t-attf-class="form-group #{error and 'description' in error and 'has-error' or ''}">
+                                            <label class="col-md-3 col-sm-4 control-label" for="description">Description</label>
+                                            <div class="col-md-7 col-sm-8">
+                                                <input type="text" class="form-control" name="description" t-attf-value="#{description or ''}" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
+                                                <button class="btn btn-primary btn-lg">Send</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
-              </div>
-            </div>
-          </section>
-        </div>
-      </t>
-    </template>
-  </data>
+            </t>
+        </template>
+        <template id="stock_quickmove_assets_frontend" name="Stock Quickmove Assets Frontend" inherit_id="website.assets_frontend">
+            <xpath expr="." position="inside">
+                <link href="/stock_quickmove/static/src/css/main.css" rel="stylesheet" />
+                <script src="/stock_quickmove/static/src/js/main.js" type="text/javascript" />
+            </xpath>
+        </template>
+        <template id="stock_quickmove_barcode_index" name="Stock Quickmove Barcode Index" inherit_id="stock.barcode_index">
+            <xpath expr="." position="inside">
+                <link href="/stock_quickmove/static/src/css/barcode.css" rel="stylesheet" />
+            </xpath>
+        </template>
+    </data>
 </openerp>
