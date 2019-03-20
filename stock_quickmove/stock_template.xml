@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <template id="stock_quickmove.webapp">
+        <template id="stock_quickmove.webapp" name="Quick Move">
             <t t-call="website.layout">
                 <div id="wrap" class="oe_structure oe_empty">
                     <section class="mt16 mb16">
@@ -10,41 +10,37 @@
                                 <div class="col-md-12 text-center mt16 mb32">
                                     <form action="/stock/quickmove" method="post" class="form-horizontal mt32" enctype="multipart/form-data">
                                         <input name="picking_type" type="hidden" t-att-value="picking_type"/>
-                                        <div t-attf-class="form-group #{error and 'product_id' in error and 'has-error' or ''}">
-                                            <label class="col-md-3 col-sm-4 control-label" for="product_id">Product</label>
-                                            <div class="col-md-7 col-sm-8">
-                                                <select id="quickmove_product_id" class="form-control" name="product_id">
-                                                    <option/>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div name="product_oum_quantity_container" t-attf-class="form-group #{error and 'product_oum_quantity' in error and 'has-error' or ''}">
-                                            <label class="col-md-3 col-sm-4 control-label" for="product_oum_quantity">Quantity</label>
-                                            <div class="col-md-7 col-sm-8">
-                                                <input type="number" class="form-control" name="product_oum_quantity" required="1" t-attf-value="#{product_oum_quantity or ''}" />
-                                            </div>
-                                        </div>
                                         <div t-attf-class="form-group #{error and 'location_src_id' in error and 'has-error' or ''}">
-                                            <label class="col-md-3 col-sm-4 control-label" for="location_src_id">From</label>
+                                            <label class="col-md-3 col-sm-4 control-label pull-left" for="location_src_id">From</label>
                                             <div class="col-md-7 col-sm-8">
                                                 <div id="quickmove_location_src_id"/>
                                             </div>
                                         </div>
                                         <div t-attf-class="form-group #{error and 'location_dest_id' in error and 'has-error' or ''}">
-                                            <label class="col-md-3 col-sm-4 control-label" for="location_dest_id">To</label>
+                                            <label class="col-md-3 col-sm-4 control-label pull-left" for="location_dest_id">To</label>
                                             <div class="col-md-7 col-sm-8">
                                                 <div id="quickmove_location_dest_id"/>
                                             </div>
                                         </div>
                                         <div t-attf-class="form-group #{error and 'description' in error and 'has-error' or ''}">
-                                            <label class="col-md-3 col-sm-4 control-label" for="description">Description</label>
+                                            <label class="col-md-3 col-sm-4 control-label pull-left" for="description">Description</label>
                                             <div class="col-md-7 col-sm-8">
                                                 <input type="text" class="form-control" name="description" t-attf-value="#{description or ''}" />
                                             </div>
                                         </div>
+                                        <table class="table table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">Product</th>
+                                                    <th class="text-center">Quantity</th>
+                                                    <th/>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="quickmove_product_lines"/>
+                                        </table>
                                         <div class="form-group">
-                                            <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
-                                                <button class="btn btn-primary btn-lg">Send</button>
+                                            <div class="col-md-12">
+                                                <button class="btn btn-primary btn-lg pull-right">Transfer</button>
                                             </div>
                                         </div>
                                     </form>

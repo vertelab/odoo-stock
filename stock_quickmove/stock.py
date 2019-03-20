@@ -37,12 +37,12 @@ class StockSquickMove(http.Controller):
     @http.route(['/stock/quickmove_barcode'], type='json', auth='user', website=True)
     def quickmove_barcode(self, barcode='', location_src_scanned=False, **kw):
         # search EAN13
-        _logger.warn(request.env.context)
         product_ids = request.env['product.product'].search([('ean13', '=', barcode)])
         if len(product_ids) > 0:
             products = []
             for p in product_ids:
-                products.append([p.id, '%s %s' %(p.name, ','.join([a.name for a in p.attribute_value_ids]))])
+                qty = sum(request.env['stock.quant'].search([('product_id', '=', p.id), ('location_id', '=', p.stock_location_id.id)]).mapped('qty'))
+                products.append([p.id, '%s %s' %(p.name, ','.join([a.name for a in p.attribute_value_ids])), qty])
             return {'type': 'product', 'product_ids': products}
         else:
             if not location_src_scanned:
@@ -53,7 +53,8 @@ class StockSquickMove(http.Controller):
                     product_ids = request.env['product.product'].search([('stock_location_id', '=', src_location_id.id)])
                     products = []
                     for p in product_ids:
-                        products.append([p.id, '%s %s' %(p.name, ','.join([a.name for a in p.attribute_value_ids]))])
+                        qty = sum(request.env['stock.quant'].search([('product_id', '=', p.id), ('location_id', '=', p.stock_location_id.id)]).mapped('qty'))
+                        products.append([p.id, '%s %s' %(p.name, ','.join([a.name for a in p.attribute_value_ids])), qty])
                     return {'type': 'src_location', 'product_ids': products, 'location': {'id': src_location_id.id, 'name': src_location_id.display_name}}
             else:
                 # search destination location

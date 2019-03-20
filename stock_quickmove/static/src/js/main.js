@@ -96,16 +96,43 @@ $("body").barcodeListener().on("barcode.valid", function(e, code){
         'location_src_scanned': location_src_scanned
     }).done(function(result){
         if (result.type === 'product') {
-            var content = openerp.qweb.render('quickmove_product_id', {
-                'product_ids': result.product_ids,
+            var product_ids = [];
+            var result_product_ids = [];
+            $.each($("tbody#quickmove_product_lines").find("tr"), function() {
+                product_ids.push(parseInt($(this).data("id")));
             });
-            $("select#quickmove_product_id").html(content);
+            $.each(result.product_ids, function() {
+                var product_id = $(this)[0];
+                var product_name = $(this)[1];
+                var product_qty = $(this)[2];
+                if ($.inArray(product_id, product_ids) === -1) {
+                    result_product_ids.push([product_id, product_name, product_qty]);
+                }
+            });
+            var product_content = openerp.qweb.render('quickmove_product_lines', {
+                'product_ids': result_product_ids,
+            });
+            $("tbody#quickmove_product_lines").append(product_content);
         }
         if (result.type === 'src_location') {
-            var content = openerp.qweb.render('quickmove_product_id', {
-                'product_ids': result.product_ids,
+            var product_ids = [];
+            var result_product_ids = [];
+            $.each($("tbody#quickmove_product_lines").find("tr"), function() {
+                product_ids.push(parseInt($(this).data("id")));
             });
-            $("select#quickmove_product_id").html(content);
+            console.log(product_ids);
+            $.each(result.product_ids, function() {
+                var product_id = $(this)[0];
+                var product_name = $(this)[1];
+                var product_qty = $(this)[2];
+                if ($.inArray(product_id, product_ids) === -1) {
+                    result_product_ids.push([product_id, product_name, product_qty]);
+                }
+            });
+            var product_content = openerp.qweb.render('quickmove_product_lines', {
+                'product_ids': result_product_ids,
+            });
+            $("tbody#quickmove_product_lines").append(product_content);
             var content = openerp.qweb.render('quickmove_location_src_id', {
                 'location_src_id': result.location.id,
                 'location_src_name': result.location.name,
@@ -122,7 +149,29 @@ $("body").barcodeListener().on("barcode.valid", function(e, code){
             location_src_scanned = false;
         }
     });
+
 })
+
+function quickmove_minus(e) {
+    var input = e.closest("div").find("input");
+    var val = input.val();
+    if (parseInt(val) == 0) {
+        input.val("0");
+    }
+    else {
+        input.val(String(parseInt(val) - 1));
+    }
+}
+
+function quickmove_plus(e) {
+    var input = e.closest("div").find("input");
+    var val = input.val();
+    input.val(String(parseInt(val) + 1));
+}
+
+function quickmove_remove(e) {
+    var tr = e.closest("tr").remove();
+}
 
 $(document).ready(function() {
 });

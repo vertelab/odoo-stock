@@ -7,9 +7,23 @@
             </t>
         </t>
     </t>
-    <t t-name="quickmove_product_id">
+    <t t-name="quickmove_product_lines">
         <t t-foreach="product_ids" t-as="product">
-            <option t-att-value="product[0]" t-att-selected="product[2]"><t t-esc="product[1]"/></option>
+            <tr t-att-data-id="product[0]">
+                <td>
+                    <t t-esc="product[1]"/>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <span class="input-group-addon quickmove_minus input-sm" t-att-data-product-id="product[0]" onclick="quickmove_minus($(this));"><a href="#"><i class="fa fa-minus"/></a></span>
+                        <input class="form-control text-center" type="text" t-att-value="product[2]"/>
+                        <span class="input-group-addon quickmove_plus input-sm" t-att-data-product-id="product[0]" onclick="quickmove_plus($(this));"><a href="#"><i class="fa fa-plus"/></a></span>
+                    </div>
+                </td>
+                <td>
+                    <i class="fa fa-trash fa-2x text-primary" onclick="quickmove_remove($(this));"/>
+                </td>
+            </tr>
         </t>
     </t>
     <t t-name="quickmove_location_src_id">
