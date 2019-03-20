@@ -95,13 +95,13 @@ $("body").barcodeListener().on("barcode.valid", function(e, code){
         'barcode': code,
         'location_src_scanned': location_src_scanned
     }).done(function(result){
-        if (result.type === 'product') {
+        function update_product_lines(res) {
             var product_ids = [];
             var result_product_ids = [];
             $.each($("tbody#quickmove_product_lines").find("tr"), function() {
                 product_ids.push(parseInt($(this).data("id")));
             });
-            $.each(result.product_ids, function() {
+            $.each(res.product_ids, function() {
                 var product_id = $(this)[0];
                 var product_name = $(this)[1];
                 var product_qty = $(this)[2];
@@ -114,30 +114,16 @@ $("body").barcodeListener().on("barcode.valid", function(e, code){
             });
             $("tbody#quickmove_product_lines").append(product_content);
         }
+        if (result.type === 'product') {
+            update_product_lines(result);
+        }
         if (result.type === 'src_location') {
-            var product_ids = [];
-            var result_product_ids = [];
-            $.each($("tbody#quickmove_product_lines").find("tr"), function() {
-                product_ids.push(parseInt($(this).data("id")));
-            });
-            console.log(product_ids);
-            $.each(result.product_ids, function() {
-                var product_id = $(this)[0];
-                var product_name = $(this)[1];
-                var product_qty = $(this)[2];
-                if ($.inArray(product_id, product_ids) === -1) {
-                    result_product_ids.push([product_id, product_name, product_qty]);
-                }
-            });
-            var product_content = openerp.qweb.render('quickmove_product_lines', {
-                'product_ids': result_product_ids,
-            });
-            $("tbody#quickmove_product_lines").append(product_content);
+            update_product_lines(result);
             var content = openerp.qweb.render('quickmove_location_src_id', {
                 'location_src_id': result.location.id,
                 'location_src_name': result.location.name,
             });
-            $("div#quickmove_location_src_id").html(content);
+            $("input#quickmove_location_src_id").replaceWith(content);
             location_src_scanned = true;
         }
         if (result.type === 'dest_location') {
@@ -145,7 +131,7 @@ $("body").barcodeListener().on("barcode.valid", function(e, code){
                 'location_dest_id': result.location.id,
                 'location_dest_name': result.location.name,
             });
-            $("div#quickmove_location_dest_id").html(content);
+            $("input#quickmove_location_dest_id").replaceWith(content);
             location_src_scanned = false;
         }
     });
