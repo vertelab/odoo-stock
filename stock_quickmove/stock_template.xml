@@ -7,18 +7,56 @@
                     <section class="mt16 mb16">
                         <div class="container">
                             <div class="row">
-                                <t t-if="picking">
-                                    <div class="col-md-12 mt16 mb32">
-                                        <a class="btn btn-success" t-att-href="'/stock/quickmove?picking_type_id=%s' %picking.picking_type_id.id">New Transfer</a>
-                                    </div>
-                                </t>
                                 <div class="col-md-12 mt16 mb32">
+                                    <t t-if="previous_picking_id">
+                                        <t t-set="previous_picking" t-value="request.env['stock.picking'].browse(int(previous_picking_id))"/>
+                                        <t t-set="previous_picking_alert" t-value="'secondary'"/>
+                                        <t t-set="previous_picking_state_label" t-value="'default'"/>
+                                        <t t-if="previous_picking.state == 'draft'">
+                                            <t t-set="previous_picking_alert" t-value="'secondary'"/>
+                                            <t t-set="previous_picking_state_label" t-value="'default'"/>
+                                        </t>
+                                        <t t-if="previous_picking.state == 'waiting'">
+                                            <t t-set="previous_picking_alert" t-value="'info'"/>
+                                            <t t-set="previous_picking_state_label" t-value="'info'"/>
+                                        </t>
+                                        <t t-if="previous_picking.state == 'confirmed'">
+                                            <t t-set="previous_picking_alert" t-value="'primary'"/>
+                                            <t t-set="previous_picking_state_label" t-value="'primary'"/>
+                                        </t>
+                                        <t t-if="previous_picking.state == 'partially_available'">
+                                            <t t-set="previous_picking_alert" t-value="'warning'"/>
+                                            <t t-set="previous_picking_state_label" t-value="'warning'"/>
+                                        </t>
+                                        <t t-if="previous_picking.state == 'assigned'">
+                                            <t t-set="previous_picking_alert" t-value="'primary'"/>
+                                            <t t-set="previous_picking_state_label" t-value="'primary'"/>
+                                        </t>
+                                        <t t-if="previous_picking.state == 'done'">
+                                            <t t-set="previous_picking_alert" t-value="'success'"/>
+                                            <t t-set="previous_picking_state_label" t-value="'success'"/>
+                                        </t>
+                                        <t t-if="previous_picking.state == 'cancel'">
+                                            <t t-set="previous_picking_alert" t-value="'danger'"/>
+                                            <t t-set="previous_picking_state_label" t-value="'danger'"/>
+                                        </t>
+                                        <div t-att-class="'col-md-12 alert alert-%s' %previous_picking_alert" role="alert">
+                                            <h2 class="text-center">Last Picking: <a t-att-href="'/web#id=%s&amp;view_type=form&amp;model=stock.picking&amp;active_id=%s' %(previous_picking.id, previous_picking.picking_type_id.id)" target="_blank"><h2 t-esc="previous_picking.name"/></a></h2>
+                                            <h4 class="text-center"><span t-att-class="'label label-%s' %previous_picking_state_label" t-field="previous_picking.state"/></h4>
+                                        </div>
+                                    </t>
                                     <t t-if="picking">
                                         <form t-att-action="'/stock/quickmove/picking/%s' %picking.id if picking else ''" method="post" class="form-horizontal mt32" enctype="multipart/form-data">
                                             <input name="picking_type_id" type="hidden" t-att-value="picking.picking_type_id.id"/>
-                                            <div class="col-md-12">
-                                                <a t-att-href="'/web#id=%s&amp;view_type=form&amp;model=stock.picking&amp;active_id=%s' %(picking.id, picking.picking_type_id.id)"><h2 t-esc="picking.name"/></a>
-                                                <p t-esc="picking.state" class="pull-right"/>
+                                            <div class="mb32">
+                                                <a t-att-href="'/web#id=%s&amp;view_type=form&amp;model=stock.picking&amp;active_id=%s' %(picking.id, picking.picking_type_id.id)" target="_blank"><h2 t-esc="picking.name"/></a>
+                                                <t t-if="picking.state == 'draft'"><span t-field="picking.state" class="label label-default"/></t>
+                                                <t t-if="picking.state == 'waiting'"><span t-field="picking.state" class="label label-info"/></t>
+                                                <t t-if="picking.state == 'confirmed'"><span t-field="picking.state" class="label label-primary"/></t>
+                                                <t t-if="picking.state == 'partially_available'"><span t-field="picking.state" class="label label-warning"/></t>
+                                                <t t-if="picking.state == 'assigned'"><span t-field="picking.state" class="label label-primary"/></t>
+                                                <t t-if="picking.state == 'done'"><span t-field="picking.state" class="label label-success"/></t>
+                                                <t t-if="picking.state == 'cancel'"><span t-field="picking.state" class="label label-danger"/></t>
                                             </div>
                                             <div t-attf-class="form-group #{error and 'description' in error and 'has-error' or ''}">
                                                 <label class="col-md-3 col-sm-4 control-label pull-left" for="description">Description</label>

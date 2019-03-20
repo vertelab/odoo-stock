@@ -31,7 +31,6 @@ class StockSquickMove(http.Controller):
     @http.route(['/stock/quickmove', '/stock/quickmove/picking/<model("stock.picking"):picking>'], type='http', auth='user', website=True)
     def stock_quickmove(self, picking=None, **post):
         if request.httprequest.method == 'POST':
-            _logger.warn('<<<<<<<<<<<<<< %s' %post)
             description = post.get('description')
             picking_type_id = post.get('picking_type_id')
             location_src_id = post.get('location_src_id')
@@ -59,11 +58,10 @@ class StockSquickMove(http.Controller):
                             })
                 else:
                     # update move lines
-                    _logger.warn('<<<<<< %s' %post)
                     for k,v in post.items():
                         if k.startswith('product_qty_'):
                             product = request.env['product.product'].browse(int(k.split('_')[-1]))
-                            move = picking.move_lines.with_context(product_id=product.id).filtered(lambda l: l.product_id == l._context.get('product_id'))
+                            move = picking.move_lines.with_context(product_id=product.id).filtered(lambda l: l.product_id.id == l._context.get('product_id'))
                             if move:
                                 move.write({
                                     'name': product.name,
@@ -86,7 +84,48 @@ class StockSquickMove(http.Controller):
                     for line in picking.move_lines:
                         if not post.get('product_qty_%s' %line.product_id.id, False):
                             line.unlink()
-                return request.redirect('/stock/quickmove/picking/%s' %picking.id)
+                picking.action_confirm() # mark as todo
+                picking.action_assign() # check availability
+                # do transfer
+                if picking.state == 'assigned':
+                    operation_completed = []
+                    for line in picking.move_lines:
+                        try:
+                            ops = request.env['stock.pack.operation'].search([('product_id', '=', line.product_id.id), ('picking_id', '=', picking.id), ('location_id', '=', location_src_id), ('location_dest_id', '=', location_dest_id)])
+                            if len(ops) > 0:
+                                op = ops[0]
+                                if len(ops) > 1:
+                                    for o in ops:
+                                        if o != op:
+                                            o.unlink()
+                                op.write({
+                                    'product_id': line.product_id.id,
+                                    'picking_id': picking.id,
+                                    'location_id': location_src_id,
+                                    'location_dest_id': location_dest_id,
+                                    'product_qty': line.product_uom_qty,
+                                    'qty_done': line.product_uom_qty,
+                                    'product_uom_id': line.product_uom.id,
+                                    'processed': 'true'
+                                })
+                            else:
+                                request.env['stock.pack.operation'].create({
+                                    'product_id': line.product_id.id,
+                                    'picking_id': picking.id,
+                                    'location_id': location_src_id,
+                                    'location_dest_id': location_dest_id,
+                                    'product_qty': line.product_uom_qty,
+                                    'qty_done': line.product_uom_qty,
+                                    'product_uom_id': line.product_uom.id,
+                                    'processed': 'true'
+                                })
+                            operation_completed.append(True)
+                        except:
+                            operation_completed.append(False)
+                    if all(operation_completed):
+                        picking.do_transfer()
+                return request.website.render('stock_quickmove.webapp', {'picking_type_id': picking.picking_type_id.id, 'previous_picking_id': picking.id})
+                # ~ return request.redirect('/stock/quickmove/picking/%s' %picking.id)
         return request.website.render('stock_quickmove.webapp', {'picking_type_id': post.get('picking_type_id' or ''), 'picking': picking})
 
     @http.route(['/stock/quickmove_barcode'], type='json', auth='user', website=True)
