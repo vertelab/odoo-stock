@@ -28,11 +28,66 @@ _logger = logging.getLogger(__name__)
 
 class StockSquickMove(http.Controller):
 
-    @http.route(['/stock/quickmove'], type='http', auth='user', website=True)
-    def stock_quickmove(self, **post):
+    @http.route(['/stock/quickmove', '/stock/quickmove/picking/<model("stock.picking"):picking>'], type='http', auth='user', website=True)
+    def stock_quickmove(self, picking=None, **post):
         if request.httprequest.method == 'POST':
-            _logger.warn(post)
-        return request.website.render('stock_quickmove.webapp', {'picking_type': post.get('picking_type' or '')})
+            _logger.warn('<<<<<<<<<<<<<< %s' %post)
+            description = post.get('description')
+            picking_type_id = post.get('picking_type_id')
+            location_src_id = post.get('location_src_id')
+            location_dest_id = post.get('location_dest_id')
+            if description and picking_type_id and location_src_id and location_dest_id:
+                picking_type_id = int(picking_type_id)
+                location_src_id = int(location_src_id)
+                location_dest_id = int(location_dest_id)
+                if not picking:
+                    picking = request.env['stock.picking'].create({
+                        'name': description,
+                        'picking_type_id': picking_type_id,
+                    })
+                    for k,v in post.items():
+                        if k.startswith('product_qty_'):
+                            product = request.env['product.product'].browse(int(k.split('_')[-1]))
+                            request.env['stock.move'].create({
+                                'product_id': product.id,
+                                'name': product.name,
+                                'product_uom_qty': float(int(v)),
+                                'product_uom': product.uom_id.id,
+                                'location_id': location_src_id,
+                                'location_dest_id': location_dest_id,
+                                'picking_id': picking.id
+                            })
+                else:
+                    # update move lines
+                    _logger.warn('<<<<<< %s' %post)
+                    for k,v in post.items():
+                        if k.startswith('product_qty_'):
+                            product = request.env['product.product'].browse(int(k.split('_')[-1]))
+                            move = picking.move_lines.with_context(product_id=product.id).filtered(lambda l: l.product_id == l._context.get('product_id'))
+                            if move:
+                                move.write({
+                                    'name': product.name,
+                                    'product_uom_qty': float(int(v)),
+                                    'product_uom': product.uom_id.id,
+                                    'location_id': location_src_id,
+                                    'location_dest_id': location_dest_id,
+                                })
+                            else:
+                                request.env['stock.move'].create({
+                                    'product_id': product.id,
+                                    'name': product.name,
+                                    'product_uom_qty': float(int(v)),
+                                    'product_uom': product.uom_id.id,
+                                    'location_id': location_src_id,
+                                    'location_dest_id': location_dest_id,
+                                    'picking_id': picking.id
+                                })
+                    # remove move lines
+                    for line in picking.move_lines:
+                        if not post.get('product_qty_%s' %line.product_id.id, False):
+                            line.unlink()
+                return request.redirect('/stock/quickmove/picking/%s' %picking.id)
+        return request.website.render('stock_quickmove.webapp', {'picking_type_id': post.get('picking_type_id' or ''), 'picking': picking})
 
     @http.route(['/stock/quickmove_barcode'], type='json', auth='user', website=True)
     def quickmove_barcode(self, barcode='', location_src_scanned=False, **kw):

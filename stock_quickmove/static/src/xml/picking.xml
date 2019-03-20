@@ -3,7 +3,7 @@
     <t t-extend="PickingMenuWidget">
         <t t-jquery="div[t-att-data-id='type.id']" t-operation="before">
             <t t-if="type.code == 'internal'">
-                <a t-att-href="'/stock/quickmove/?picking_type=' + type.id" class="quickmove-btn label label-primary pull-right">Quick Move</a>
+                <a t-att-href="'/stock/quickmove/?picking_type_id=' + type.id" class="quickmove-btn label label-primary pull-right">Quick Move</a>
             </t>
         </t>
     </t>

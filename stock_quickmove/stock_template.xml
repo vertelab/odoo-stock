@@ -7,43 +7,112 @@
                     <section class="mt16 mb16">
                         <div class="container">
                             <div class="row">
-                                <div class="col-md-12 text-center mt16 mb32">
-                                    <form action="/stock/quickmove" method="post" class="form-horizontal mt32" enctype="multipart/form-data">
-                                        <input name="picking_type" type="hidden" t-att-value="picking_type"/>
-                                        <div t-attf-class="form-group #{error and 'description' in error and 'has-error' or ''}">
-                                            <label class="col-md-3 col-sm-4 control-label pull-left" for="description">Description</label>
-                                            <div class="col-md-7 col-sm-8">
-                                                <input type="text" class="form-control" name="description" t-attf-value="#{description or ''}" onkeypress="if (event.keyCode == 13) {return false;}" />
-                                            </div>
-                                        </div>
-                                        <div t-attf-class="form-group #{error and 'location_src_id' in error and 'has-error' or ''}">
-                                            <label class="col-md-3 col-sm-4 control-label pull-left" for="location_src_id">From</label>
-                                            <div class="col-md-7 col-sm-8">
-                                                <input id="quickmove_location_src_id" class="form-control" name="location_src_id" value="Scan the source location tag" disabled="disabled"/>
-                                            </div>
-                                        </div>
-                                        <div t-attf-class="form-group #{error and 'location_dest_id' in error and 'has-error' or ''}">
-                                            <label class="col-md-3 col-sm-4 control-label pull-left" for="location_dest_id">To</label>
-                                            <div class="col-md-7 col-sm-8">
-                                                <input id="quickmove_location_dest_id" class="form-control" name="location_dest_id" value="Scan the destination location tag" disabled="disabled"/>
-                                            </div>
-                                        </div>
-                                        <table class="table table-condensed">
-                                            <thead>
-                                                <tr>
-                                                    <th class="text-left">Product</th>
-                                                    <th class="text-center" style="width: 150px;">Quantity</th>
-                                                    <th style="width: 30px;"/>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="quickmove_product_lines"/>
-                                        </table>
-                                        <div class="form-group">
+                                <t t-if="picking">
+                                    <div class="col-md-12 mt16 mb32">
+                                        <a class="btn btn-success" t-att-href="'/stock/quickmove?picking_type_id=%s' %picking.picking_type_id.id">New Transfer</a>
+                                    </div>
+                                </t>
+                                <div class="col-md-12 mt16 mb32">
+                                    <t t-if="picking">
+                                        <form t-att-action="'/stock/quickmove/picking/%s' %picking.id if picking else ''" method="post" class="form-horizontal mt32" enctype="multipart/form-data">
+                                            <input name="picking_type_id" type="hidden" t-att-value="picking.picking_type_id.id"/>
                                             <div class="col-md-12">
-                                                <button class="btn btn-primary btn-lg pull-right">Transfer</button>
+                                                <a t-att-href="'/web#id=%s&amp;view_type=form&amp;model=stock.picking&amp;active_id=%s' %(picking.id, picking.picking_type_id.id)"><h2 t-esc="picking.name"/></a>
+                                                <p t-esc="picking.state" class="pull-right"/>
                                             </div>
-                                        </div>
-                                    </form>
+                                            <div t-attf-class="form-group #{error and 'description' in error and 'has-error' or ''}">
+                                                <label class="col-md-3 col-sm-4 control-label pull-left" for="description">Description</label>
+                                                <div class="col-md-7 col-sm-8">
+                                                    <input type="text" class="form-control" name="description" t-attf-value="#{picking.name or ''}" onkeypress="if(event.keyCode == 13) {return false;}" required="1" />
+                                                </div>
+                                            </div>
+                                            <div t-attf-class="form-group #{error and 'location_src_id' in error and 'has-error' or ''}">
+                                                <label class="col-md-3 col-sm-4 control-label pull-left" for="location_src_id">From</label>
+                                                <div class="col-md-7 col-sm-8">
+                                                    <input type="hidden" class="form-control" name="location_src_id" t-att-value="str(picking.move_lines[0].location_id.id) if len(picking.move_lines) &gt; 0 else '0'" />
+                                                    <input id="quickmove_location_src_id" class="form-control" name="location_src_id" t-att-value="picking.move_lines[0].location_id.name if len(picking.move_lines) &gt; 0 else 'Scan the source location tag'" disabled="disabled" required="1" />
+                                                </div>
+                                            </div>
+                                            <div t-attf-class="form-group #{error and 'location_dest_id' in error and 'has-error' or ''}">
+                                                <label class="col-md-3 col-sm-4 control-label pull-left" for="location_dest_id">To</label>
+                                                <div class="col-md-7 col-sm-8">
+                                                    <input type="hidden" class="form-control" name="location_dest_id" t-att-value="str(picking.move_lines[0].location_dest_id.id) if len(picking.move_lines) &gt; 0 else '0'" />
+                                                    <input id="quickmove_location_dest_id" class="form-control" name="location_dest_id" t-att-value="picking.move_lines[0].location_dest_id.name if len(picking.move_lines) &gt; 0 else  'Scan the destination location tag'" disabled="disabled" required="1" />
+                                                </div>
+                                            </div>
+                                            <table class="table table-condensed">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-left">Product</th>
+                                                        <th class="text-center" style="width: 150px;">Quantity</th>
+                                                        <th style="width: 30px;"/>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="quickmove_product_lines">
+                                                    <t t-foreach="picking.move_lines" t-as="line">
+                                                        <tr t-att-data-id="line.product_id.id">
+                                                            <td>
+                                                                <p class="text-left quickmove_product_name"><t t-esc="line.product_id.display_name"/></p>
+                                                            </td>
+                                                            <td style="width: 150px;">
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon quickmove_minus input-sm" t-att-data-product-id="line.product_id.id" onclick="quickmove_minus($(this));"><a href="#"><i class="fa fa-minus"/></a></span>
+                                                                    <input class="form-control text-center quickmove_qty" t-att-name="'product_qty_%s' %line.product_id.id" type="text" t-att-value="int(line.product_uom_qty)" onkeypress="if (event.keyCode == 13) {return false;}" />
+                                                                    <span class="input-group-addon quickmove_plus input-sm" t-att-data-product-id="line.product_id.id" onclick="quickmove_plus($(this));"><a href="#"><i class="fa fa-plus"/></a></span>
+                                                                </div>
+                                                            </td>
+                                                            <td style="width: 30px;">
+                                                                <i class="fa fa-trash fa-2x text-primary" onclick="quickmove_remove($(this));"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                            <div class="form-group">
+                                                <div class="col-md-12 mt48">
+                                                    <button class="btn btn-primary btn-lg pull-right">Transfer</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </t>
+                                    <t t-if="not picking">
+                                        <form action="/stock/quickmove" method="post" class="form-horizontal mt32" enctype="multipart/form-data">
+                                            <input name="picking_type_id" type="hidden" t-att-value="picking_type_id"/>
+                                            <div t-attf-class="form-group #{error and 'description' in error and 'has-error' or ''}">
+                                                <label class="col-md-3 col-sm-4 control-label pull-left" for="description">Description</label>
+                                                <div class="col-md-7 col-sm-8">
+                                                    <input type="text" class="form-control" name="description" t-attf-value="#{description or ''}" onkeypress="if(event.keyCode == 13) {return false;}" required="1" />
+                                                </div>
+                                            </div>
+                                            <div t-attf-class="form-group #{error and 'location_src_id' in error and 'has-error' or ''}">
+                                                <label class="col-md-3 col-sm-4 control-label pull-left" for="location_src_id">From</label>
+                                                <div class="col-md-7 col-sm-8">
+                                                    <input id="quickmove_location_src_id" class="form-control" name="location_src_id" value="Scan the source location tag" disabled="disabled" required="1" />
+                                                </div>
+                                            </div>
+                                            <div t-attf-class="form-group #{error and 'location_dest_id' in error and 'has-error' or ''}">
+                                                <label class="col-md-3 col-sm-4 control-label pull-left" for="location_dest_id">To</label>
+                                                <div class="col-md-7 col-sm-8">
+                                                    <input id="quickmove_location_dest_id" class="form-control" name="location_dest_id" value="Scan the destination location tag" disabled="disabled" required="1" />
+                                                </div>
+                                            </div>
+                                            <table class="table table-condensed">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-left">Product</th>
+                                                        <th class="text-center" style="width: 150px;">Quantity</th>
+                                                        <th style="width: 30px;"/>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="quickmove_product_lines"/>
+                                            </table>
+                                            <div class="form-group">
+                                                <div class="col-md-12 mt48">
+                                                    <button class="btn btn-primary btn-lg pull-right">Transfer</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </t>
                                 </div>
                             </div>
                         </div>
