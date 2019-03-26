@@ -70,6 +70,11 @@
                                                     <input type="hidden" class="form-control" name="location_src_id" t-att-value="str(picking.move_lines[0].location_id.id) if len(picking.move_lines) &gt; 0 else '0'" />
                                                     <input id="quickmove_location_src_id" class="form-control" name="location_src_id" t-att-value="picking.move_lines[0].location_id.name if len(picking.move_lines) &gt; 0 else 'Scan the source location tag'" disabled="disabled" required="1" />
                                                 </div>
+                                                <div class="col-md-offset-3 col-md-7 col-sm-offset-4 col-sm-8">
+                                                    <input id="location_input" type="" class="form-control" />
+                                                    <select class="form-control" id="location_sel">
+                                                    </select>
+                                                </div>
                                             </div>
                                             <div t-attf-class="form-group #{error and 'location_dest_id' in error and 'has-error' or ''}">
                                                 <label class="col-md-3 col-sm-4 control-label pull-left" for="location_dest_id">To</label>
@@ -125,13 +130,13 @@
                                             <div t-attf-class="form-group #{error and 'location_src_id' in error and 'has-error' or ''}">
                                                 <label class="col-md-3 col-sm-4 control-label pull-left" for="location_src_id">From</label>
                                                 <div class="col-md-7 col-sm-8">
-                                                    <input id="quickmove_location_src_id" class="form-control" name="location_src_id" value="Scan the source location tag" disabled="disabled" required="1" />
+                                                    <select id="quickmove_location_src_id" class="form-control" name="location_src_id" required="1" />
                                                 </div>
                                             </div>
                                             <div t-attf-class="form-group #{error and 'location_dest_id' in error and 'has-error' or ''}">
                                                 <label class="col-md-3 col-sm-4 control-label pull-left" for="location_dest_id">To</label>
                                                 <div class="col-md-7 col-sm-8">
-                                                    <input id="quickmove_location_dest_id" class="form-control" name="location_dest_id" value="Scan the destination location tag" disabled="disabled" required="1" />
+                                                    <select id="quickmove_location_dest_id" class="form-control" name="location_dest_id" required="1" />
                                                 </div>
                                             </div>
                                             <table class="table table-condensed">

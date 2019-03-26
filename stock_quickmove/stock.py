@@ -21,7 +21,8 @@
 from openerp import models, fields, api, _
 from openerp.exceptions import except_orm, Warning, RedirectWarning
 from openerp.addons.web import http
-from openerp.http import request
+from openerp.http import request, Response
+import simplejson
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -156,3 +157,32 @@ class StockSquickMove(http.Controller):
                 if len(dest_location_ids) > 0:
                     dest_location_id = dest_location_ids[0]
                     return {'type': 'dest_location', 'location': {'id': dest_location_id.id, 'name': dest_location_id.display_name}}
+
+    @http.route(['/stock/quickmove_location_search'], type='http', auth='user', website=True)
+    def quickmove_location_search(self, **post):
+        word = post.get('term')
+        results = []
+        locations = request.env['stock.location'].search([('name', 'ilike', word)])
+        if len(locations) > 0:
+            for l in locations:
+                results.append({'id': l.id, 'text': l.display_name})
+        return Response(simplejson.dumps({'results': results}), mimetype='application/json')
+
+    @http.route(['/stock/quickmove_product_search'], type='json', auth='user', website=True)
+    def quickmove_product_search(self, word='', **kw):
+        if word and word != '':
+            result = []
+            products = request.env['product.product'].search(['|', ('name', 'ilike', word), ('default_code', 'ilike', word)])
+            if len(products) > 0:
+                for p in products:
+                    result.append([p.id, p.display_name])
+            return result
+
+    @http.route(['/stock/quickmove_location_search_products'], type='json', auth='user', website=True)
+    def quickmove_location_search_products(self, location='0', **kw):
+        product_ids = request.env['product.product'].search([('stock_location_id', '=', int(location))])
+        products = []
+        for p in product_ids:
+            qty = sum(request.env['stock.quant'].search([('product_id', '=', p.id), ('location_id', '=', int(location))]).mapped('qty'))
+            products.append([p.id, '%s %s' %(p.name, ','.join([a.name for a in p.attribute_value_ids])), qty])
+        return {'product_ids': products}

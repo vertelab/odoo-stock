@@ -29,7 +29,7 @@ Implements a fast way to move products between locations.
     'author': 'Vertel AB',
     'license': 'AGPL-3',
     'website': 'http://www.vertel.se',
-    'depends': ['stock'],
+    'depends': ['stock', 'website_bootstrap_select2'],
     'data': [
         'stock_template.xml',
     ],

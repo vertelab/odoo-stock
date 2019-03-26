@@ -1,5 +1,50 @@
 var location_src_scanned = false;
 
+function update_product_lines(res) {
+    var product_ids = [];
+    var result_product_ids = [];
+    $.each($("tbody#quickmove_product_lines").find("tr"), function() {
+        product_ids.push(parseInt($(this).data("id")));
+    });
+    $.each(res.product_ids, function() {
+        var product_id = $(this)[0];
+        var product_name = $(this)[1];
+        var product_qty = $(this)[2];
+        if ($.inArray(product_id, product_ids) === -1) {
+            result_product_ids.push([product_id, product_name, product_qty]);
+        }
+    });
+    var product_content = openerp.qweb.render('quickmove_product_lines', {
+        'product_ids': result_product_ids,
+    });
+    $("tbody#quickmove_product_lines").append(product_content);
+}
+
+function remove_all_product_lines() {
+    $("tbody#quickmove_product_lines").empty();
+}
+
+function quickmove_minus(e) {
+    var input = e.closest("div").find("input");
+    var val = input.val();
+    if (parseInt(val) == 0) {
+        input.val("0");
+    }
+    else {
+        input.val(String(parseInt(val) - 1));
+    }
+}
+
+function quickmove_plus(e) {
+    var input = e.closest("div").find("input");
+    var val = input.val();
+    input.val(String(parseInt(val) + 1));
+}
+
+function quickmove_remove(e) {
+    var tr = e.closest("tr").remove();
+}
+
 (function($){
 
     $.barcodeListener = function(context, options){
@@ -95,69 +140,62 @@ $("body").barcodeListener().on("barcode.valid", function(e, code){
         'barcode': code,
         'location_src_scanned': location_src_scanned
     }).done(function(result){
-        function update_product_lines(res) {
-            var product_ids = [];
-            var result_product_ids = [];
-            $.each($("tbody#quickmove_product_lines").find("tr"), function() {
-                product_ids.push(parseInt($(this).data("id")));
-            });
-            $.each(res.product_ids, function() {
-                var product_id = $(this)[0];
-                var product_name = $(this)[1];
-                var product_qty = $(this)[2];
-                if ($.inArray(product_id, product_ids) === -1) {
-                    result_product_ids.push([product_id, product_name, product_qty]);
-                }
-            });
-            var product_content = openerp.qweb.render('quickmove_product_lines', {
-                'product_ids': result_product_ids,
-            });
-            $("tbody#quickmove_product_lines").append(product_content);
-        }
         if (result.type === 'product') {
             update_product_lines(result);
         }
         if (result.type === 'src_location') {
-            update_product_lines(result);
-            var content = openerp.qweb.render('quickmove_location_src_id', {
-                'location_src_id': result.location.id,
-                'location_src_name': result.location.name,
-            });
-            $("input#quickmove_location_src_id").replaceWith(content);
+            if (result.product_ids.length === 0) {
+                remove_all_product_lines();
+            }
+            else {
+                update_product_lines(result);
+            }
+            //~ var content = openerp.qweb.render('quickmove_location_src_id', {
+                //~ 'location_src_id': result.location.id,
+                //~ 'location_src_name': result.location.name,
+            //~ });
+            var newOption = new Option(result.location.name, result.location.id, false, true);
+            $('select#quickmove_location_src_id').append(newOption).trigger('change');
             location_src_scanned = true;
         }
         if (result.type === 'dest_location') {
-            var content = openerp.qweb.render('quickmove_location_dest_id', {
-                'location_dest_id': result.location.id,
-                'location_dest_name': result.location.name,
-            });
-            $("input#quickmove_location_dest_id").replaceWith(content);
+            //~ var content = openerp.qweb.render('quickmove_location_dest_id', {
+                //~ 'location_dest_id': result.location.id,
+                //~ 'location_dest_name': result.location.name,
+            //~ });
+            var newOption = new Option(result.location.name, result.location.id, false, true);
+            $('select#quickmove_location_dest_id').append(newOption).trigger('change');
             location_src_scanned = false;
         }
     });
 
 })
 
-function quickmove_minus(e) {
-    var input = e.closest("div").find("input");
-    var val = input.val();
-    if (parseInt(val) == 0) {
-        input.val("0");
-    }
-    else {
-        input.val(String(parseInt(val) - 1));
-    }
-}
-
-function quickmove_plus(e) {
-    var input = e.closest("div").find("input");
-    var val = input.val();
-    input.val(String(parseInt(val) + 1));
-}
-
-function quickmove_remove(e) {
-    var tr = e.closest("tr").remove();
-}
-
 $(document).ready(function() {
+    var website = openerp.website;
+    website.add_template_file("/stock_quickmove/static/src/xml/picking.xml");
+    $("select#quickmove_location_src_id").select9({
+        ajax: {
+            url: '/stock/quickmove_location_search',
+            dataType: 'json',
+        }
+    });
+    $("select#quickmove_location_src_id").on('change.select9', function() {
+        openerp.jsonRpc("/stock/quickmove_location_search_products", "call", {
+            'location': $(this).val()
+        }).done(function(result){
+            if (result.product_ids.length === 0) {
+                remove_all_product_lines();
+            }
+            else {
+                update_product_lines(result);
+            }
+        });
+    });
+    $("select#quickmove_location_dest_id").select9({
+        ajax: {
+            url: '/stock/quickmove_location_search',
+            dataType: 'json'
+        }
+    });
 });
