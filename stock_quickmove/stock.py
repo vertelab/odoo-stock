@@ -34,6 +34,8 @@ class StockSquickMove(http.Controller):
         if request.httprequest.method == 'POST':
             description = post.get('description')
             picking_type_id = post.get('picking_type_id')
+            if not picking_type_id:
+                picking_type_id = request.env['stock.picking.type'].search([('code', '=', 'internal')], limit=1)
             location_src_id = post.get('location_src_id')
             location_dest_id = post.get('location_dest_id')
             if description and picking_type_id and location_src_id and location_dest_id:
