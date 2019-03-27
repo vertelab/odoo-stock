@@ -151,7 +151,7 @@ class StockSquickMove(http.Controller):
                     products = []
                     for p in product_ids:
                         qty = sum(request.env['stock.quant'].search([('product_id', '=', p.id), ('location_id', '=', p.stock_location_id.id)]).mapped('qty'))
-                        products.append([p.id, '%s %s' %(p.name, ','.join([a.name for a in p.attribute_value_ids])), qty])
+                        products.append([p.id, p.display_name, qty])
                     return {'type': 'src_location', 'product_ids': products, 'location': {'id': src_location_id.id, 'name': src_location_id.display_name}}
             else:
                 # search destination location
@@ -164,21 +164,21 @@ class StockSquickMove(http.Controller):
     def quickmove_location_search(self, **post):
         word = post.get('term')
         results = []
-        locations = request.env['stock.location'].search([('name', 'ilike', word)])
+        locations = request.env['stock.location'].search_read([('name', 'ilike', word)], fields=['id', 'display_name'])
         if len(locations) > 0:
             for l in locations:
-                results.append({'id': l.id, 'text': l.display_name})
+                results.append({'id': l.get('id'), 'text': l.get('display_name')})
         return Response(simplejson.dumps({'results': results}), mimetype='application/json')
 
-    @http.route(['/stock/quickmove_product_search'], type='json', auth='user', website=True)
-    def quickmove_product_search(self, word='', **kw):
-        if word and word != '':
-            result = []
-            products = request.env['product.product'].search(['|', ('name', 'ilike', word), ('default_code', 'ilike', word)])
-            if len(products) > 0:
-                for p in products:
-                    result.append([p.id, p.display_name])
-            return result
+    @http.route(['/stock/quickmove_product_search'], type='http', auth='user', website=True)
+    def quickmove_product_search(self, word='', **post):
+        word = post.get('term')
+        results = []
+        products = request.env['product.product'].search_read(['|', ('name', 'ilike', word), ('default_code', 'ilike', word)], fields=['id', 'display_name'])
+        if len(products) > 0:
+            for p in products:
+                results.append({'id': p.get('id'), 'text': p.get('display_name')})
+        return Response(simplejson.dumps({'results': results}), mimetype='application/json')
 
     @http.route(['/stock/quickmove_location_search_products'], type='json', auth='user', website=True)
     def quickmove_location_search_products(self, location='0', **kw):
