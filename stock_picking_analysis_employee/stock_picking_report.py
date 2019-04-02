@@ -73,12 +73,19 @@ class stock_picking(models.Model):
     @api.one
     @api.depends('qc_id',)
     def _wraping_starts(self):
-        if self.qc_id:
+        if self.qc_id and not self.wraping_stops and not self.wraping_starts:
             self.wraping_starts = fields.Datetime.now()
 
     @api.one
     def stop_picking(self):
-        self.picking_stops = fields.Datetime.now()
+        if self.picking_starts and not self.picking_stops:
+            self.picking_stops = fields.Datetime.now()
+
+    @api.one
+    def stop_wrapping(self):
+        _logger.warn('\n\n%s %s\n' % (self, self.wraping_stops))
+        if not self.wraping_stops:
+            self.wraping_stops = fields.Datetime.now()
 
     @api.model
     def get_wraping_time_date(self, date):
@@ -158,6 +165,14 @@ class stock_picking(models.Model):
         times.reverse()
         return days, times
 
+    @api.multi
+    def write(self, values):
+        _logger.warn('\n\n%s.write(%s)\n' % (self, values))
+        res = super(stock_picking, self).write(values)
+        if values.get('state') == 'done':
+            self.stop_wrapping()
+        return res
+
 class stock_picking_wizard(models.TransientModel):
     _inherit = 'stock.picking.multiple'
 
@@ -171,9 +186,8 @@ class stock_invoice_onshipping(models.TransientModel):
 
     @api.multi
     def open_invoice(self):
-        self.env['stock.picking'].browse(self._context.get('active_ids', [])).write({'wraping_stops': fields.Datetime.now()})
+        self.env['stock.picking'].browse(self._context.get('active_ids', [])).stop_wrapping()
         return super(stock_invoice_onshipping, self).open_invoice()
-
 
 class stock_picking_report(models.Model):
     _inherit = "stock_picking.report"
@@ -182,17 +196,16 @@ class stock_picking_report(models.Model):
     legacy_employee_id =  fields.Many2one("hr.employee", "Picking Employee (legacy)", readonly=True)
     qc_id =  fields.Many2one("hr.employee", "Controlled by", readonly=True)
 
-    picking_time = fields.Float(string='Picking Time', digits=(16,2), readonly=True)
-    wraping_time = fields.Float(string='Wrapping Time', digits=(16,2), readonly=True)
-    order_time = fields.Float(string='Order Time', digits=(16,2), readonly=True)
+    picking_time = fields.Float(string='Avg. Picking Time', group_operator='avg', digits=(16,2), readonly=True)
+    wraping_time = fields.Float(string='Avg. Wrapping Time', group_operator='avg', digits=(16,2), readonly=True)
+    order_time = fields.Float(string='Avg. Order Time', group_operator='avg', digits=(16,2), readonly=True)
 
     def _select(self):
-        return  super(stock_picking_report, self)._select() + """
-                    , sp.employee_id as legacy_employee_id, move.employee_id as employee_id, sp.qc_id as qc_id
-                    , extract(epoch from avg(date_trunc('day',sp.picking_stops)-date_trunc('day',sp.picking_starts)))/(24*60*60)::decimal(16,2) as picking_time
-                    , extract(epoch from avg(date_trunc('day',sp.wraping_stops)-date_trunc('day',sp.wraping_starts)))/(24*60*60)::decimal(16,2) as wraping_time
-                    , extract(epoch from avg(date_trunc('day',sp.wraping_stops)-date_trunc('day',sp.picking_starts)))/(24*60*60)::decimal(16,2) as order_time"""
-
+        return  super(stock_picking_report, self)._select() + \
+                    """, sp.employee_id as legacy_employee_id, move.employee_id as employee_id, sp.qc_id as qc_id
+                    , extract(epoch from sp.picking_stops - sp.picking_starts) / 60::decimal(16,2) as picking_time
+                    , extract(epoch from sp.wraping_stops - sp.wraping_starts) / 60::decimal(16,2) as wraping_time
+                    , extract(epoch from sp.wraping_stops - sp.picking_starts) / 60::decimal(16,2) as order_time"""
 
     def _group_by(self):
         return super(stock_picking_report, self)._group_by() + ", sp.employee_id, move.employee_id, sp.qc_id"
