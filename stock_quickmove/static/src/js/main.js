@@ -198,7 +198,7 @@ $(document).ready(function() {
         placeholder: "Search location",
         allowClear: true,
         ajax: {
-            url: '/stock/quickmove_location_search',
+            url: '/stock/quickmove_location_search/',
             dataType: 'json'
         }
     });
@@ -206,7 +206,7 @@ $(document).ready(function() {
         placeholder: "Search product",
         allowClear: true,
         ajax: {
-            url: '/stock/quickmove_product_search',
+            url: '/stock/quickmove_product_search/',
             dataType: 'json'
         }
     });

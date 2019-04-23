@@ -174,7 +174,7 @@ class StockSquickMove(http.Controller):
     def quickmove_product_search(self, word='', **post):
         word = post.get('term')
         results = []
-        products = request.env['product.product'].search_read(['|', ('name', 'ilike', word), ('default_code', 'ilike', word)], fields=['id', 'display_name'])
+        products = request.env['product.product'].search_read(['|', '|', ('name', 'ilike', word), ('default_code', 'ilike', word), ('ean13', 'ilike', word)], fields=['id', 'display_name'])
         if len(products) > 0:
             for p in products:
                 results.append({'id': p.get('id'), 'text': p.get('display_name')})
