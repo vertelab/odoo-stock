@@ -1,0 +1,78 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* stock_quickmove
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0-20171009\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-04-24 08:49+0000\n"
+"PO-Revision-Date: 2019-04-24 08:49+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_quickmove
+#: view:website:stock_quickmove.webapp
+msgid "Description"
+msgstr "Beskrivning"
+
+#. module: stock_quickmove
+#: view:website:stock_quickmove.webapp
+msgid "From"
+msgstr "Från"
+
+#. module: stock_quickmove
+#: view:website:stock_quickmove.webapp
+msgid "To"
+msgstr "Till"
+
+#. module: stock_quickmove
+#: view:website:stock_quickmove.webapp
+msgid "Last Picking:"
+msgstr "Senaste plockning:"
+
+#. module: stock_quickmove
+#: view:website:stock_quickmove.webapp
+msgid "Product"
+msgstr "Produkt"
+
+#. module: stock_quickmove
+#: view:website:stock_quickmove.webapp
+msgid "Quantity"
+msgstr "Antal"
+
+#. module: stock_quickmove
+#. openerp-web
+#: code:addons/stock_quickmove/static/src/xml/picking.xml:6
+#, python-format
+msgid "Quick Move"
+msgstr "Snabbflytt"
+
+#. module: stock_quickmove
+#: view:website:stock_quickmove.layout
+msgid "Stock Quick Move"
+msgstr "Stock Quick Move"
+
+#. module: stock_quickmove
+#: view:website:stock_quickmove.webapp
+msgid "Transfer"
+msgstr "Flytt"
+
+#. module: stock_quickmove
+#. openerp-web
+#: code:addons/stock_quickmove/static/src/js/main.js:178
+#: code:addons/stock_quickmove/static/src/js/main.js:198
+#, python-format
+msgid "Search location"
+msgstr "Sök lagerställe"
+
+#. module: stock_quickmove
+#. openerp-web
+#: code:addons/stock_quickmove/static/src/js/main.js:206
+#, python-format
+msgid "Search product"
+msgstr "Sök produkt"

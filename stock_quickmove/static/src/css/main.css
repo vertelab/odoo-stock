@@ -1,1 +1,19 @@
+#quick_move_wrapwrap {
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+}
 
+.quickmove-btn {
+    height: 30px;
+    padding-top: 10px;
+}
+
+#quick_move_logo {
+	max-height: 50px;
+	margin: auto;
+	display: block;
+}
+
+@media only screen and (max-width: 768px) {
+}

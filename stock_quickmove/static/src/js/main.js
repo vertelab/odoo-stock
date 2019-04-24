@@ -175,7 +175,7 @@ $(document).ready(function() {
     var website = openerp.website;
     website.add_template_file("/stock_quickmove/static/src/xml/picking.xml");
     $("select#quickmove_location_src_id").select9({
-        placeholder: "Search location",
+        placeholder: openerp._t("Search location"),
         allowClear: true,
         ajax: {
             url: '/stock/quickmove_location_search',
@@ -195,7 +195,7 @@ $(document).ready(function() {
         });
     });
     $("select#quickmove_location_dest_id").select9({
-        placeholder: "Search location",
+        placeholder: openerp._t("Search location"),
         allowClear: true,
         ajax: {
             url: '/stock/quickmove_location_search/',
@@ -203,7 +203,7 @@ $(document).ready(function() {
         }
     });
     $("select#quickmove_product_search").select9({
-        placeholder: "Search product",
+        placeholder: openerp._t("Search product"),
         allowClear: true,
         ajax: {
             url: '/stock/quickmove_product_search/',
