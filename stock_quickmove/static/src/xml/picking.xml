@@ -16,7 +16,7 @@
                 <td style="width: 150px;">
                     <div class="input-group">
                         <span class="input-group-addon quickmove_minus input-sm" t-att-data-product-id="product[0]" onclick="quickmove_minus($(this));"><a href="#"><i class="fa fa-minus"/></a></span>
-                        <input class="form-control text-center quickmove_qty" t-att-name="'product_qty_' + product[0]" type="text" t-att-value="product[2]" onkeypress="if (event.keyCode == 13) {return false;}" />
+                        <input class="form-control text-center quickmove_qty" t-att-name="'product_qty_' + product[0]" type="number" t-att-value="product[2]" onkeypress="if (event.keyCode == 13) {return false;}" />
                         <span class="input-group-addon quickmove_plus input-sm" t-att-data-product-id="product[0]" onclick="quickmove_plus($(this));"><a href="#"><i class="fa fa-plus"/></a></span>
                     </div>
                 </td>
