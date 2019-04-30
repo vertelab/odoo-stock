@@ -15,14 +15,14 @@
 	display: block;
 }
 
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
+input.quickmove_qty::-webkit-inner-spin-button, 
+input.quickmove_qty::-webkit-outer-spin-button { 
 	-webkit-appearance: none; 
 	margin: 0; 
 }
 
-input[type=number] {
-    -moz-appearance:textfield; /* Firefox */
+input.quickmove_qty {
+    -moz-appearance:textfield;
 }
 
 @media only screen and (max-width: 768px) {
