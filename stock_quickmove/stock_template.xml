@@ -216,5 +216,22 @@
 				</section>
             </t>
         </template>
+        <record id="stock_picking_type_kanban" model="ir.ui.view">
+            <field name="name">stock.picking.type.quickmove.kanban</field>
+            <field name="model">stock.picking.type</field>
+            <field name="inherit_id" ref="stock.stock_picking_type_kanban"/>
+            <field name="arch" type="xml">
+                
+                <a name="open_barcode_interface" position="after">
+                    <div style="width:100%;text-align:center;margin:0;margin-top:2px;">
+                        <a name="open_quickmove_interface" type="object">
+                             <span class="open_quickmove_interface" style="padding:1px 3px;font-weight:bold;font-size:90%;color:white;background-color:#438bca;-moz-border-radius:2px;-webkit-border-radius:2px;border-radius:2px;" attrs="{'invisible':[('code', '!=', 'internal')]}" title="Click to launch the quickmove interface">Snabbflytt</span>
+                        </a>
+                    </div>
+                </a>
+                
+            </field>
+        </record>
+
     </data>
 </openerp>

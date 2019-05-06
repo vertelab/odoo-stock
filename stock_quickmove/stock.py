@@ -29,11 +29,11 @@ _logger = logging.getLogger(__name__)
 
 class StockSquickMove(http.Controller):
 
-    @http.route(['/stock/quickmove', '/stock/quickmove/picking/<model("stock.picking"):picking>'], type='http', auth='user', website=True)
-    def stock_quickmove(self, picking=None, **post):
+    @http.route(['/stock/quickmove', '/stock/quickmove/picking/<model("stock.picking"):picking>','/stock/quickmove/pickingtype/<model("stock.picking.type"):picking_type_id>'], type='http', auth='user', website=True)
+    def stock_quickmove(self, picking=None, picking_type_id = None, **post):
         if request.httprequest.method == 'POST':
             description = post.get('description')
-            picking_type_id = post.get('picking_type_id')
+            picking_type_id = picking_type_id or post.get('picking_type_id')
             if not picking_type_id:
                 picking_type_id = request.env['stock.picking.type'].search([('code', '=', 'internal')], limit=1)
             location_src_id = post.get('location_src_id')
@@ -188,3 +188,10 @@ class StockSquickMove(http.Controller):
             qty = sum(request.env['stock.quant'].search([('product_id', '=', p.id), ('location_id', '=', int(location))]).mapped('qty'))
             products.append([p.id, '%s %s' %(p.name, ','.join([a.name for a in p.attribute_value_ids])), qty])
         return {'product_ids': products}
+
+class stock_picking_type(models.Model):
+    _inherit = "stock.picking.type"
+    @api.multi
+    def open_quickmove_interface(self):
+        final_url = "/stock/quickmove/pickingtype/%s"%self.id
+        return {'type': 'ir.actions.act_url', 'url': final_url, 'target': 'self'}
