@@ -29,7 +29,8 @@ Adds a button to check stock levels on sale orders.
     'author': 'Vertel AB',
     'license': 'AGPL-3',
     'website': 'http://www.vertel.se',
-    'depends': ['sale_stock'],
+    'depends': ['sale_stock',
+                'calc_orderpoint',],
     'data': [
         'sale_view.xml',
     ],

@@ -38,7 +38,7 @@ class sale_order(models.Model):
                 is_available = line._check_routing(product, self.warehouse_id.id)
                 
                 #check if product is available, and if not: raise a warning, but do this only for products that aren't processed in MTO
-                if not is_available:
+                if not is_available and product.virtual_available_days < 5:
                     uom_record = line.product_uom
                     compare_qty = float_compare(line.product_id.virtual_available, line.product_uom_qty, precision_rounding=uom_record.rounding)
                     if compare_qty == -1:
