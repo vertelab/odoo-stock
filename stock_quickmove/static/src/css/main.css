@@ -25,5 +25,21 @@ input.quickmove_qty {
     -moz-appearance:textfield;
 }
 
+.red_icon {
+    color:#ff0000;
+}
+
+.fa-1x {
+font-size: 1.5rem;
+}
+
+.navbar-header {
+    position:absolute;
+    z-index: 5;
+    left: 50%;
+    width: 100px;
+    padding-right: 50%;
+}
+
 @media only screen and (max-width: 768px) {
 }

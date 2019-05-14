@@ -127,9 +127,9 @@ class StockSquickMove(http.Controller):
                             operation_completed.append(False)
                     if all(operation_completed):
                         picking.do_transfer()
-                return request.website.render('stock_quickmove.webapp', {'picking_type_id': picking.picking_type_id.id, 'previous_picking_id': picking.id})
+                return request.website.render('stock_quickmove.webapp', {'move_class':'active','picking_type_id': picking.picking_type_id.id, 'previous_picking_id': picking.id, 'title':'Stock Quick Move'})
                 # ~ return request.redirect('/stock/quickmove/picking/%s' %picking.id)
-        return request.website.render('stock_quickmove.webapp', {'picking_type_id': post.get('picking_type_id' or ''), 'picking': picking})
+        return request.website.render('stock_quickmove.webapp', {'move_class':'active','picking_type_id': post.get('picking_type_id' or ''), 'picking': picking, 'title':'Stock Quick Move'})
 
     @http.route(['/stock/quickmove_barcode'], type='json', auth='user', website=True)
     def quickmove_barcode(self, barcode='', location_src_scanned=False, **kw):
@@ -188,6 +188,34 @@ class StockSquickMove(http.Controller):
             qty = sum(request.env['stock.quant'].search([('product_id', '=', p.id), ('location_id', '=', int(location))]).mapped('qty'))
             products.append([p.id, '%s %s' %(p.name, ','.join([a.name for a in p.attribute_value_ids])), qty])
         return {'product_ids': products}
+    
+    # ----- inventory methods ----------------
+    @http.route(['/stock/inventory','/stock/inventory/<model("product.product"):product>'], type='http', auth='user', website=True)
+    def quickmove_inventory(self, product=None, **post):
+        return request.website.render('stock_quickmove.webapp_inventory',{'title':'Inventory','product':product,'inv_class':'active'})
+        
+    @http.route(['/stock/inventory_search_product_location'], type='json', auth='user', website=True)
+    def quickmove_inventory_search_product_location(self, product_id, **kw):
+        product_locations = []
+        stock_location = request.env.ref('stock.stock_location_stock')
+        # ~ quants = request.env['stock.quant'].search([('product_id','=',product_id),('location_id','child_of',stock_location.id)])
+        quants = request.env['stock.quant'].search([('product_id','=',int(product_id)),('location_id','child_of',stock_location.id)])
+        for location in quants.mapped('location_id'):
+            product_locations.append({'qty':sum(quants.filtered(lambda q: q.location_id == location).mapped('qty')),'name': location.display_name,'location_id': location.id})
+        
+        return product_locations # list of dicts
+        
+    @http.route(['/stock/inventory_adjust'], type='json', auth='user', website=True)
+    def quickmove_inventory_adjust(self, location_id, product_id, quantity):
+        #
+            inventory = request.env['stock.inventory'].create({'name':'test', 'product_id':product_id, 'location_id':location_id, 'filter':'product'})
+            inventory.prepare_inventory()
+            
+            if inventory.line_ids:
+                inventory.line_ids[0].product_qty = quantity
+                inventory.action_done()
+            else:
+                raise Warning('No stock for %s on location %s'% (inventory.product_id.display_name,inventory.location_id.display_name))
 
 class stock_picking_type(models.Model):
     _inherit = "stock.picking.type"

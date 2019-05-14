@@ -20,6 +20,24 @@ function update_product_lines(res) {
     $("tbody#quickmove_product_lines").append(product_content);
 }
 
+function update_product_location_lines(res) {
+    var product_id = res['product_id'];
+    if (!product_id) return;
+    openerp.jsonRpc("/stock/inventory_search_product_location", "call", {
+        'product_id': product_id
+    }).done(function(locations){
+        console.log(locations); //{location_id: 5290, name: "WH/Plocklager/L01D", qty: 3674}
+        var location_content = openerp.qweb.render('product_location_lines', {'locations': locations});
+        
+        remove_all_location_lines();
+        $("tbody#product_location_lines").append(location_content);
+    });
+}
+
+function remove_all_location_lines() {
+    $("tbody#product_location_lines").empty();
+}
+
 function remove_all_product_lines() {
     $("tbody#quickmove_product_lines").empty();
 }
@@ -33,16 +51,43 @@ function quickmove_minus(e) {
     else {
         input.val(String(parseInt(val) - 1));
     }
+    input.change();
 }
 
 function quickmove_plus(e) {
     var input = e.closest("div").find("input");
     var val = input.val();
     input.val(String(parseInt(val) + 1));
+    input.change();
+
 }
 
 function quickmove_remove(e) {
     var tr = e.closest("tr").remove();
+}
+
+// inventory
+function quickmove_adjust(e) {
+    var tr = e.parents('tr'),
+        id = parseInt(tr.data('id')),
+        product_id = parseInt($("select#inventory_product_search").val()),
+        input = tr.find('input'),
+        quantity = parseInt(input.val());
+        tr.find('i.fa-check').removeClass('red_icon').addClass('disabled');
+
+    openerp.jsonRpc("/stock/inventory_adjust", "call", {
+        'location_id': id, 'product_id': product_id, 'quantity':quantity
+    }).fail(function(arg1,res){
+        console.log(arguments);
+        window.alert(res.data.message + '\n\n' + res.data.debug);
+        }).done(function(res){
+    });
+}
+
+function set_confirm_enabled(e) {
+    var elm = e.closest('tr').find('i.fa-check');
+    elm.removeClass('disabled');
+    elm.addClass('red_icon');
 }
 
 (function($){
@@ -213,4 +258,20 @@ $(document).ready(function() {
     $("select#quickmove_product_search").on('change.select9', function() {
         update_product_lines({"type": "product", "product_ids": [[$(this).val(), $("span#select9-quickmove_product_search-container").attr("title"), 1]]});
     });
+    // inventory
+    $("select#inventory_product_search").select9({
+        placeholder: openerp._t("Search product"),
+        allowClear: true,
+        ajax: {
+            url: '/stock/quickmove_product_search/',
+            dataType: 'json'
+        }
+    });
+    
+    // fix for random problem with templates not loaded in time
+    setTimeout(function () {
+    $("select#inventory_product_search").on('change.select9', function() {
+        update_product_location_lines({"product_id":$(this).val()});
+    }).change();
+}, 100);
 });
