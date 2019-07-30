@@ -7,7 +7,7 @@
       <field name="inherit_id" ref="sale.view_order_form" />
       <field name="arch" type="xml">
 		  <field name="state" position="before">
-			<button name="check_order_stock" states="draft,sent" string="Check order stock" type="object" groups="base.group_user"/>
+			<button name="check_order_stock" class="oe_read_only" states="draft,sent" string="Check order stock" type="object" groups="base.group_user"/>
 		  </field>
       </field>
     </record>

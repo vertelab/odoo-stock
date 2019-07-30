@@ -47,8 +47,7 @@ class sale_order(models.Model):
                             line.product_uom_qty, uom_record.name,
                             max(0,product.virtual_available), uom_record.name,
                             max(0,product.qty_available), uom_record.name))
-                        
-                                
+        
         if out_of_stock:
             raise Warning(_('Missing stock:\n') + '\n'.join(out_of_stock))
             
