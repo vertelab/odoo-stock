@@ -39,6 +39,7 @@ class stock_picking(models.Model):
 
     @api.model
     def _search_employee_ids(self, operator, value):
+        _logger.warn('%s %s' % (operator, value))
         return [('move_lines.employee_id', operator, value)]
 
     @api.multi
