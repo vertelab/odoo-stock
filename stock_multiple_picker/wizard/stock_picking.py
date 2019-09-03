@@ -46,11 +46,16 @@ class stock_picking_wizard(models.TransientModel):
 
     @api.multi
     def set_picking_employee(self):
+
         if self.force or not self.picking_id.employee_id:
             self.picking_id.employee_id = self.employee_ids[0]
             picker_count = len(self.employee_ids)
+
             for idx,line in enumerate(self.picking_id.move_lines):
                 line.employee_id = self.employee_ids[idx % picker_count]
+            
+            return self.env['report'].get_action(self.picking_id, 'stock_multiple_picker.picking_operations_document')
         else:
             raise Warning(_('Picking Employee is already set.'))
 
+           

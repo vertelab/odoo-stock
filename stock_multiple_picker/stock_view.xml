@@ -10,6 +10,9 @@
                     <field name="qc_id"/>
                     <field name="employee_ids"/>
                 </field>
+                <field name="name" position="before">
+                    <button name="print_picking_with_location" type="object" icon="gtk-print" />
+                </field>
             </field>
         </record>
 

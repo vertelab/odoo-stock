@@ -41,6 +41,11 @@ class stock_picking(models.Model):
     def _search_employee_ids(self, operator, value):
         return [('move_lines.employee_id', operator, value)]
 
+    @api.multi
+    def print_picking_with_location(self):
+        return self.env['report'].get_action(self, 'stock_multiple_picker.picking_operations_document')
+
+
 class stock_move(models.Model):
     _inherit = "stock.move"
 

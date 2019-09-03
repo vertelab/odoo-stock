@@ -178,8 +178,9 @@ class stock_picking_wizard(models.TransientModel):
 
     @api.multi
     def set_picking_employee(self):
-        super(stock_picking_wizard, self).set_picking_employee()
+        res = super(stock_picking_wizard, self).set_picking_employee()
         self.picking_id.picking_starts = fields.Datetime.now()
+        return res
 
 class stock_invoice_onshipping(models.TransientModel):
     _inherit = 'stock.invoice.onshipping'
