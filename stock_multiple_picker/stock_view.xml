@@ -1,49 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record id="vpicktree" model="ir.ui.view">
-            <field name="name">stock.picking.tree</field>
-            <field name="model">stock.picking</field>
-            <field name="inherit_id" ref="stock.vpicktree"/>
-            <field name="arch" type="xml">
-                <field name="state" position="before">
-                    <field name="qc_id"/>
-                    <field name="employee_ids"/>
-                </field>
-                <field name="name" position="before">
-                    <button name="print_picking_with_location" attrs="{'invisible': [('employee_ids', '=', [])]}" type="object" icon="gtk-print"  />
-                </field>
-            </field>
-        </record>
-
+        <!--
+             2019-09-04 VIKTIGT!!
+             TRASSEL I KODEN!
+             Koden fungerar lokalt, men inte på Tor. Då blir det konflikt.
+             Koden är därför flyttad och skriven i annan fil:
+             odoo-stock-extra / stock-extra / stock_dermanord / stock_view.xml
+             // jakob
+             
+             <record id="vpicktree" model="ir.ui.view">
+             <field name="name">stock.picking.tree</field>
+             <field name="model">stock.picking</field>
+             <field name="inherit_id" ref="stock.vpicktree"/>
+             <field name="arch" type="xml">
+             <field name="state" position="before">
+             <field name="qc_id"/>
+             <field name="employee_ids"/>
+             </field>
+             <field name="name" position="before">
+             <button name="print_picking_with_location" attrs="{'invisible': [('employee_ids', '=', [])]}" type="object" icon="gtk-print"  />
+             </field>
+             </field>
+             </record>
+        -->
         <record id="view_picking_internal_search" model="ir.ui.view">
             <field name="name">stock.picking.internal.search</field>
             <field name="model">stock.picking</field>
-            <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+            <field name="inherit_id" ref="stock.view_picking_internal_search" />
             <field name="arch" type="xml">
                 <field name="group_id" position="after">
-                    <field name="qc_id"/>
-                    <field name="employee_ids"/>
+                    <field name="qc_id" />
+                    <field name="employee_ids" />
                 </field>
             </field>
         </record>
-
         <record id="view_picking_form" model="ir.ui.view">
             <field name="name">stock.picking.form.inherit</field>
             <field name="model">stock.picking</field>
-            <field name="priority" eval="99"/>
-            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="priority" eval="99" />
+            <field name="inherit_id" ref="stock.view_picking_form" />
             <field name="arch" type="xml">
                 <field name="state" position="before">
-                    <button name="stock_multiple_picker.stock_picking_wizard_form_act" type="action" string="Set Picking Users" class="oe_highlight"/>
+                    <button name="stock_multiple_picker.stock_picking_wizard_form_act" type="action" string="Set Picking Users" class="oe_highlight" />
                 </field>
                 <field name="backorder_id" position="after">
-                    <field name="employee_ids" widget="many2many_tags"/>
-                    <field name="write_date"/>
-                    <field name="qc_id"/>
+                    <field name="employee_ids" widget="many2many_tags" />
+                    <field name="write_date" />
+                    <field name="qc_id" />
                 </field>
             </field>
         </record>
-
     </data>
 </openerp>
