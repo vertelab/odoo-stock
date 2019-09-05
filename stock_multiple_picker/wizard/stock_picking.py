@@ -40,22 +40,26 @@ class stock_picking_wizard(models.TransientModel):
         if not picking_id:
             picking_id = self._context.get('active_ids') and self._context.get('active_ids')[0]
         return picking_id
+
+    def _default_picking_ids(self):
+        picking_ids = self._context.get('active_ids')
+        return picking_ids
     employee_ids = fields.Many2many(comodel_name='hr.employee', string='Picking Employee', default=_default_employee_id, required=True)
-    picking_id = fields.Many2one('stock.picking', 'Stock Picking', default=_default_picking_id, required=True)
+    # ~ picking_id = fields.Many2one('stock.picking', 'Stock Picking', default=_default_picking_id, required=True)
+    picking_ids = fields.Many2many( comodel_name='stock.picking', string='Stock Picking', default=_default_picking_ids, required=True)
     force = fields.Boolean('Replace Current Picking Employee')
 
     @api.multi
     def set_picking_employee(self):
 
-        if self.force or not self.picking_id.employee_id:
-            self.picking_id.employee_id = self.employee_ids[0]
-            picker_count = len(self.employee_ids)
-
-            for idx,line in enumerate(self.picking_id.move_lines):
-                line.employee_id = self.employee_ids[idx % picker_count]
+        if self.force or not self.picking_ids.mapped('employee_id'):
+            for picking in self.picking_ids:
+                picking.employee_id = self.employee_ids[0]
+                picker_count = len(self.employee_ids)
+                
+                for idx,line in enumerate(picking.move_lines):
+                    line.employee_id = self.employee_ids[idx % picker_count]
             
-            return self.env['report'].get_action(self.picking_id, 'stock_multiple_picker.picking_operations_document')
+            return self.env['report'].get_action(self.picking_ids, 'stock_multiple_picker.picking_operations_document')
         else:
             raise Warning(_('Picking Employee is already set.'))
-
-           

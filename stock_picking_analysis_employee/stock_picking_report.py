@@ -178,8 +178,10 @@ class stock_picking_wizard(models.TransientModel):
 
     @api.multi
     def set_picking_employee(self):
-        res = super(stock_picking_wizard, self).set_picking_employee()
-        self.picking_id.picking_starts = fields.Datetime.now()
+        for picking_form in self:
+            res = super(stock_picking_wizard, picking_form).set_picking_employee()
+            for picking in picking_form.picking_ids:
+                picking.picking_starts = fields.Datetime.now()
         return res
 
 class stock_invoice_onshipping(models.TransientModel):
