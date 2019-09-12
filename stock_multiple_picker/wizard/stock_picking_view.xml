@@ -14,6 +14,8 @@
                     </group>
                     <footer>
                         <button name="set_picking_employee" string="Set Picking Employees" type="object" class="oe_highlight" />
+                            or
+                        <button string="_Cancel" class="oe_link" special="cancel" />
                     </footer>
                 </form>
             </field>
