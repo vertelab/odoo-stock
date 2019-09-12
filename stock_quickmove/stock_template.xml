@@ -69,7 +69,7 @@
 				<section class="mt16 mb16">
 					<div class="container">
 						<div class="row">
-							<div class="col-md-12 mt16 mb32">
+							<div class="col-md-12 fix_padding mt16 mb32">
 								<t t-if="previous_picking_id">
 									<t t-set="previous_picking" t-value="request.env['stock.picking'].browse(int(previous_picking_id))"/>
 									<t t-set="previous_picking_alert" t-value="'secondary'"/>
@@ -237,7 +237,7 @@
 				<section class="mt16 mb16">
 					<div class="container">
 						<div class="row">
-                            <div class="col-md-12 mt16 mb32">
+                            <div class="col-md-12 fix_padding mt16 mb32">
                                 <form action="" method="post" class="form-horizontal mt32" enctype="multipart/form-data">
                                     <div t-attf-class="form-group #{error and 'location_dest_id' in error and 'has-error' or ''}">
                                         <label class="col-md-3 col-sm-4 col-xs-12 control-label pull-left" for="location_dest_id">Produkt</label>

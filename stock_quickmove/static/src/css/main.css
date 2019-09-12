@@ -30,7 +30,7 @@ input.quickmove_qty {
 }
 
 .fa-1x {
-font-size: 1.5rem;
+    font-size: 1.5rem;
 }
 
 .navbar-header {
@@ -41,5 +41,20 @@ font-size: 1.5rem;
     padding-right: 50%;
 }
 
+.quickmove_product_name.form-control{
+    padding: 0;
+
+}
+
+input.form-control.text-center.quickmove_qty {
+    padding: 0;
+}
+
 @media only screen and (max-width: 768px) {
+}
+
+.fix_padding{
+    padding-right: 12px;
+    padding-left: 12px;
+
 }

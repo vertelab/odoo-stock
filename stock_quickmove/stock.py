@@ -201,7 +201,10 @@ class StockSquickMove(http.Controller):
         # ~ quants = request.env['stock.quant'].search([('product_id','=',product_id),('location_id','child_of',stock_location.id)])
         quants = request.env['stock.quant'].search([('product_id','=',int(product_id)),('location_id','child_of',stock_location.id)])
         for location in quants.mapped('location_id'):
-            product_locations.append({'qty':sum(quants.filtered(lambda q: q.location_id == location).mapped('qty')),'name': location.display_name,'location_id': location.id})
+            product_locations.append({
+                'qty':sum(quants.filtered(lambda q: q.location_id == location).mapped('qty')),
+                'name': location.name,
+                'location_id': location.id})
         
         return product_locations # list of dicts
         
