@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 8.0-20171009\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-24 09:12+0000\n"
-"PO-Revision-Date: 2019-09-24 09:12+0000\n"
+"POT-Creation-Date: 2019-09-24 09:08+0000\n"
+"PO-Revision-Date: 2019-09-24 09:08+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,60 +18,60 @@ msgstr ""
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp
 msgid "Description"
-msgstr "Beskrivning"
+msgstr ""
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.layout
 msgid "Flytt"
-msgstr "Flytt"
+msgstr ""
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp
 msgid "From"
-msgstr "Från"
+msgstr ""
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.layout
 msgid "Inventering"
-msgstr "Inventering"
+msgstr ""
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp
 msgid "Last Picking:"
-msgstr "Senaste plockning:"
+msgstr ""
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp_inventory
 msgid "Name"
-msgstr "Namn"
+msgstr ""
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp
 msgid "Product"
-msgstr "Produkt"
+msgstr ""
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp_inventory
 msgid "Product is missing. Try again."
-msgstr "Produkten saknas. Försök igen."
+msgstr ""
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp_inventory
 msgid "Produkt"
-msgstr "Produkt"
+msgstr ""
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp
 #: view:website:stock_quickmove.webapp_inventory
 msgid "Quantity"
-msgstr "Antal"
+msgstr ""
 
 #. module: stock_quickmove
 #. openerp-web
 #: code:addons/stock_quickmove/static/src/xml/picking.xml:6
 #, python-format
 msgid "Quick Move"
-msgstr "Snabbflytt"
+msgstr ""
 
 #. module: stock_quickmove
 #. openerp-web
@@ -79,7 +79,7 @@ msgstr "Snabbflytt"
 #: code:addons/stock_quickmove/static/src/js/main.js:271
 #, python-format
 msgid "Search location"
-msgstr "Sök lagerställe"
+msgstr ""
 
 #. module: stock_quickmove
 #. openerp-web
@@ -87,25 +87,25 @@ msgstr "Sök lagerställe"
 #: code:addons/stock_quickmove/static/src/js/main.js:291
 #, python-format
 msgid "Search product"
-msgstr "Sök produkt"
+msgstr ""
 
 #. module: stock_quickmove
 #: view:stock.picking.type:stock_quickmove.stock_picking_type_kanban
 msgid "Snabbflytt"
-msgstr "Snabbflytt"
+msgstr ""
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp_inventory
 msgid "Something went wrong. Try again."
-msgstr "Något gick fel. Försök igen."
+msgstr ""
 
 #. module: stock_quickmove
 #: model:ir.model,name:stock_quickmove.model_stock_picking_type
 msgid "The picking type determines the picking view"
-msgstr "The picking type determines the picking view"
+msgstr ""
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp
 msgid "Transfer"
-msgstr "Flytt"
+msgstr ""
 
