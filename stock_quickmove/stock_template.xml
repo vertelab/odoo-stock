@@ -27,6 +27,14 @@
 							<link rel="alternate" t-att-hreflang="lg['hreflang']" t-att-href="lg['href']"/>
 						</t>
 					</t>
+                    <t t-call-assets="web.assets_common" t-css="false"/>
+<!--
+                    <t t-call-assets="web.assets_backend" t-css="false"/>
+-->
+                    <t t-call-assets="website.assets_frontend" t-css="false"/>
+                    <script type="text/javascript" src="/website_bootstrap_select2/static/src/js/select2.min.js"/>
+                    <script type="text/javascript" src="/website_bootstrap_select2/static/src/js/select9_search.js"/>
+                    <script src="/stock_quickmove/static/src/js/main.js" type="text/javascript" />
 				</head>
 				<body>
                     <div id="quick_move_wrapwrap">
@@ -55,17 +63,16 @@
                         </main>
                         <footer/>
                     </div>
-                    <t t-call-assets="web.assets_common" t-css="false"/>
-                    <t t-call-assets="website.assets_frontend" t-css="false"/>
-                    <script type="text/javascript" src="/website_bootstrap_select2/static/src/js/select2.min.js"/>
-                    <script type="text/javascript" src="/website_bootstrap_select2/static/src/js/select9_search.js"/>
-                    <script src="/stock_quickmove/static/src/js/main.js" type="text/javascript" />
+                    
 				</body>
 			</html>
 		</template>
         <!-- move -->
         <template id="webapp" name="Quick Move">
             <t t-call="stock_quickmove.layout">
+                <script type="text/javascript">
+                    $(document).ready(quickmove_start_scanner);
+                </script>
 				<section class="mt16 mb16">
 					<div class="container">
 						<div class="row">
@@ -233,6 +240,9 @@
         <!-- inventory -->
         <template id="webapp_inventory" name="Quick Move Inventory">
             <t t-call="stock_quickmove.layout">
+                <script type="text/javascript">
+                    $(document).ready(quickmove_inventory_start_scanner);
+                </script>
                 <t t-set="title" t-value="'Inventory'"/>
 				<section class="mt16 mb16">
 					<div class="container">
@@ -259,6 +269,12 @@
                                         </thead>
                                         <tbody id="product_location_lines"/>
                                     </table>
+                                    <div class="red-alert-message alert alert-danger hidden" role="alert">
+                                    Something went wrong. Try again.
+                                    </div>
+                                    <div class="red-alert-message-undefined alert alert-danger hidden" role="alert">
+                                    Product is missing. Try again.
+                                    </div>
                                 </form>
 
                             </div>

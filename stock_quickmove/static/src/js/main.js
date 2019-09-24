@@ -178,43 +178,71 @@ function set_confirm_enabled(e) {
 
 })(jQuery);
 
-$("body").barcodeListener().on("barcode.valid", function(e, code){
-    var website = openerp.website;
-    website.add_template_file("/stock_quickmove/static/src/xml/picking.xml");
-    openerp.jsonRpc("/stock/quickmove_barcode", "call", {
-        'barcode': code,
-        'location_src_scanned': location_src_scanned
-    }).done(function(result){
-        if (result.type === 'product') {
-            update_product_lines(result);
-        }
-        if (result.type === 'src_location') {
-            if (result.product_ids.length === 0) {
-                remove_all_product_lines();
-            }
-            else {
+function quickmove_start_scanner() {
+    $("body").barcodeListener().on("barcode.valid", function(e, code){
+        var website = openerp.website;
+        website.add_template_file("/stock_quickmove/static/src/xml/picking.xml");
+        openerp.jsonRpc("/stock/quickmove_barcode", "call", {
+            'barcode': code,
+            'location_src_scanned': location_src_scanned
+        }).done(function(result){
+            if (result.type === 'product') {
                 update_product_lines(result);
             }
-            //~ var content = openerp.qweb.render('quickmove_location_src_id', {
-                //~ 'location_src_id': result.location.id,
-                //~ 'location_src_name': result.location.name,
-            //~ });
-            var newOption = new Option(result.location.name, result.location.id, false, true);
-            $('select#quickmove_location_src_id').append(newOption).trigger('change');
-            location_src_scanned = true;
-        }
-        if (result.type === 'dest_location') {
-            //~ var content = openerp.qweb.render('quickmove_location_dest_id', {
-                //~ 'location_dest_id': result.location.id,
-                //~ 'location_dest_name': result.location.name,
-            //~ });
-            var newOption = new Option(result.location.name, result.location.id, false, true);
-            $('select#quickmove_location_dest_id').append(newOption).trigger('change');
-            location_src_scanned = false;
-        }
-    });
+            if (result.type === 'src_location') {
+                if (result.product_ids.length === 0) {
+                    remove_all_product_lines();
+                }
+                else {
+                    update_product_lines(result);
+                }
+                var newOption = new Option(result.location.name, result.location.id, false, true);
+                $('select#quickmove_location_src_id').append(newOption).trigger('change');
+                location_src_scanned = true;
+            }
+            if (result.type === 'dest_location') {
+                var newOption = new Option(result.location.name, result.location.id, false, true);
+                $('select#quickmove_location_dest_id').append(newOption).trigger('change');
+                location_src_scanned = false;
+            }
+        });
 
-})
+    })
+};
+
+function quickmove_inventory_start_scanner() {
+    $("body").barcodeListener().on("barcode.valid", function(e, code){
+        
+        $.ajax({
+            url: '/stock/quickmove_product_search',
+            datatype: 'json',
+            data: {term: code},
+            type: "POST",
+            
+            success: function (data)
+            {
+                if (Array.isArray(data.results) && data.results.length) { 
+
+                var product_text = data.results[0].text;
+                var product_id = data.results[0].id;
+            
+                var newOption = new Option(product_text, product_id, false, true);
+                $('select#inventory_product_search').append(newOption).trigger('change');
+                location_src_scanned = true;
+                $(".red-alert-message-undefined").addClass("hidden");
+                } else {
+                    $(".red-alert-message-undefined").removeClass("hidden");
+                }
+            },
+
+            error: function ()
+            {
+              $(".red-alert-message").removeClass("hidden");
+            }
+        });
+
+    })
+};
 
 $(document).ready(function() {
     var website = openerp.website;
@@ -274,4 +302,5 @@ $(document).ready(function() {
         update_product_location_lines({"product_id":$(this).val()});
     }).change();
 }, 100);
+
 });
