@@ -60,8 +60,11 @@ class stock_picking_wizard(models.TransientModel):
                 
                 for idx,line in enumerate(picking.move_lines):
                     line.employee_id = self.employee_ids[idx % picker_count]
-            # ~ return {'type': 'ir.actions.act_window_close'}
-            return self.env['report'].get_action(self.picking_ids, 'stock_multiple_picker.picking_operations_document')
+                self.env['report'].print_document(picking, 'stock_multiple_picker.picking_operations_document')
+
+            # ~ self.env['report'].print_document(invoice, default_report)
+            return {'type': 'ir.actions.act_window_close'}
+            # ~ return self.env['report'].get_action(self.picking_ids, 'stock_multiple_picker.picking_operations_document')
         else:
             raise Warning(_('Picking Employee is already set.'))
 
