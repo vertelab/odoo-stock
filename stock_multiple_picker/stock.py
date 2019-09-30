@@ -44,7 +44,15 @@ class stock_picking(models.Model):
 
     @api.multi
     def print_picking_with_location(self):
-        return self.env['report'].get_action(self, 'stock_multiple_picker.picking_operations_document')
+        if len(self[0].employee_ids) > 0:
+            return self.env['report'].get_action(self, 'stock_multiple_picker.picking_operations_document')
+        else:
+            return { 'name':'Set Picking Employee','res_model':'stock.picking.multiple','view_model':'form','view_mode':'form','target':'new','type':'ir.actions.act_window' }
+        
+    @api.multi
+    def print_picking_with_location2(self):
+        # ~ raise Warning(self.context.get('active_ids'))
+        return { 'name':'Set Picking Employee','res_model':'stock.picking.multiple','view_model':'form','view_mode':'form','target':'new','type':'ir.actions.act_window' }
 
 
 class stock_move(models.Model):

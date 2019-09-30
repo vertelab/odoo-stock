@@ -6,7 +6,7 @@
              TRASSEL I KODEN!
              Koden fungerar lokalt, men inte på Tor. Då blir det konflikt.
              Koden är därför flyttad och skriven i annan fil:
-             odoo-stock-extra / stock-extra / stock_dermanord / stock_view.xml
+             odoo-stock-extra / stock_dermanord / stock_view.xml
              // jakob
              
              <record id="vpicktree" model="ir.ui.view">

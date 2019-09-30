@@ -42,6 +42,7 @@ class stock_picking_wizard(models.TransientModel):
         return picking_id
 
     def _default_picking_ids(self):
+        # ~ raise Warning(self._context )
         picking_ids = self._context.get('active_ids')
         return picking_ids
     employee_ids = fields.Many2many(comodel_name='hr.employee', string='Picking Employee', default=_default_employee_id, required=True)
