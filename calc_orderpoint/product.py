@@ -146,7 +146,7 @@ class product_product(models.Model):
             stock_nbr_days_year = (date.today() - fields.Date.from_string(stocks_year[0]['date'])).days
             year_count = sum([r['product_qty'] for r in stocks_year])
             self.sales_count = year_count
-            self.consumption_per_year = year_count / stock_nbr_days_year * 365
+            self.consumption_per_year = year_count / (stock_nbr_days_year or 1) * 365
             if stocks_month:
                 stock_nbr_days_month = 31
                 month_count = sum([r['product_qty'] for r in stocks_month])
