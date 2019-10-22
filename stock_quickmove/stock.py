@@ -32,6 +32,7 @@ class StockSquickMove(http.Controller):
     @http.route(['/stock/quickmove', '/stock/quickmove/picking/<model("stock.picking"):picking>','/stock/quickmove/pickingtype/<model("stock.picking.type"):picking_type_id>'], type='http', auth='user', website=True)
     def stock_quickmove(self, picking=None, picking_type_id = None, **post):
         if request.httprequest.method == 'POST':
+            _logger.warn(post)
             description = post.get('description')
             picking_type_id = picking_type_id or post.get('picking_type_id')
             if not picking_type_id:
@@ -44,11 +45,11 @@ class StockSquickMove(http.Controller):
                 location_dest_id = int(location_dest_id)
                 if not picking:
                     picking = request.env['stock.picking'].create({
-                        'name': description,
                         'picking_type_id': picking_type_id,
                     })
-                    for k,v in post.items():
-                        if k.startswith('product_qty_'):
+                    picking.name = '%s - %s' % (picking.name, description)
+                    for k, v in post.items():
+                        if k.startswith('total_qty_'):
                             product = request.env['product.product'].browse(int(k.split('_')[-1]))
                             request.env['stock.move'].create({
                                 'product_id': product.id,
@@ -138,8 +139,7 @@ class StockSquickMove(http.Controller):
         if len(product_ids) > 0:
             products = []
             for p in product_ids:
-                qty = sum(request.env['stock.quant'].search([('product_id', '=', p.id), ('location_id', '=', p.stock_location_id.id)]).mapped('qty'))
-                products.append([p.id, '%s %s' %(p.name, ','.join([a.name for a in p.attribute_value_ids])), qty])
+                products = [p.id, p.display_name]
             return {'type': 'product', 'product_ids': products}
         else:
             if not location_src_scanned:
@@ -147,12 +147,7 @@ class StockSquickMove(http.Controller):
                 src_location_ids = request.env['stock.location'].search([('name', '=', barcode)])
                 if len(src_location_ids) > 0:
                     src_location_id = src_location_ids[0]
-                    product_ids = request.env['product.product'].search([('stock_location_id', '=', src_location_id.id)])
-                    products = []
-                    for p in product_ids:
-                        qty = sum(request.env['stock.quant'].search([('product_id', '=', p.id), ('location_id', '=', p.stock_location_id.id)]).mapped('qty'))
-                        products.append([p.id, p.display_name, qty])
-                    return {'type': 'src_location', 'product_ids': products, 'location': {'id': src_location_id.id, 'name': src_location_id.display_name}}
+                    return {'type': 'src_location', 'location': {'id': src_location_id.id, 'name': src_location_id.display_name}}
             else:
                 # search destination location
                 dest_location_ids = request.env['stock.location'].search([('name', '=', barcode)])
@@ -179,6 +174,24 @@ class StockSquickMove(http.Controller):
             for p in products:
                 results.append({'id': p.get('id'), 'text': p.get('display_name')})
         return Response(simplejson.dumps({'results': results}), mimetype='application/json')
+
+
+    @http.route(['/stock/quickmove_get_product_stock'], type='json', auth='user', website=True)
+    def quickmove_get_product_stock(self, location_id=None, product_id=None, **kw):
+        product_id = product_id and int(product_id)
+        location_id = location_id and int(location_id)
+        res = []
+        if product_id:
+            products = request.env['product.product'].browse(product_id)
+        else:
+            products = request.env['product.product'].search([('stock_location_id', '=', location_id)])
+        for product in products:
+            quants = request.env['stock.quant'].search([('product_id', '=', product.id), ('location_id', '=', location_id)])
+            reserved_qty = sum(quants.filtered(lambda q: True if q.reservation_id else False).mapped('qty'))
+            unreserved_qty = sum(quants.filtered(lambda q: False if q.reservation_id else True).mapped('qty'))
+            res.append([product.id, product.display_name, reserved_qty, reserved_qty + unreserved_qty, unreserved_qty])
+        return res
+        
 
     @http.route(['/stock/quickmove_location_search_products'], type='json', auth='user', website=True)
     def quickmove_location_search_products(self, location='0', **kw):

@@ -6,14 +6,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 8.0-20171009\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-24 09:12+0000\n"
-"PO-Revision-Date: 2019-09-24 09:12+0000\n"
+"POT-Creation-Date: 2019-10-22 14:37+0000\n"
+"PO-Revision-Date: 2019-10-22 14:37+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: stock_quickmove
+#: view:website:stock_quickmove.webapp
+msgid "Booked"
+msgstr "Boka"
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp
@@ -41,6 +46,11 @@ msgid "Last Picking:"
 msgstr "Senaste plockning:"
 
 #. module: stock_quickmove
+#: view:website:stock_quickmove.webapp
+msgid "Move"
+msgstr "Flytta"
+
+#. module: stock_quickmove
 #: view:website:stock_quickmove.webapp_inventory
 msgid "Name"
 msgstr "Namn"
@@ -49,11 +59,6 @@ msgstr "Namn"
 #: view:website:stock_quickmove.webapp
 msgid "Product"
 msgstr "Produkt"
-
-#. module: stock_quickmove
-#: view:website:stock_quickmove.webapp_inventory
-msgid "Product is missing. Try again."
-msgstr "Produkten saknas. Försök igen."
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp_inventory
@@ -75,15 +80,15 @@ msgstr "Snabbflytt"
 
 #. module: stock_quickmove
 #. openerp-web
-#: code:addons/stock_quickmove/static/src/js/main.js:251
-#: code:addons/stock_quickmove/static/src/js/main.js:271
+#: code:addons/stock_quickmove/static/src/js/main.js:241
+#: code:addons/stock_quickmove/static/src/js/main.js:250
 #, python-format
 msgid "Search location"
 msgstr "Sök lagerställe"
 
 #. module: stock_quickmove
 #. openerp-web
-#: code:addons/stock_quickmove/static/src/js/main.js:279
+#: code:addons/stock_quickmove/static/src/js/main.js:258
 #: code:addons/stock_quickmove/static/src/js/main.js:291
 #, python-format
 msgid "Search product"
@@ -95,9 +100,15 @@ msgid "Snabbflytt"
 msgstr "Snabbflytt"
 
 #. module: stock_quickmove
+#: view:website:stock_quickmove.webapp
 #: view:website:stock_quickmove.webapp_inventory
 msgid "Something went wrong. Try again."
 msgstr "Något gick fel. Försök igen."
+
+#. module: stock_quickmove
+#: view:website:stock_quickmove.webapp_inventory
+msgid "Something. Try again."
+msgstr "Något gick fel. Försök igen"
 
 #. module: stock_quickmove
 #: model:ir.model,name:stock_quickmove.model_stock_picking_type
