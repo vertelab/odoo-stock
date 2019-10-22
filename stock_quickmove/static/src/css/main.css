@@ -50,11 +50,17 @@ input.form-control.text-center.quickmove_qty {
     padding: 0;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 400px) {
+
+    span.input-group-addon.quickmove_plus.input-sm {
+        display: none;
+    }
+    span.input-group-addon.quickmove_minus.input-sm {
+        display: none;
+    }
 }
 
 .fix_padding{
     padding-right: 12px;
     padding-left: 12px;
-
 }

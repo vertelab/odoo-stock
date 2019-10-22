@@ -151,7 +151,9 @@
 											<thead>
 												<tr>
 													<th class="text-left">Product</th>
-													<th class="text-center" style="width: 150px;">Quantity</th>
+                                                    <th class="text-center" style="width: 150px;">Booked</th>
+                                                    <th class="text-center" style="width: 150px;">Quantity</th>
+													<th class="text-center" style="width: 150px;">Move</th>
 													<th style="width: 30px;"/>
 												</tr>
 											</thead>
@@ -161,6 +163,11 @@
 														<td>
 															<p class="text-left quickmove_product_name"><t t-esc="line.product_id.display_name"/></p>
 														</td>
+                                                        
+                                                        <td>
+                                                        <span class="reserved_qty_field" ></span>
+                                                        </td>
+                                                        
 														<td style="width: 150px;">
 															<div class="input-group">
 																<span class="input-group-addon quickmove_minus input-sm" t-att-data-product-id="line.product_id.id" onclick="quickmove_minus($(this));"><a href="#"><i class="fa fa-minus"/></a></span>
@@ -215,12 +222,20 @@
 											<thead>
 												<tr>
 													<th class="text-left">Product</th>
+                                                    <th class="text-center" style="width: 150px;">Booked</th>
 													<th class="text-center" style="width: 150px;">Quantity</th>
+                                                    <th class="text-center" style="width: 150px;">Move</th>
 													<th style="width: 30px;"/>
 												</tr>
 											</thead>
 											<tbody id="quickmove_product_lines"/>
 										</table>
+                                        <div class="red-alert-message alert alert-danger hidden" role="alert">
+                                        Something went wrong. Try again.
+                                        </div>
+                                        <div class="red-alert-message-undefined alert alert-danger hidden" role="alert">
+                                        Something went wrong. Try again.
+                                        </div>
 										<div class="col-md-6 col-sm-6 col-xs-12 mt32" style="padding: 0px;">
 											<select id="quickmove_product_search" class="form-control" style="width: 100%;" />
 										</div>
@@ -273,7 +288,7 @@
                                     Something went wrong. Try again.
                                     </div>
                                     <div class="red-alert-message-undefined alert alert-danger hidden" role="alert">
-                                    Product is missing. Try again.
+                                    Something. Try again.
                                     </div>
                                 </form>
 

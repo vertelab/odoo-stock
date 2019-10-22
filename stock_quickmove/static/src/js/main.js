@@ -1,21 +1,9 @@
 var location_src_scanned = false;
 
 function update_product_lines(res) {
-    var product_ids = [];
-    var result_product_ids = [];
-    $.each($("tbody#quickmove_product_lines").find("tr"), function() {
-        product_ids.push(parseInt($(this).data("id")));
-    });
-    $.each(res.product_ids, function() {
-        var product_id = $(this)[0];
-        var product_name = $(this)[1];
-        var product_qty = $(this)[2];
-        if ($.inArray(product_id, product_ids) === -1) {
-            result_product_ids.push([product_id, product_name, product_qty]);
-        }
-    });
+    remove_all_product_lines()
     var product_content = openerp.qweb.render('quickmove_product_lines', {
-        'product_ids': result_product_ids,
+        'product_ids': res,
     });
     $("tbody#quickmove_product_lines").append(product_content);
 }
@@ -173,7 +161,6 @@ function set_confirm_enabled(e) {
                 $(this).data('barcodeListener', plugin);
             }
         });
-
     }
 
 })(jQuery);
@@ -181,34 +168,37 @@ function set_confirm_enabled(e) {
 function quickmove_start_scanner() {
     $("body").barcodeListener().on("barcode.valid", function(e, code){
         var website = openerp.website;
+
         website.add_template_file("/stock_quickmove/static/src/xml/picking.xml");
         openerp.jsonRpc("/stock/quickmove_barcode", "call", {
             'barcode': code,
             'location_src_scanned': location_src_scanned
         }).done(function(result){
-            if (result.type === 'product') {
-                update_product_lines(result);
-            }
-            if (result.type === 'src_location') {
-                if (result.product_ids.length === 0) {
-                    remove_all_product_lines();
-                }
-                else {
-                    update_product_lines(result);
-                }
-                var newOption = new Option(result.location.name, result.location.id, false, true);
+             console.log(result);
+            
+            if (result === undefined){
+                $(".red-alert-message-undefined").removeClass("hidden");
+                return 
+                
+            } else if (result.type === 'product') {
+                var newOption = new Option(result.product_ids[1], result.product_ids[0], false, true);
+                $('select#quickmove_product_search').append(newOption).trigger('change');
+                location_src_scanned = true;
+            } else if (result.type === 'src_location') {
+               
+                var newOption = new Option(result.product_ids[1], result.product_ids[0], false, true);
                 $('select#quickmove_location_src_id').append(newOption).trigger('change');
                 location_src_scanned = true;
-            }
-            if (result.type === 'dest_location') {
+                
+            } else if (result.type === 'dest_location') {
                 var newOption = new Option(result.location.name, result.location.id, false, true);
                 $('select#quickmove_location_dest_id').append(newOption).trigger('change');
                 location_src_scanned = false;
             }
-        });
-
-    })
-};
+            $(".red-alert-message-undefined").addClass("hidden");
+        })
+        })
+}
 
 function quickmove_inventory_start_scanner() {
     $("body").barcodeListener().on("barcode.valid", function(e, code){
@@ -255,18 +245,7 @@ $(document).ready(function() {
             dataType: 'json',
         }
     });
-    $("select#quickmove_location_src_id").on('change.select9', function() {
-        openerp.jsonRpc("/stock/quickmove_location_search_products", "call", {
-            'location': $(this).val()
-        }).done(function(result){
-            if (result.product_ids.length === 0) {
-                remove_all_product_lines();
-            }
-            else {
-                update_product_lines(result);
-            }
-        });
-    });
+
     $("select#quickmove_location_dest_id").select9({
         placeholder: openerp._t("Search location"),
         allowClear: true,
@@ -283,9 +262,30 @@ $(document).ready(function() {
             dataType: 'json'
         }
     });
-    $("select#quickmove_product_search").on('change.select9', function() {
-        update_product_lines({"type": "product", "product_ids": [[$(this).val(), $("span#select9-quickmove_product_search-container").attr("title"), 1]]});
-    });
+    
+    function quickmove_product_change(){
+    
+        var self = $(this);
+        var product_id = $('select#quickmove_product_search').val();
+        var location_id = $('select#quickmove_location_src_id').val();
+        
+        if (location_id !== null){ 
+                openerp.jsonRpc("/stock/quickmove_get_product_stock", "call", {
+                'product_id': product_id,
+                'location_id': location_id,
+            }).done(function(result){
+                  if (result.length === 0) {
+                      remove_all_product_lines();
+                    }
+                    else {
+                    update_product_lines(result);
+                }
+            });
+        }
+    }
+    $("select#quickmove_product_search").on('change.select9', quickmove_product_change);
+    $("select#quickmove_location_src_id").on('change.select9', quickmove_product_change);
+        
     // inventory
     $("select#inventory_product_search").select9({
         placeholder: openerp._t("Search product"),
