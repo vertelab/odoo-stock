@@ -18,7 +18,7 @@ msgstr ""
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp
 msgid "Booked"
-msgstr "Boka"
+msgstr "Bokade"
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp
