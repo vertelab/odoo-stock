@@ -1,0 +1,19 @@
+tr.current_unfinished, tr.unfinished {
+    background-color: #FF8700;
+}
+
+tr.current_finished {
+    background-color: #DFF0D8;
+}
+
+tr.notbelong {
+    background-color: #FF0;
+}
+button.js_backorder {
+    margin-right: 100px;
+}
+.dn_unifaun_input {
+    width: 100px;
+}
+@media (max-width: 768px) {
+}
