@@ -1,6 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
     
+    <t t-name='AlternativeOperationEditorWidget'>
+        <tr t-att-class="widget.get_classes()" t-att-data-id="widget.data.id" t-att-data-product_id="widget.data.product_id.id" t-att-data-package_id="'' + widget.data.package_id.id">
+            <!-- Product name -->
+            <td><t t-esc="widget.data.product_id.display_name"/></td>
+            <!-- Scanned -->
+            <td class="brctbl-col2 text-center js_row_qty">
+                <div class="input-group">
+                    <span class="input-group-addon js_minus input-sm" t-att-data-product-id='widget.data.product_id.id'><a href="#"><i class="fa fa-minus"></i></a></span>
+                    <form class="js_submit_value">
+                        <input type="number" class="form-control text-center js_qty" t-att-value="widget.data.qty_done"></input>
+                        <!-- <input type="submit" class="hidden"></input> -->
+                    </form>
+                    <span class="input-group-addon js_plus input-sm" t-att-data-product-id='widget.data.product_id.id'><a href="#"><i class="fa fa-plus"></i></a></span>
+                </div>
+            </td>
+            <!-- Todo -->
+            <td class="brctbl-col3 text-center">
+                <t t-esc="widget.data.qty_remaining"/> / <t t-esc="widget.data.quantity"/> <t t-esc="widget.data.product_uom_id.display_name" />
+            </td>
+            <!-- From -->
+            <td class="brctbl-col4 js_loc">
+                <t t-esc="widget.data.sourceloc_id.display_name" />
+                <t t-if="widget.data.lot_id" ><span> : <t t-esc="widget.data.lot_id.display_name" /></span></t>
+            </td>
+            <!-- To -->
+            <td class="brctbl-col5 js_loc">
+                <t t-esc="widget.data.destinationloc_id.display_name" />
+<!--
+                <div class="pull-right btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle fa fa-cog" data-toggle="dropdown">
+                     <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <t t-if="row.cols.product_id">
+                            <li><a class="js_create_lot" href="#">Create &#47; Change Lot</a></li>
+                        </t>
+                        <t t-if="!row.cols.head_container &amp;&amp; !row.cols.container">
+                            <li><a class="js_change_src" href="#">Change source location</a></li>
+                            <li><a class="js_change_dst" href="#">Change destination location</a></li>
+                        </t>
+                        <t t-if="row.cols.head_container">
+                            <li><a class="js_pack_change_dst" href="#">Change destination location</a></li>
+                            <li class="divider"></li>
+                            <li><a class="js_pack_configure" href="#">Configure package</a></li>
+                            <li><a class="js_delete_pack" href="#">Remove from package</a></li>
+                            <li><a class="js_print_pack" href="#">Print package label</a></li>
+                        </t>
+                    </ul>
+                </div>
+-->
+            </td>
+        </tr>
+    </t>
+    
+    <t t-name='AlternativePackageEditorWidget'>
+        <tbody class="js_packop_package" t-att-data-package-id="'' + widget.data.id">
+            <tr class="js_packop_package" t-att-data-package-id="widget.data.id">
+                <td colspan="5">
+                    <center><t t-esc="widget.data.display_name"/></center>
+                </td>
+            </tr>
+            <t t-foreach="widget.data.operation_ids" t-as="operation_id">
+                <tr class="js_packop" t-att-data-id="operation_id"/>
+            </t>
+        </tbody>
+    </t>
+    
     <t t-name='AlternativePickingEditorWidget'>
 
 <!--
@@ -75,7 +142,7 @@
         <div class="row">
                 <div>
                     <div class="col-sm-4 col-xs-6">
-                        <h2 class="oe_pick_app_header" />
+                        <h2 class="oe_pick_app_header"><a id="picking_url_backend" t-att-href="widget.get_backend_url()"><t t-esc="widget.getParent().picking.name"/></a></h2>
                     </div>
                     <div class="col-sm-8 col-xs⁻6 text-right">
 
@@ -100,8 +167,8 @@
                 </div>
                 <div class="col-md-6 col-sm-4 col-xs-12 text-right">
                     <h3>
-                        <button type="button" class='btn btn-default js_pick_pack js_putinpack'> Put in Pack </button>
-                        <button type="button" class='btn btn-danger js_drop_down fa fa-download'> Put in Cart </button>
+                        <button type="button" class='btn btn-default js_create_package'> Create Package </button>
+                        <button type="button" class='btn btn-danger js_do_transfer fa fa-download'> Put in Cart </button>
                     </h3>
                 </div>
             </div>
@@ -119,68 +186,12 @@
                     </tr>
                 </thead>
 
-                <tbody>
-                    <div class="js_packops_package" data-id="0"></div>
-                    
-                    <t t-foreach="widget.get_packages()" t-as="package">
-                        <tr class="js_packop_package">
-                            <td colspan="5">
-                                <center><t t-esc="package.display_name"/></center>
-                            </td>
-                        </tr>
-                        <t t-foreach="widget.get_package_rows(package.id)" t-as="row">
-                            <tr t-att-data-id="row.id" t-att-data-product_id="row.product_id.id" t-att-data-package_id="package.id">
-                                <!-- Product name -->
-                                <td><t t-esc="row.product_id.display_name"/></td>
-                                <!-- Scanned -->
-                                <td class="brctbl-col2 text-center js_row_qty">
-                                    <div class="input-group">
-                                        <span class="input-group-addon js_minus input-sm" t-att-data-product-id='row.product_id.id'><a href="#"><i class="fa fa-minus"></i></a></span>
-                                        <form class="js_submit_value">
-                                            <input type="text" class="form-control text-center js_qty" t-att-value="row.qty_done"></input>
-                                            <!-- <input type="submit" class="hidden"></input> -->
-                                        </form>
-                                        <span class="input-group-addon js_plus input-sm" t-att-data-product-id='row.product_id.id'><a href="#"><i class="fa fa-plus"></i></a></span>
-                                    </div>
-                                </td>
-                                <!-- Todo -->
-                                <td class="brctbl-col3 text-center">
-                                    <t t-esc="row.qty_planned"/> <t t-esc="row.product_uom_id.display_name" />
-                                </td>
-                                <!-- From -->
-                                <td class="brctbl-col4 js_loc">
-                                    <t t-esc="row.sourceloc_id.display_name" />
-                                    <t t-if="row.lot_id" ><span> : <t t-esc="row.lot_id.display_name" /></span></t>
-                                </td>
-                                <!-- To -->
-                                <td class="brctbl-col5 js_loc">
-                                    <t t-esc="row.destinationloc_id.display_name" />
-    <!--
-                                    <div class="pull-right btn-group">
-                                        <button type="button" class="btn btn-default dropdown-toggle fa fa-cog" data-toggle="dropdown">
-                                         <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <t t-if="row.cols.product_id">
-                                                <li><a class="js_create_lot" href="#">Create &#47; Change Lot</a></li>
-                                            </t>
-                                            <t t-if="!row.cols.head_container &amp;&amp; !row.cols.container">
-                                                <li><a class="js_change_src" href="#">Change source location</a></li>
-                                                <li><a class="js_change_dst" href="#">Change destination location</a></li>
-                                            </t>
-                                            <t t-if="row.cols.head_container">
-                                                <li><a class="js_pack_change_dst" href="#">Change destination location</a></li>
-                                                <li class="divider"></li>
-                                                <li><a class="js_pack_configure" href="#">Configure package</a></li>
-                                                <li><a class="js_delete_pack" href="#">Remove from package</a></li>
-                                                <li><a class="js_print_pack" href="#">Print package label</a></li>
-                                            </t>
-                                        </ul>
-                                    </div>
-    -->
-                                </td>
-                            </tr>
-                        </t>
+                
+                    <t t-foreach="widget.packages" t-as="package">
+                        <tbody class="js_packop_package" t-att-data-package-id="'' + package.data.id"/>
+<!--
+                        <tr class="js_packop_package" t-att-data-package-id="'' + package.data.id"/>
+-->
                     </t>
                     
 <!--
@@ -242,9 +253,72 @@
                         </tr>
                     </t>
 -->
+<!--
                 </tbody>
+-->
             </table>
         </div>
+    </t>
+    
+    <t t-name="ThisIsTrash">
+                        <tr class="js_packop_package">
+                            <td colspan="5">
+                                <center><t t-esc="package.display_name"/></center>
+                            </td>
+                        </tr>
+                        <t t-foreach="widget.get_package_rows(package.id)" t-as="row">
+                            <tr t-att-data-id="row.id" t-att-data-product_id="row.product_id.id" t-att-data-package_id="package.id">
+                                <!-- Product name -->
+                                <td><t t-esc="row.product_id.display_name"/></td>
+                                <!-- Scanned -->
+                                <td class="brctbl-col2 text-center js_row_qty">
+                                    <div class="input-group">
+                                        <span class="input-group-addon js_minus input-sm" t-att-data-product-id='row.product_id.id'><a href="#"><i class="fa fa-minus"></i></a></span>
+                                        <form class="js_submit_value">
+                                            <input type="text" class="form-control text-center js_qty" t-att-value="row.qty_done"></input>
+                                            <!-- <input type="submit" class="hidden"></input> -->
+                                        </form>
+                                        <span class="input-group-addon js_plus input-sm" t-att-data-product-id='row.product_id.id'><a href="#"><i class="fa fa-plus"></i></a></span>
+                                    </div>
+                                </td>
+                                <!-- Todo -->
+                                <td class="brctbl-col3 text-center">
+                                    <t t-esc="row.quantity"/> <t t-esc="row.product_uom_id.display_name" />
+                                </td>
+                                <!-- From -->
+                                <td class="brctbl-col4 js_loc">
+                                    <t t-esc="row.sourceloc_id.display_name" />
+                                    <t t-if="row.lot_id" ><span> : <t t-esc="row.lot_id.display_name" /></span></t>
+                                </td>
+                                <!-- To -->
+                                <td class="brctbl-col5 js_loc">
+                                    <t t-esc="row.destinationloc_id.display_name" />
+    <!--
+                                    <div class="pull-right btn-group">
+                                        <button type="button" class="btn btn-default dropdown-toggle fa fa-cog" data-toggle="dropdown">
+                                         <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <t t-if="row.cols.product_id">
+                                                <li><a class="js_create_lot" href="#">Create &#47; Change Lot</a></li>
+                                            </t>
+                                            <t t-if="!row.cols.head_container &amp;&amp; !row.cols.container">
+                                                <li><a class="js_change_src" href="#">Change source location</a></li>
+                                                <li><a class="js_change_dst" href="#">Change destination location</a></li>
+                                            </t>
+                                            <t t-if="row.cols.head_container">
+                                                <li><a class="js_pack_change_dst" href="#">Change destination location</a></li>
+                                                <li class="divider"></li>
+                                                <li><a class="js_pack_configure" href="#">Configure package</a></li>
+                                                <li><a class="js_delete_pack" href="#">Remove from package</a></li>
+                                                <li><a class="js_print_pack" href="#">Print package label</a></li>
+                                            </t>
+                                        </ul>
+                                    </div>
+    -->
+                                </td>
+                            </tr>
+                        </t>
     </t>
     
     <t t-name="AlternativeBarcodeInterface">
