@@ -92,6 +92,7 @@ class stock_picking(models.Model):
     
     @api.multi
     def abc_load_picking(self):
+        """Create a JSON description of a picking and its products for the Javascript GUI."""
         _logger.warn(self)
         self.ensure_one()
         picking = self.abc_make_records(
@@ -130,8 +131,6 @@ class stock_picking(models.Model):
         else:
             operations = []
             products = []
-        for op in operations:
-            op['qty_done'] = 0.0
         # TODO: Find packages
         packages = []
         res = {'picking': picking, 'operations': operations, 'products': products, 'packages': packages}
@@ -139,6 +138,25 @@ class stock_picking(models.Model):
         return res
     
     @api.multi
-    def abc_do_picking(self, lines, packages):
+    def abc_do_transfer(self, lines, packages, **data):
+        """Complete the picking operation."""
         self.ensure_one()
-        pass
+        # Attempt to find the wizard used to create the data
+        # TODO: Don't rely on the old wizard.
+        _logger.warn(lines)
+        wizard = self.env['stock.transfer_details'].search([('item_ids', 'in', [l['id'] for l in lines])])
+        if not wizard:
+            raise Warning('The wizard has been deleted. Please restart the picking process. This will be fixed in future versions.')
+        for item in wizard.item_ids:
+            line = filter(lambda l: l['id'] == item.id, lines)[0]
+            item.quantity = line['qty_done']
+        wizard.do_detailed_transfer()
+        return {'result': 'success'}
+    
+    @api.multi
+    def abc_open_picking(self):
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'url': '/barcode2/web#picking_id=%s' % self.id,
+        }

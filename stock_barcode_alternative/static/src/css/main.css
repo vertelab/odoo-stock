@@ -17,3 +17,17 @@ button.js_backorder {
 }
 @media (max-width: 768px) {
 }
+
+/*
+Hiding input spinner. Proudly stolen from stack overflow.
+*/
+input.js_qty::-webkit-outer-spin-button,
+input.js_qty::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input.js_qty[type=number] {
+    -moz-appearance:textfield; /* Firefox */
+}
