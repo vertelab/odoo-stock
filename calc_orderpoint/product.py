@@ -20,6 +20,7 @@
 ##############################################################################
 from openerp import models, fields, api, _
 from datetime import datetime, timedelta, date
+from openerp.tools import safe_eval as eval
 import pytz
 import logging
 _logger = logging.getLogger(__name__)
@@ -33,9 +34,10 @@ class product_template(models.Model):
     _inherit = 'product.template'
 
     @api.one
-    def _consumption_per_day(self):
+    def _consumption_per_day(self, location_ids=None):
         _logger.warn('Computing _consumption_per_day for product.template %s, %s' % (self.id, self.name))
-        self.product_variant_ids._consumption_per_day()
+        location_ids = location_ids or eval(self.env['ir.config_parameter'].get_param('calc_orderpoint.location_ids', '[]'))
+        self.product_variant_ids._consumption_per_day(location_ids)
         variant_count = len(self.product_variant_ids) or 1
         self.sales_count = sum([p.sales_count for p in self.product_variant_ids])
         self.consumption_per_day = sum([p.consumption_per_day for p in self.product_variant_ids])
@@ -91,6 +93,7 @@ class product_template(models.Model):
                 run = True
                 break
         if run:
+            location_ids = eval(self.env['ir.config_parameter'].get_param('calc_orderpoint.location_ids', '[]'))
             limit = timedelta(minutes=float(self.env['ir.config_parameter'].get_param('calc_orderpoint.time_limit', '4')))
             _logger.warn('Starting compute_consumption_per_day.')
             products = self.env['product.template'].search(
@@ -123,11 +126,17 @@ class product_product(models.Model):
     _inherit = 'product.product'
 
     @api.one
-    def _consumption_per_day(self):
+    def _consumption_per_day(self, location_ids=None):
         _logger.warn('Computing _consumption_per_day for product.product %s, %s' % (self.id, self.name))
-        locations = self.env.ref('stock.picking_type_out').default_location_dest_id
-        locations |= self.env.ref('point_of_sale.picking_type_posout').default_location_dest_id
-        locations |= self.env.ref('stock.location_production')
+        location_ids = location_ids or []
+        if self.env.context.get('location_ids'):
+            locations = self.env['stock.picking.type'].browse()
+            for loc in self.env['stock.picking.type'].browse(location_ids): # list of stock.location
+                locations |= loc.default_location_dest_id
+        else:
+            locations = self.env.ref('stock.picking_type_out').default_location_dest_id
+            locations |= self.env.ref('point_of_sale.picking_type_posout').default_location_dest_id
+            locations |= self.env.ref('stock.location_production')
         stocks_year = self.env['stock.move'].search_read(
             [
                 ('product_id', '=', self.id),
@@ -146,7 +155,7 @@ class product_product(models.Model):
             stock_nbr_days_year = (date.today() - fields.Date.from_string(stocks_year[0]['date'])).days
             year_count = sum([r['product_qty'] for r in stocks_year])
             self.sales_count = year_count
-            self.consumption_per_year = year_count / stock_nbr_days_year * 365
+            self.consumption_per_year = year_count / (stock_nbr_days_year or 1) * 365
             if stocks_month:
                 stock_nbr_days_month = 31
                 month_count = sum([r['product_qty'] for r in stocks_month])
