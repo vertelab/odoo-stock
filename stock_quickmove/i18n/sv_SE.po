@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 8.0-20171009\n"
+"Project-Id-Version: Odoo Server 8.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-22 14:37+0000\n"
-"PO-Revision-Date: 2019-10-22 14:37+0000\n"
+"POT-Creation-Date: 2019-10-23 07:22+0000\n"
+"PO-Revision-Date: 2019-10-23 07:22+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -48,7 +48,7 @@ msgstr "Senaste plockning:"
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp
 msgid "Move"
-msgstr "Flytta"
+msgstr "Affärshändelse"
 
 #. module: stock_quickmove
 #: view:website:stock_quickmove.webapp_inventory
