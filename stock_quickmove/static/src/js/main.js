@@ -15,7 +15,7 @@ function update_product_location_lines(res) {
         'product_id': product_id
     }).done(function(locations){
         console.log(locations); //{location_id: 5290, name: "WH/Plocklager/L01D", qty: 3674}
-        var location_content = openerp.qweb.render('product_location_lines', {'locations': locations});
+        var location_content = openerp.qweb.render('product_location_lines', {'locations': locations, 'product_id': product_id});
         
         remove_all_location_lines();
         $("tbody#product_location_lines").append(location_content);
@@ -266,6 +266,7 @@ $(document).ready(function() {
     function quickmove_product_change(){
     
         var self = $(this);
+
         var product_id = $('select#quickmove_product_search').val();
         var location_id = $('select#quickmove_location_src_id').val();
         
@@ -298,9 +299,27 @@ $(document).ready(function() {
     
     // fix for random problem with templates not loaded in time
     setTimeout(function () {
-    $("select#inventory_product_search").on('change.select9', function() {
-        update_product_location_lines({"product_id":$(this).val()});
-    }).change();
-}, 100);
-
+        $("select#inventory_product_search").on('change.select9', function() {
+            update_product_location_lines({"product_id":$(this).val()});
+            }).change();
+        var state = $.bbq.getState();
+        if (state.location && state.location !== "" && state.product && state.product !== ""){
+            openerp.jsonRpc("/stock/quickmove_get_product", "call", {
+                    'product': state.product,
+                }).done(function(result){
+                    var newOption = new Option(result.product_name, result.product_id, false, true);
+                    $('select#quickmove_product_search').append(newOption).trigger('change');
+                })
+    
+                openerp.jsonRpc("/stock/quickmove_get_location", "call", {
+                        'location': state.location,
+                    }).done(function(result){
+                        var newOption = new Option(result.location_name, result.location_id, false, true);
+                        $('select#quickmove_location_src_id').append(newOption).trigger('change');
+                })
+        }
+        }, 500);
+        
+        
+        
 });

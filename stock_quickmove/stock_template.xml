@@ -28,9 +28,9 @@
 						</t>
 					</t>
                     <t t-call-assets="web.assets_common" t-css="false"/>
-<!--
+					<!--
                     <t t-call-assets="web.assets_backend" t-css="false"/>
--->
+					-->
                     <t t-call-assets="website.assets_frontend" t-css="false"/>
                     <script type="text/javascript" src="/website_bootstrap_select2/static/src/js/select2.min.js"/>
                     <script type="text/javascript" src="/website_bootstrap_select2/static/src/js/select9_search.js"/>
@@ -48,7 +48,7 @@
                             -->
                             <nav class="navbar navbar-default navbar-static-top">
                               <div class="container-fluid">
-                                 <div class="navbar-header">
+                                <div class="navbar-header">
                                      <img id="quick_move_logo" src="/website_logo.png"/>
                                 </div>
                                 <ul class="nav navbar-nav">
@@ -130,7 +130,7 @@
 										<div t-attf-class="form-group #{error and 'description' in error and 'has-error' or ''}">
 											<label class="col-md-3 col-sm-4 col-xs-12 control-label pull-left" for="description">Description</label>
 											<div class="col-md-7 col-sm-8 col-xs-12">
-												<input type="text" class="form-control" name="description" t-attf-value="#{picking.name or ''}" onkeypress="if(event.keyCode == 13) {return false;}" required="1" />
+												<input type="text" class="form-control" name="description" t-attf-value="#{picking.name or ''}" onkeypress="if(event.keyCode == 13) {return false;}" />
 											</div>
 										</div>
 										<div t-attf-class="form-group #{error and 'location_src_id' in error and 'has-error' or ''}">
@@ -203,7 +203,7 @@
 										<div t-attf-class="form-group #{error and 'description' in error and 'has-error' or ''}">
 											<label class="col-md-3 col-sm-4 col-xs-12 control-label pull-left" for="description">Description</label>
 											<div class="col-md-7 col-sm-8 col-xs-12">
-												<input type="text" class="form-control" name="description" t-attf-value="#{description or ''}" onkeypress="if(event.keyCode == 13) {return false;}" required="1" />
+												<input type="text" class="form-control" name="description" t-attf-value="#{description or ''}" onkeypress="if(event.keyCode == 13) {return false;}" />
 											</div>
 										</div>
 										<div t-attf-class="form-group #{error and 'location_src_id' in error and 'has-error' or ''}">

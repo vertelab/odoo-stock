@@ -52,7 +52,9 @@
       <tr t-att-data-id="location.location_id" t-att-data-qty="location.qty">
         <td>
           <p class="text-left quickmove_product_name">
-            <t t-esc="location.name" />
+            <a t-att-href="'/stock/quickmove#product=' + product_id + '&amp;location=' + location.location_id">
+              <t t-esc="location.name" />
+            </a>
           </p>
         </td>
         <td>
