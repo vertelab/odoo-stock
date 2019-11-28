@@ -8,13 +8,16 @@
             <!-- Scanned -->
             <td class="brctbl-col2 text-center js_row_qty">
                 <div class="input-group">
-                    <span class="input-group-addon js_minus input-sm" t-att-data-product-id='widget.data.product_id.id'><a href="#"><i class="fa fa-minus"></i></a></span>
+                    <span class="input-group-addon js_minus input-sm" t-att-data-product-id='widget.data.product_id.id'><a href="#"><i class="abc-op-qty-minus fa fa-minus"></i></a></span>
                     <form class="js_submit_value">
                         <input type="number" class="form-control text-center js_qty" t-att-value="widget.data.qty_done"></input>
                         <!-- <input type="submit" class="hidden"></input> -->
                     </form>
-                    <span class="input-group-addon js_plus input-sm" t-att-data-product-id='widget.data.product_id.id'><a href="#"><i class="fa fa-plus"></i></a></span>
+                    <span class="input-group-addon js_plus input-sm" t-att-data-product-id='widget.data.product_id.id'><a href="#"><i class="abc-op-qty-plus fa fa-plus"></i></a></span>
                 </div>
+            </td>
+            <td>
+                <i class="abc-op-maximize-qty fa fa-fast-forward fa-2x"/>
             </td>
             <!-- Todo -->
             <td class="brctbl-col3 text-center">
@@ -56,14 +59,14 @@
     </t>
     
     <t t-name='AlternativePackageEditorWidget'>
-        <tbody class="js_packop_package" t-att-data-package-id="'' + widget.data.id">
-            <tr class="js_packop_package" t-att-data-package-id="widget.data.id">
-                <td colspan="5">
+        <tbody class="abc-packop-package" t-att-data-package-id="'' + widget.data.id">
+            <tr class="js-packop-package" t-att-data-package-id="widget.data.id">
+                <td colspan="6">
                     <center><t t-esc="widget.data.display_name"/></center>
                 </td>
             </tr>
             <t t-foreach="widget.data.operation_ids" t-as="operation_id">
-                <tr class="js_packop" t-att-data-id="operation_id"/>
+                <tr class="abc-packop" t-att-data-id="operation_id"/>
             </t>
         </tbody>
     </t>
@@ -188,10 +191,7 @@
 
                 
                     <t t-foreach="widget.packages" t-as="package">
-                        <tbody class="js_packop_package" t-att-data-package-id="'' + package.data.id"/>
-<!--
-                        <tr class="js_packop_package" t-att-data-package-id="'' + package.data.id"/>
--->
+                        <tbody class="abc-packop-package" t-att-data-package-id="'' + package.data.id"/>
                     </t>
                     
 <!--
@@ -281,6 +281,7 @@
                                         <span class="input-group-addon js_plus input-sm" t-att-data-product-id='row.product_id.id'><a href="#"><i class="fa fa-plus"></i></a></span>
                                     </div>
                                 </td>
+                                <td></td>
                                 <!-- Todo -->
                                 <td class="brctbl-col3 text-center">
                                     <t t-esc="row.quantity"/> <t t-esc="row.product_uom_id.display_name" />
@@ -325,13 +326,16 @@
         <div class="navbar navbar-inverse navbar-static-top" role="navigation">
             <div class="container">
                 <div class="navbar-left">
+<!--
                     <button type="button" class="btn btn-primary navbar-btn js_pick_menu">Menu</button>
-                    <button type="button" class="btn navbar-btn js_force_reload">Force Reload</button>
+-->
                     <button type="button" class="btn navbar-btn js_clear_storage">Clear Data</button>
                 </div>
                 <div class="navbar-right">
+<!--
                     <button type="button" class="btn btn-default navbar-btn js_pick_prev">&lt; Previous</button>
                     <button type="button" class="btn btn-default navbar-btn js_pick_next">Next &gt;</button>
+-->
                 </div>
             </div>
         </div>

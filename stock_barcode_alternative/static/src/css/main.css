@@ -1,20 +1,23 @@
-tr.current_unfinished, tr.unfinished {
-    background-color: #FF8700;
+tr.abc-packop.unfinished {
+    background-color: #FFFAD8;
 }
 
-tr.current_finished {
+tr.abc-packop.finished {
     background-color: #DFF0D8;
 }
 
-tr.notbelong {
-    background-color: #FF0;
+tr.abc-packop.qty-over {
+    background-color: #F2DEDE;
 }
+
 button.js_backorder {
     margin-right: 100px;
 }
+
 .dn_unifaun_input {
     width: 100px;
 }
+
 @media (max-width: 768px) {
 }
 

@@ -114,6 +114,7 @@ class stock_picking(models.Model):
                     ('product_uom_id', ['display_name']),
                     'quantity',
                     ('package_id', []),
+                    ('packop_id', []),
                     ('result_package_id', ['display_name']),
                     ('sourceloc_id', ['display_name']),
                     ('destinationloc_id', ['display_name']),
@@ -142,7 +143,7 @@ class stock_picking(models.Model):
         """Complete the picking operation."""
         self.ensure_one()
         # Attempt to find the wizard used to create the data
-        # TODO: Don't rely on the old wizard.
+        # TODO: Don't rely on the old wizard. Match the lines through packop_id.
         _logger.warn(lines)
         wizard = self.env['stock.transfer_details'].search([('item_ids', 'in', [l['id'] for l in lines])])
         if not wizard:
@@ -160,3 +161,20 @@ class stock_picking(models.Model):
             'target': 'new',
             'url': '/barcode2/web#picking_id=%s' % self.id,
         }
+    
+    @api.model
+    def abc_scan(self, code):
+        product = self.env['product.product'].search(['|', ('ean13', '=', code), ('default_code', '=', code)], limit=1)
+        if product:
+            return {
+                'type': 'product.product',
+                'product': self.abc_make_records(
+                    product,
+                    ['display_name', 'default_code', 'ean13'])}
+        picking = self.env['stock.picking'].search_read([('name', '=', code)], ['id'])
+        if picking:
+            return {
+                'type': 'stock.picking',
+                'picking': picking[0]
+            }
+        return {'type': 'no hit'}
