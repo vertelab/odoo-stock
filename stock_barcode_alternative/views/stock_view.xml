@@ -15,7 +15,9 @@
                 <field name="inherit_id" ref="stock.view_picking_form"/>
                 <field name="arch" type="xml">
                         <field name="state" position="before">
-                                <button name="abc_open_picking" type="object" string="Barcode Scanner"/>
+<!--
+                                <button name="abc_open_picking" type="object" string="Barcode Scanner" />
+-->
                         </field>
                 </field>
         </record>
