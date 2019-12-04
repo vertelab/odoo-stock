@@ -179,13 +179,15 @@ class StockSquickMove(http.Controller):
 
     @http.route(['/stock/quickmove_get_product_stock'], type='json', auth='user', website=True)
     def quickmove_get_product_stock(self, location_id=None, product_id=None, **kw):
+        _logger.warn('DAER /stock/quickmove_get_product_stock: %s' % '')
         product_id = product_id and int(product_id)
         location_id = location_id and int(location_id)
         res = []
         if product_id:
             products = request.env['product.product'].browse(product_id)
         else:
-            products = request.env['product.product'].search([('stock_location_id', '=', location_id)])
+            quants = request.env['stock.quant'].search([('location_id', '=', location_id)])
+            products = quants.mapped('product_id')
         for product in products:
             quants = request.env['stock.quant'].search([('product_id', '=', product.id), ('location_id', '=', location_id)])
             reserved_qty = sum(quants.filtered(lambda q: True if q.reservation_id else False).mapped('qty'))
