@@ -179,7 +179,6 @@ class StockSquickMove(http.Controller):
 
     @http.route(['/stock/quickmove_get_product_stock'], type='json', auth='user', website=True)
     def quickmove_get_product_stock(self, location_id=None, product_id=None, **kw):
-        _logger.warn('DAER /stock/quickmove_get_product_stock: %s' % '')
         product_id = product_id and int(product_id)
         location_id = location_id and int(location_id)
         res = []
