@@ -445,7 +445,7 @@ function openerp_picking_alt_widgets(instance){
         },
         has_product: function(product_id){
             return _.filter(this.rows, function(e, pos, l){
-                e.product_id.id === product_id;
+                return e.product_id.id === product_id;
             }).length > 0;
         }
     });
