@@ -185,7 +185,8 @@ class StockSquickMove(http.Controller):
         if product_id:
             products = request.env['product.product'].browse(product_id)
         else:
-            products = request.env['product.product'].search([('stock_location_id', '=', location_id)])
+            quants = request.env['stock.quant'].search([('location_id', '=', location_id)])
+            products = quants.mapped('product_id')
         for product in products:
             quants = request.env['stock.quant'].search([('product_id', '=', product.id), ('location_id', '=', location_id)])
             reserved_qty = sum(quants.filtered(lambda q: True if q.reservation_id else False).mapped('qty'))
