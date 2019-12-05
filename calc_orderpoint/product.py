@@ -22,6 +22,8 @@ from openerp import models, fields, api, _
 from datetime import datetime, timedelta, date
 from openerp.tools import safe_eval as eval
 import pytz
+import traceback
+
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -32,7 +34,19 @@ _logger = logging.getLogger(__name__)
 
 class product_template(models.Model):
     _inherit = 'product.template'
-
+    
+    sales_count = fields.Integer('# Sales', compute='_get_sales_count', store=True, readonly=True, default=0)  # Initially defined in sale-module
+    consumption_per_day = fields.Float('Consumption per Day', default=0)
+    consumption_per_month = fields.Float(string='Consumption per Month', default=0,help="Number of items that is consumed per month")
+    consumption_per_year = fields.Float(string='Consumption per Year', default=0,help="Number of items that is consumed per year")
+    orderpoint_computed = fields.Float('Orderpoint', default=0)
+    virtual_available_days = fields.Float('Virtual Available Days', default=0)
+    instock_percent = fields.Integer('Instock Percent', default=0)
+    last_sales_count = fields.Datetime('Last Sales Compute', help="The last point in time when # Sales, Consumption per Day, Orderpoint, Virtual Available Days, and Instock Percent were computed.")
+    earliest_sales_count = fields.Datetime('Earliest Sales Compute', help="Don't try to recompute before this time. Set when compute fails for a product.")
+    virtual_available_delay = fields.Float('Delay', default=0,help="Number of days before refill of stock")
+    is_out_of_stock = fields.Boolean(string='Is out of stock',help='Check this box to ensure not to sell this product due to stock outage (instock_percent = 0)')
+    
     @api.one
     def _consumption_per_day(self, location_ids=None):
         _logger.warn('Computing _consumption_per_day for product.template %s, %s' % (self.id, self.name))
@@ -64,17 +78,6 @@ class product_template(models.Model):
     def _sales_count(self, cr, uid, ids, field_name, arg, context=None):
         pass
 
-    sales_count = fields.Integer('# Sales', compute='_get_sales_count', store=True, readonly=True, default=0)  # Initially defined in sale-module
-    consumption_per_day = fields.Float('Consumption per Day', default=0)
-    consumption_per_month = fields.Float(string='Consumption per Month', default=0,help="Number of items that is consumed per month")
-    consumption_per_year = fields.Float(string='Consumption per Year', default=0,help="Number of items that is consumed per year")
-    orderpoint_computed = fields.Float('Orderpoint', default=0)
-    virtual_available_days = fields.Float('Virtual Available Days', default=0)
-    instock_percent = fields.Integer('Instock Percent', default=0)
-    last_sales_count = fields.Datetime('Last Sales Compute', help="The last point in time when # Sales, Consumption per Day, Orderpoint, Virtual Available Days, and Instock Percent were computed.")
-    virtual_available_delay = fields.Float('Delay', default=0,help="Number of days before refill of stock")
-    is_out_of_stock = fields.Boolean(string='Is out of stock',help='Check this box to ensure not to sell this product due to stock outage (instock_percent = 0)')
-
     @api.model
     def compute_consumption_per_day(self):
         """Compute sales_count and its dependant fields. This can be a
@@ -93,29 +96,54 @@ class product_template(models.Model):
                 run = True
                 break
         if run:
+            now = fields.Datetime.now()
             location_ids = eval(self.env['ir.config_parameter'].get_param('calc_orderpoint.location_ids', '[]'))
             limit = timedelta(minutes=float(self.env['ir.config_parameter'].get_param('calc_orderpoint.time_limit', '4')))
             _logger.warn('Starting compute_consumption_per_day.')
             products = self.env['product.template'].search(
-                ['|', ('product_variant_ids.sale_ok', '=', True),
-                    ('sale_ok', '=', True),
-                    ('last_sales_count', '=', False)],
+                [
+                    '|',
+                        ('product_variant_ids.sale_ok', '=', True),
+                        ('sale_ok', '=', True),
+                    ('last_sales_count', '=', False),
+                    '|',
+                        ('earliest_sales_count', '=', False),
+                        ('earliest_sales_count', '<', now)
+                ],
                 limit=int(self.env['ir.config_parameter'].get_param(
                     'calc_orderpoint.product_limit', '30')))
             if not products:
                 products = self.env['product.template'].search(
-                    ['|', ('product_variant_ids.sale_ok', '=', True),
-                        ('sale_ok', '=', True)],
+                    [
+                        '|',
+                            ('product_variant_ids.sale_ok', '=', True),
+                            ('sale_ok', '=', True),
+                        '|',
+                            ('earliest_sales_count', '=', False),
+                            ('earliest_sales_count', '<', now)
+                    ],
                     order='last_sales_count asc',
                     limit=int(self.env['ir.config_parameter'].get_param(
                         'calc_orderpoint.product_limit', '30')))
             _logger.warn('Computing compute_consumption_per_day for the following products: %s' % products)
             for product in products:
-                product._consumption_per_day()
-                dt = fields.Datetime.now()
-                product.write({'last_sales_count': fields.Datetime.now()})
-                if (datetime.now() - start) > limit:
-                    break
+                try:
+                    product._consumption_per_day()
+                    product.write({
+                        'last_sales_count': fields.Datetime.now(),
+                        'earliest_sales_count': False,
+                    })
+                    if (datetime.now() - start) > limit:
+                        break
+                except:
+                    tb = traceback.format_exc()
+                    tomorrow = fields.Datetime.to_string(fields.Datetime.from_string(fields.Datetime.now()) + timedelta(1))
+                    subject = 'compute_consumption_per_day failed to compute %s (%s)' % (product.display_name, product.id)
+                    body = 'Earliest recompute attempt set to %s.\n\n%s' % (tomorrow, tb)
+                    _logger.warn('%s. %s' % (subject, body))
+                    product.earliest_sales_count = tomorrow
+                    product.message_post(body=body.replace('\n', '<br/>'), subject=subject, type='notification')
+                    
             _logger.warn('Finished compute_consumption_per_day.')
 
     @api.one

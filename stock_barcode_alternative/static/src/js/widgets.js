@@ -673,6 +673,7 @@ function openerp_picking_alt_widgets(instance){
             }
             else if (result.type === 'no hit'){
                 this.error_beep.play();
+                window.alert(result.term + " didn't match any products or pickings.");
             }
         },
         scanned_product: function(product){
