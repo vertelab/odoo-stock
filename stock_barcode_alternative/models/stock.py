@@ -142,9 +142,29 @@ class stock_picking(models.Model):
     def abc_do_transfer(self, lines, packages, **data):
         """Complete the picking operation."""
         self.ensure_one()
+        res = {'warnings': [], 'messages': [], 'results': {}}
+        params = {}
+        for step in self.abc_transfer_steps():
+            # Perform all the necessary picking steps
+            # lines     Line data from UI
+            # packages  Package data from UI
+            # data      Other da<ta from UI
+            # params    Parameters accumulated in the picking process. Inject data communicated between steps here.
+            # res       The result returned to the UI.
+            getattr(self, step)(lines, packages, data, params, res)
+        return res
+            
+    @api.model
+    def abc_transfer_steps(self):
+        """Return all the steps (function names) to complete the picking process in the correct order."""
+        return ['abc_transfer_wizard', 'abc_create_invoice', 'abc_confirm_invoice']
+    
+    @api.multi
+    def abc_transfer_wizard(self, lines, packages, data, params, res):
         # Attempt to find the wizard used to create the data
         # TODO: Don't rely on the old wizard. Match the lines through packop_id.
         _logger.warn(lines)
+        res['results']['transfer'] = 'failure'
         wizard = self.env['stock.transfer_details'].search([('item_ids', 'in', [l['id'] for l in lines])])
         if not wizard:
             raise Warning('The wizard has been deleted. Please restart the picking process. This will be fixed in future versions.')
@@ -152,7 +172,62 @@ class stock_picking(models.Model):
             line = filter(lambda l: l['id'] == item.id, lines)[0]
             item.quantity = line['qty_done']
         wizard.do_detailed_transfer()
-        return {'result': 'success'}
+        res['results']['transfer'] = 'success'
+        params['wizard'] = wizard
+    
+    @api.multi
+    def abc_create_invoice(self, lines, packages, data, params, res):
+        res_invoice = {'id': None, 'name': ''}
+        res['invoice'] = res_invoice
+        # Check if this order is NOT to be invoiced (prepaid most likely)
+        if self.invoice_state == 'none':
+            res_invoice['no_invoice'] = True
+            # TODO: Check where order policy comes from.
+            if self.sale_id and self.sale_id.order_policy == 'prepaid':
+                res_invoice['prepaid'] = True
+            return
+        
+        # Check if this order is already invoiced. Unknown when this might happen.
+        if self.invoice_state == 'invoiced':
+            res_invoice['already_invoiced'] = True
+            return
+        # Create invoice
+        try:
+            context = {'active_id': self.id, 'active_ids': self._ids, 'active_model': self._name, 'default_invoice_date': fields.Date.today()}
+            wizard = self.env['stock.invoice.onshipping'].with_context(context).create({})
+            action = wizard.open_invoice()
+            params['invoice'] = invoice = self.env['account.invoice'].browse(eval(action['domain'])[0][2][0])
+            res_invoice['id'] = invoice.id
+            res_invoice['name'] = invoice.name
+            res['results']['invoice'] = 'created'
+        except Exception as e:
+            res['results']['invoice'] = 'failure'
+            res['warnings'].append((
+                _(u"Failed to create invoice!"),
+                '%s\n\nTraceback:\n%s' % (e.message or 'Unknown Error', traceback.format_exc())))
+
+    @api.multi
+    def abc_confirm_invoice(self, lines, packages, data, params, res):
+        """Confirm invoice. Split into its own function to not lock the invoice sequence."""
+        cr =self.env.cr
+        cr.commit()
+        try:
+            invoice = None
+            # Create savepoint in case this fails.
+            with cr.savepoint():
+                invoice = params.get('invoice')
+                if invoice:
+                    # Validate invoice
+                    invoice.signal_workflow('invoice_open')
+                    res['invoice']['name'] = invoice.number
+                    res['messages'].append(u"Created and confirmed invoice %s." % invoice.number)
+                    res['results']['invoice'] = 'confirmed'
+            # Commit to unlock the invoice sequence
+            cr.commit()
+        except Exception as e:
+            res['warnings'].append((
+                _(u"Failed to confirm invoice %s!") % (invoice and (invocie.number or invoice.name) or 'Unknown'),
+                '%s\n\nTraceback:\n%s' % (e.message or 'Unknown Error', traceback.format_exc())))
     
     @api.multi
     def abc_open_picking(self):

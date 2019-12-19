@@ -148,12 +148,11 @@
                         <h2 class="oe_pick_app_header"><a id="picking_url_backend" t-att-href="widget.get_backend_url()"><t t-esc="widget.getParent().picking.name"/></a></h2>
                     </div>
                     <div class="col-sm-8 col-xs⁻6 text-right">
-
-                    <button type="button" class='btn btn-default js_pick_done'> Create backorder </button>
-                    <button type="button" class='btn btn-default js_pick_print'> Print </button>
-
+                        <button type="button" class='btn btn-default js_pick_done'> Create backorder </button>
+                        <button type="button" class='btn btn-default js_pick_print'> Print </button>
                     </div>
                 </div>
+                <div><ul class="abc-message-area"></ul></div>
         </div>
 
         <div class="row">
@@ -183,9 +182,10 @@
                     <tr>
                         <th class="text-left">Product</th>
                         <th class='text-center' width="150">Scanned</th>
+                        <th class='text-center'></th>
                         <th class='text-center'>Todo</th>
-                        <th>From</th>
-                        <th>To</th>
+                        <th class='text-left'>From</th>
+                        <th class='text-left'>To</th>
                     </tr>
                 </thead>
 

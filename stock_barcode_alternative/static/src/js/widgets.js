@@ -1,5 +1,5 @@
 function openerp_picking_alt_widgets(instance){
-
+    console.log('openerp_picking_alt_widgets');
     var module = instance.stock_barcode_alternative;
     var _t     = instance.web._t;
     var QWeb   = instance.web.qweb;
@@ -28,7 +28,7 @@ function openerp_picking_alt_widgets(instance){
             console.log('OperationEditorWidget.init');
             console.log(options);
             var self = this;
-            // this.data contains pure data ({}, [], strings, integers, floats etc) describing this packop, destined for storage.
+            // this.data contains pure data (JSONifiable stuff like {}, [], strings, integers, floats etc) describing this packop, destined for storage.
             // We reuse the provided object to keep all the data up to date on PickingEditorWidget (the same object is in that structure, so all changes are automatically mirrored there).
             // Any instantiated widgets or similar objects should be stored on this, not in data.
             this.data = options.row;
@@ -53,11 +53,13 @@ function openerp_picking_alt_widgets(instance){
             return this.getParent().get_picking_widget();
         },
         set_package: function(package){
+            // Not finished and unused.
             var old_parent = this.getParent();
             var old_package = null; //TODO
             this.setParent();
         },
         maximize_qty: function(){
+            // Add the remaining planned quantity to this line 
             this.set_qty(this.data.qty_done + this.data.qty_remaining);
         },
         increase: function(place_first){
@@ -67,7 +69,7 @@ function openerp_picking_alt_widgets(instance){
             this.set_qty(this.data.qty_done - 1, place_first);
         },
         get_classes: function(){
-            // Return the classes decorating this row
+            // Return the classes decorating this row in the UI
             var classes = 'abc-packop';
             if (this.data.qty_remaining < 0) {
                 classes += ' qty-over';
@@ -165,6 +167,7 @@ function openerp_picking_alt_widgets(instance){
             return this.getParent();
         },
         place_first: function(packop_id){
+            // Place the given packop first in the list.
             this.data.operation_ids.sort(function(el1, el2){
                 if (el1 == packop_id) {
                     return -1;
@@ -304,6 +307,8 @@ function openerp_picking_alt_widgets(instance){
                 return e.id == self.current_package;})[0];
         },
         set_current_package: function(id){
+            // UNUSED. Package management not implemented yet.
+            // Make this the current package (put all scanned objects into it).
             var old_package = this.get_current_package();
             this.current_package = id;
             this.save('current_package');
@@ -343,19 +348,6 @@ function openerp_picking_alt_widgets(instance){
                 operation.renderElement();
             });
         },
-        set_current_package: function(package) {
-            this.current_package = package;
-            this.save('current_package');
-        },
-        get_packop_product: function(packop_id){
-            var parent = this.getParent();
-            var row = _.filter(this.rows, function(e, pos, l) {e.id === packop_id})[0];
-            return _.filter(parent.products, function(e, pos, l) {e.id === row.product_id.id})[0]
-        },
-        get_packages: function(){
-            // Return list of packages.
-            return [{id:null, display_name: 'No package'}]
-        },
         get_package_rows: function(package_id){
             // Return all rows for a given package. Package can be
             // null (returns all unpackaged rows).
@@ -376,54 +368,21 @@ function openerp_picking_alt_widgets(instance){
             this.save('rows');
         },
         split_row: function(id, package_id){
+            // UNUSED. Package management not implemented yet.
             //Split one of the products from the given row and put it in the specified package.
             // Give new row a negative id.
         },
         create_package: function(){
+            // UNUSED. Package management not implemented yet.
             // Create a new package
         },
-        set_row_qty: function(row_id, qty, diff) {
-            // Set the qty_done of a row.
-            // Use qty to set quantity, diff to change it from current.
-            var self = this;
-            var row = _.filter(this.rows, function(e, pos, l){
-                return e.id == row_id;
-            });
-            if (diff !== undefined) {
-                qty = row.qty_done + diff;
-            }
-            // Don't go below 0.
-            if (qty < 0) {
-                qty = 0;
-            }
-            diff = qty - row.qty_done;
-            
-            if (diff === undefined) {
-                diff = qty - row.qty_done;
-            } else {
-                qty = row.qty_done + diff;
-            }
-            row.qty_done = qty;
-            
-        },
         get_backend_url: function (){
+            // Return the URL to go to this picking in /web
+            // TODO: Add menu and action to the url.
             if (this.getParent().picking) {
                 return '/web#id=' + this.id + '&view_type=form&model=stock.picking';
             }
             return '/web#page=0&amp;limit=80&amp;view_type=list&amp;model=stock.picking&amp;active_id=2';
-        },
-        update_picking_goals: function(product_id, qty){
-            // Deprecated?
-            if (this.picking_goals[product_id] === undefined) {
-                this.picking_goals[product_id] = 0.0;
-            }
-            this.picking_goals[product_id] -= qty;
-            this.save('picking_goals');
-            var rows = _.filter(this.rows, function(e, pos, l){
-                return e.product_id.id == product_id;
-            });
-            _.each(rows, function(row){});//youarehere
-            return this.picking_goals[product_id];
         },
         delete_picking: function(){
             var self = this;
@@ -434,16 +393,28 @@ function openerp_picking_alt_widgets(instance){
             var self = this;
             console.log(this.id);
             new instance.web.Model('stock.picking')
-                .call('abc_do_transfer', [this.id, this.rows, this.package_data]).then(
-                    function(result){
-                        if (result.result == 'success'){
-                            window.alert('Picking completed');
-                            self.delete_picking();
-                        }
-                    }
-                );
+                .call('abc_do_transfer', [this.id, this.rows, this.package_data])
+                .then(function(result){self.transfer_done(result)});
+        },
+        transfer_done: function(result){
+            var self = this;
+            console.log('transfer_done');
+            console.log(result);
+            
+            _.each(result.messages, function(message) {
+                self.getParent().log_message(message);
+            });
+            _.each(result.warnings, function(warning) {
+                var details = warning[0] + '\n\n' + warning[1];
+                self.getParent().log_message(warning[0], 'warning', details);
+                window.alert(details);
+            });
+            if (result.results.transfer == 'success'){
+                this.delete_picking();
+            }
         },
         has_product: function(product_id){
+            // Check if the given product is on this picking
             return _.filter(this.rows, function(e, pos, l){
                 return e.product_id.id === product_id;
             }).length > 0;
@@ -639,7 +610,7 @@ function openerp_picking_alt_widgets(instance){
             this.storage.clear();
         },
         scan: function(code){
-            // Perform a scan.
+            // Handle the scanned code.
             console.log('Scanned: ' + code);
             console.log(this);
             var self = this;
@@ -651,7 +622,6 @@ function openerp_picking_alt_widgets(instance){
             console.log(product);
             if (product.length > 0){
                 // Matched a known product.
-                
                 this.scanned_product(product[0]);
             } else {
                 // Contact backend to get result.
@@ -663,6 +633,7 @@ function openerp_picking_alt_widgets(instance){
             
         },
         handle_scan_result: function(result) {
+            // Handle the result from backend scan query
             console.log('handle_scan_result');
             console.log(result);
             if (result.type === 'product.product') {
@@ -677,6 +648,7 @@ function openerp_picking_alt_widgets(instance){
             }
         },
         scanned_product: function(product){
+            // The user scanned a product. Do something with it.
             console.log('scanned_product');
             console.log(product);
             if (this.picking_editor.has_product(product.id)){
@@ -685,6 +657,40 @@ function openerp_picking_alt_widgets(instance){
                 this.error_beep.play();
                 // TODO: Translation
                 window.alert(product.display_name + " finns ej på denna plocksedel!")
+            }
+        },
+        log_message: function(msg, type, details){
+            // Log a message in the messge area.
+            var msg_area = $('.abc-message-area');
+            var scrollAtBottom = msg_area.prop('scrollHeight') - msg_area.prop('clientHeight') <= msg_area.scrollTop() + 1;
+            var message = $('<li></li>');
+            //message.text(msg);
+            var first = true;
+            _.each(msg.split('\n'), function(m){
+                var p = $('<p class="abc-message-row"></p>');
+                p.text(m);
+                var chevron = $('<span class="abc-message-chevron"></span>');
+                if (first){
+                    chevron.append($('<i class="fa fa-chevron-right"></i>'));
+                    if (details) {
+                        var link = $('<a href="#"></a>');
+                        link.data('details', details);
+                        link.text('[details] ')
+                        link.click(function(){window.alert($(this).data('details'))});
+                        chevron.prepend(link);
+                    }
+                    first = false;
+                }
+                p.prepend(chevron);
+                message.append(p)
+            });
+            message.addClass('abc-message');
+            if (type) {
+                message.addClass('abc-message-' + type);
+            }
+            msg_area.append(message);
+            if (scrollAtBottom) {
+                msg_area.scrollTop(msg_area.prop('scrollHeight') - msg_area.prop('clientHeight'));
             }
         }
     });
@@ -698,6 +704,7 @@ function openerp_picking_alt_widgets(instance){
             this.clear();
         },
         connect: function(callback){
+            // Connect the scanner to a callback function.
             console.log('Connecting scanner to:');
             console.log(this);
             this.disconnect();
@@ -732,17 +739,25 @@ function openerp_picking_alt_widgets(instance){
             }
         },
         add: function(char) {
+            // Add a char to the scan result
             this.code += char;
         },
         clear: function(now) {
+            // Reset and prepare for new scan
             this.code = "";
             this.last_parse = now;
         },
         isEndChar: function(e) {
+            // Check if the given action represents our end char.
+            
             // We could check shift key and other stuff here if we want to get fancy.
             if(e.which === 13){
                 return true;
             }
+            return false;
+        },
+        isStartChar: function(e) {
+            // Check if the given action represents our start char.
             return false;
         }
     });

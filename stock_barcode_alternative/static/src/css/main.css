@@ -34,3 +34,38 @@ input.js_qty::-webkit-inner-spin-button {
 input.js_qty[type=number] {
     -moz-appearance:textfield; /* Firefox */
 }
+
+.abc-message-area {
+    list-style: none;
+    -webkit-padding-start: 0;
+    -webkit-margin-after: 0;
+    -webkit-margin-before: 1em;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+/*
+      background: #333;
+      * border: 1px solid #000;
+      color: #fff;
+*/
+}
+
+.abc-message-warning {
+    color: red;
+}
+
+p.abc-message-row {
+    margin: 0 0 0 0;
+}
+
+.abc-message-chevron {
+    display: inline-block;
+    width: 80px;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.abc-message-chevron i, .abc-message-chevron a{
+    color: inherit;
+    display: inline;
+}

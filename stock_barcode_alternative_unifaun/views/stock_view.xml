@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+<!--
+        <template id="assets_backend" name="assets_backend: Alternative Barcode Scanner - Unifaun" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/stock_barcode_alternative_unifaun/static/src/css/main.css"/>
+                <script src="/stock_barcode_alternative_unifaun/static/src/js/widgets.js" type="text/javascript"></script>
+            </xpath>
+        </template>
+-->
+        
+    </data>
+</openerp>
