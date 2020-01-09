@@ -35,19 +35,35 @@ class StockPicking(models.Model):
     _inherit = 'stock.picking'
     
     @api.model
+    def abc_get_model_fields(self, record):
+        res = super(StockPicking, self).abc_get_model_fields(record)
+        if record._name == 'stock.picking':
+            res += ['is_unifaun', 'unifaun_parcel_count', 'unifaun_parcel_weight']
+        return res
+    
+    @api.model
     def abc_transfer_steps(self):
         steps = super(StockPicking, self).abc_transfer_steps()
         steps.append('abc_unifaun')
+        steps.insert(0, 'abc_unifaun_parcel_data')
         return steps
     
     @api.multi
-    # ~ def action_barcode_ui_done_1_invoice(self):
+    def abc_unifaun_parcel_data(self, lines, packages, data, params, res):
+        """"""
+        if self.carrier_id.is_unifaun and not data.get('unifaun_no_order'):
+            self.write({
+                'unifaun_parcel_count': data.get('unifaun_parcel_count', 0),
+                'unifaun_parcel_weight': data.get('unifaun_parcel_weight', 0),
+            })
+    
+    @api.multi
     def abc_unifaun(self, lines, packages, data, params, res):
         """Order shipping through Unifaun."""
         # ~ # Print Stock Delivery Slip
         # ~ res.update(self.action_barcode_ui_print_delivery_slip())
         
-        if self.carrier_id.is_unifaun:
+        if self.carrier_id.is_unifaun and not data.get('unifaun_no_order'):
             res['results']['unifaun'] = 'failure'
             try:
                 self.order_stored_shipment()

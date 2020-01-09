@@ -38,6 +38,6 @@ Adds Unifaun functionality to the alternative barcode interface.
         'views/stock_view.xml',
     ],
     'installable': True,
-    # ~ 'qweb': ['static/src/xml/picking.xml'],
+    'qweb': ['static/src/xml/picking.xml'],
 }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

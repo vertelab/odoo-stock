@@ -72,77 +72,7 @@
     </t>
     
     <t t-name='AlternativePickingEditorWidget'>
-
-<!--
-        <div class="modal fade" id="js_LocationChooseModal" tabindex="-1" role="dialog" aria-labelledby="LocationChooseModal" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title" id="myModalLabel">Choose a location</h4>
-                    </div>
-                    <div class="modal-body">
-                        <p>Scan a location or select it in the list below</p>
-                        <select id="js_loc_select" class="form-control">
-                            <option class="js_loc_option" data-loc-id="false"></option>
-                            <t t-foreach="widget.get_location()" t-as="loc">
-                                <option class="js_loc_option" t-att-data-loc-id="loc.id"><t t-esc="loc.name"/></option>
-                            </t>
-                        </select>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary js_validate_location">Change Location</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="js_LotChooseModal" tabindex="-1" role="dialog" aria-labelledby="LotChooseModal" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title" id="myModalLabel">Create Lot</h4>
-                    </div>
-                    <div class="modal-body">
-                        <p>Scan a lot or type it below (leave empty to generate one automatically)</p>
-                        <input class='col-xs-6 js_lot_scan' type='text'/>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary js_validate_lot">Create Lot</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="js_PackConfModal" tabindex="-1" role="dialog" aria-labelledby="PackConfModal" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title" id="myModalLabel">Configure package</h4>
-                    </div>
-                    <div class="modal-body">
-                        <p>Package type</p>
-                        <select id="js_packconf_select" class="form-control">
-                            <option class="js_packing_option" data-ul-id="false"></option>
-                            <t t-foreach="widget.get_logisticunit()" t-as="ul">
-                                <option class="js_packing_option" t-att-data-ul-id="ul.id" t-att-value="ul.id"><t t-esc="ul.name"/></option>
-                            </t>
-                        </select>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary js_validate_pack">Validate package</button>
-                    </div>
-                </div>
-            </div>
-        </div>
--->
-        
-        <div class="row">
+        <div class="row" id="abc_header">
                 <div>
                     <div class="col-sm-4 col-xs-6">
                         <h2 class="oe_pick_app_header"><a id="picking_url_backend" t-att-href="widget.get_backend_url()"><t t-esc="widget.getParent().picking.name"/></a></h2>
@@ -155,7 +85,7 @@
                 <div><ul class="abc-message-area"></ul></div>
         </div>
 
-        <div class="row">
+        <div class="row" id="abc_buttons_header">
             <div>
                 <div class="col-md-3 col-sm-4 col-xs-6">
                     <h2>
@@ -175,7 +105,7 @@
                 </div>
             </div>
         </div>
-
+        
         <div>
             <table class='table table-condensed js_op_table_todo'>
                 <thead>
@@ -193,133 +123,8 @@
                     <t t-foreach="widget.packages" t-as="package">
                         <tbody class="abc-packop-package" t-att-data-package-id="'' + package.data.id"/>
                     </t>
-                    
-<!--
-                    <t t-foreach="widget.get_rows()" t-as="row">
-                        <tr t-att-class="row.classes + 'js_pack_op_line'" t-att-data-id="row.cols.id" t-att-data-container-id="row.cols.container_id" t-att-data-package-id="row.cols.package_id" t-att-data-ulid="row.cols.ul_id">
-                            <td t-att-class="'brctbl-col1 text-left' + row.cols.head_container ? ' js_unfold' : ''">
-                                <t t-if="!row.cols.head_container &amp;&amp; row.cols.container"><span class="fa fa-level-up fa-rotate-90" style="margin-left:10px;margin-right:10px;"></span></t>
-                                <t t-esc="row.cols.product" />
-                            </td>
-                            
-                            <td class='brctbl-col2 text-center js_row_qty'>
-                                <t t-if="row.cols.processed == 'false' &amp;&amp; !row.cols.container">
-                                    <div class="input-group">
-                                        <span class="input-group-addon js_minus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-minus"></i></a></span>
-                                        <form class="js_submit_value">
-                                            <input type="text" class="form-control text-center js_qty" t-att-value="row.cols.rem"></input>
-                                        </form>
-                                        <span class="input-group-addon js_plus input-sm" t-att-data-product-id='row.cols.product_id'><a href="#"><i class="fa fa-plus"></i></a></span>
-                                    </div>
-                                </t>
-                                <t t-if="(row.cols.processed == 'true' || row.cols.container)">
-                                    <t t-esc="row.cols.rem" />
-                                </t>
-                            </td>
-                            
-                            <td class="brctbl-col3 text-center">
-                                <t t-esc="row.cols.qty"/> <t t-esc="row.cols.uom" />
-                            </td>
-                            
-                            <td class="brctbl-col4 js_loc">
-                                <t t-esc="row.cols.loc" />
-                                <t t-if="row.cols.pack" ><span> : <t t-esc="row.cols.pack" /></span></t>
-                                <t t-if="row.cols.lot" ><span> : <t t-esc="row.cols.lot" /></span></t>
-                            </td>
-                            
-                            <td class="brctbl-col5 js_loc"> <t t-esc="row.cols.dest" />
-                                <div class="pull-right btn-group">
-                                    <button type="button" class="btn btn-default dropdown-toggle fa fa-cog" data-toggle="dropdown">
-                                     <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <t t-if="row.cols.product_id">
-                                            <li><a class="js_create_lot" href="#">Create &#47; Change Lot</a></li>
-                                        </t>
-                                        <t t-if="!row.cols.head_container &amp;&amp; !row.cols.container">
-                                            <li><a class="js_change_src" href="#">Change source location</a></li>
-                                            <li><a class="js_change_dst" href="#">Change destination location</a></li>
-                                        </t>
-                                        <t t-if="row.cols.head_container">
-                                            <li><a class="js_pack_change_dst" href="#">Change destination location</a></li>
-                                            <li class="divider"></li>
-                                            <li><a class="js_pack_configure" href="#">Configure package</a></li>
-                                            <li><a class="js_delete_pack" href="#">Remove from package</a></li>
-                                            <li><a class="js_print_pack" href="#">Print package label</a></li>
-                                        </t>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                    </t>
--->
-<!--
-                </tbody>
--->
             </table>
         </div>
-    </t>
-    
-    <t t-name="ThisIsTrash">
-                        <tr class="js_packop_package">
-                            <td colspan="5">
-                                <center><t t-esc="package.display_name"/></center>
-                            </td>
-                        </tr>
-                        <t t-foreach="widget.get_package_rows(package.id)" t-as="row">
-                            <tr t-att-data-id="row.id" t-att-data-product_id="row.product_id.id" t-att-data-package_id="package.id">
-                                <!-- Product name -->
-                                <td><t t-esc="row.product_id.display_name"/></td>
-                                <!-- Scanned -->
-                                <td class="brctbl-col2 text-center js_row_qty">
-                                    <div class="input-group">
-                                        <span class="input-group-addon js_minus input-sm" t-att-data-product-id='row.product_id.id'><a href="#"><i class="fa fa-minus"></i></a></span>
-                                        <form class="js_submit_value">
-                                            <input type="text" class="form-control text-center js_qty" t-att-value="row.qty_done"></input>
-                                            <!-- <input type="submit" class="hidden"></input> -->
-                                        </form>
-                                        <span class="input-group-addon js_plus input-sm" t-att-data-product-id='row.product_id.id'><a href="#"><i class="fa fa-plus"></i></a></span>
-                                    </div>
-                                </td>
-                                <td></td>
-                                <!-- Todo -->
-                                <td class="brctbl-col3 text-center">
-                                    <t t-esc="row.quantity"/> <t t-esc="row.product_uom_id.display_name" />
-                                </td>
-                                <!-- From -->
-                                <td class="brctbl-col4 js_loc">
-                                    <t t-esc="row.sourceloc_id.display_name" />
-                                    <t t-if="row.lot_id" ><span> : <t t-esc="row.lot_id.display_name" /></span></t>
-                                </td>
-                                <!-- To -->
-                                <td class="brctbl-col5 js_loc">
-                                    <t t-esc="row.destinationloc_id.display_name" />
-    <!--
-                                    <div class="pull-right btn-group">
-                                        <button type="button" class="btn btn-default dropdown-toggle fa fa-cog" data-toggle="dropdown">
-                                         <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <t t-if="row.cols.product_id">
-                                                <li><a class="js_create_lot" href="#">Create &#47; Change Lot</a></li>
-                                            </t>
-                                            <t t-if="!row.cols.head_container &amp;&amp; !row.cols.container">
-                                                <li><a class="js_change_src" href="#">Change source location</a></li>
-                                                <li><a class="js_change_dst" href="#">Change destination location</a></li>
-                                            </t>
-                                            <t t-if="row.cols.head_container">
-                                                <li><a class="js_pack_change_dst" href="#">Change destination location</a></li>
-                                                <li class="divider"></li>
-                                                <li><a class="js_pack_configure" href="#">Configure package</a></li>
-                                                <li><a class="js_delete_pack" href="#">Remove from package</a></li>
-                                                <li><a class="js_print_pack" href="#">Print package label</a></li>
-                                            </t>
-                                        </ul>
-                                    </div>
-    -->
-                                </td>
-                            </tr>
-                        </t>
     </t>
     
     <t t-name="AlternativeBarcodeInterface">
@@ -350,98 +155,4 @@
         </div>
     </t>
     
-    
-    
-    
-    
-<!--
-    <t t-extend="PickingEditorWidget">
-        <t t-jquery="t[t-esc='row.cols.product']" t-operation="after">
-            <span class="js_packop_line_weight" t-att-data-weight="row.cols.weight" t-att-data-working-weight="row.cols.working_weight" t-att-data-shipping-weight="row.cols.shipping_weight or 0.0">
-                <t t-if="row.cols.shipping_weight">
-                    <t t-esc="'(' + row.cols.shipping_weight.toFixed(3) + ' kg)'" />
-                </t>
-                <t t-if="! row.cols.shipping_weight and row.cols.working_weight">
-                    <t t-esc="'(' + row.cols.working_weight.toFixed(3) + ' kg)'" />
-                </t>
-                <t t-if="row.cols.weight !== undefined and ! (row.cols.shipping_weight or row.cols.working_weight)">
-                    <t t-esc="'(' + row.cols.weight.toFixed(3) + ' kg)'" />
-                </t>
-            </span>
-        </t>
-        
-        <t t-jquery="#js_PackConfModal .modal-body select" t-operation="after">
-            <br/><p>Calculated weight</p>
-            <p><b id="js_packconf_calc_weight" /> <b>kg</b></p>
-            <p>Set Weight</p>
-            <input id="js_packconf_weight" type="number" step="0.01" class="form-control" value="0.0" />
-        </t>
-        
-        <t t-jquery="div.col-md-3.col-sm-4.col-xs-6" t-operation="replace">
-            <div class="col-md-3 col-sm-4 col-xs-6">
-                <h2>
-                    <div class="input-group">
-                        <input type="text" class="form-control oe_searchbox" placeholder="Filter by location..."/>
-                        <span class="input-group-btn">
-                            <button class="btn btn-danger js_clear_search" type="button">x</button>
-                        </span>
-                    </div>
-                </h2>
-            </div>
-            <div class="col-md-3 col-sm-4"/>
-        </t>
-
-        <t t-jquery="h2.oe_pick_app_header" t-operation="replace">
-            <a id="picking_url_backend" t-att-href="widget.get_backend_url()"><h2 class="oe_pick_app_header" /></a>
-        </t>
-
-        <t t-jquery="button.js_pick_done" t-operation="before">
-            <button type="button" class="btn btn-default js_print_label" style="display: none;">Print Label</button>
-            <button type="button" class="btn btn-default js_print_invoice" style="display: none;">Print Invoice</button>
-            <button type="button" class="btn btn-default js_send_invoice_email" style="display: none;">Send Invoice E-mail</button>
-        </t>
-
-        <t t-jquery="div.row:first" t-operation="after">
-            <div class="row" id="dn_wrapping_invoice_area">
-                <div class="col-sm-4 col-xs-6" id="dn_wrapping_invoice_link" />
-                <div class="col-sm-8 col-xs-6" id="dn_wrapping_invoice_message" />
-            </div>
-        </t>
-
-        <t t-jquery="div.row:last" t-operation="after">
-            <div t-att-class="widget.getParent().picking.is_unifaun ? 'row' : 'row hidden'" id="dn_wrapping_packages_area">
-                <h4 class="col-xs-12">Unifaun Data</h4>
-                <div class="col-sm-12 col-md-6" id="dn_wrapping_nr_packages_div">
-                    <span class="dn_wrapping_label col-xs-12 col-md-6"># of Packages</span>
-                    <input id="dn_wrapping_nr_packages" class="dn_unifaun_input" type="number" step="0" t-att-value="widget.getParent().picking.unifaun_parcel_count"/>
-                </div>
-                <div class="col-sm-12 col-md-6" id="dn_wrapping_weight_div">
-                    <div>
-                        <span class="dn_wrapping_label col-xs-12 col-md-6">Total Weight</span>
-                        <input id="dn_wrapping_weight" class="dn_unifaun_input" type="number" step="0.01" t-att-value="widget.getParent().picking.unifaun_parcel_weight"/>
-                    </div>
-                    <span class="col-xs-12">Calculated: <b id="dn_wrapping_weight_calculated"><t t-esc="widget.getParent().picking.weight"/></b> kg</span>
-                </div>
-            </div>
-        </t>
-
-        <t t-jquery="th.text-center:not([width='150'])" t-operation="before">
-            <th/>
-        </t>
-
-        <t t-jquery="td.brctbl-col2.text-center.js_row_qty" t-operation="after">
-            <t t-if="row.cols.processed == 'false' &amp;&amp; !row.cols.container">
-                <td><i class="fa fa-fast-forward fa-2x" onclick="manual_quick_scan($(this));"/></td>
-            </t>
-            <t t-if="(row.cols.processed == 'true' || row.cols.container)">
-                <td/>
-            </t>
-        </t>
-        
-        <t t-jquery="button.js_putinpack" t-operation="before">
-            <button type="button" class='btn btn-default js_backorder'> Create Backorder </button>
-        </t>
-
-    </t>
--->
 </templates>

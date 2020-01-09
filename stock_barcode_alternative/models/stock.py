@@ -31,6 +31,16 @@ import base64
 import logging
 _logger = logging.getLogger(__name__)
 
+# Increasing persistance time for packop wizards.
+# TODO: Remove this when we implement better transfer method.
+class StockTransferDetails(models.TransientModel):
+    _inherit = 'stock.transfer_details'
+    _transient_max_hours = 24
+
+class StockTransferDetailsItems(models.TransientModel):
+    _inherit = 'stock.transfer_details_items'
+    _transient_max_hours = 24
+
 class BarcodeController(http.Controller):
 
     @http.route(['/barcode2/web/'], type='http', auth='user')
@@ -48,7 +58,7 @@ class stock_picking(models.Model):
     @api.model
     def abc_make_records(self, records, fields=None):
         """Build a record description for return to the JS interface."""
-        fields = fields or ['id']
+        fields = fields or self.abc_get_model_fields(records)
         # ~ model = records._name
         result = []
         field_types = {}
@@ -89,27 +99,18 @@ class stock_picking(models.Model):
             # ~ }
             # ~ self.abc_wizard_id = self.env['stock.transfer_details'].with_context(**context).create({'picking_id': self.id})
         # ~ return self.abc_wizard_id.wizard_view()
-    
-    @api.multi
-    def abc_load_picking(self):
-        """Create a JSON description of a picking and its products for the Javascript GUI."""
-        _logger.warn(self)
-        self.ensure_one()
-        picking = self.abc_make_records(
-            self,
-            [
+
+    @api.model
+    def abc_get_model_fields(self, record):
+        """Return a list of the fields that should be loaded for this model."""
+        if record._name == 'stock.picking':
+            return [
                 'name',
                 'state',
-                # ~ ('abc_wizard_id', []),
                 ('partner_id', ['display_name']),
             ]
-        )[0]
-        if self.state == 'assigned':
-            action = self.do_enter_transfer_details()
-            wizard = self.env['stock.transfer_details'].browse(action['res_id'])
-            operations = self.abc_make_records(
-                wizard.item_ids,
-                [
+        if record._name == 'stock.transfer_details_items':
+            return [
                     ('product_id', ['display_name']),
                     ('product_uom_id', ['display_name']),
                     'quantity',
@@ -120,15 +121,24 @@ class stock_picking(models.Model):
                     ('destinationloc_id', ['display_name']),
                     ('lot_id', ['display_name']),
                 ]
-            )
-            products = self.abc_make_records(
-                wizard.item_ids.mapped('product_id'),
-                [
+        if record._name == 'product.product':
+            return [
                     'display_name',
                     'default_code',
                     'ean13',
                 ]
-            )
+        return ['id']
+    @api.multi
+    def abc_load_picking(self):
+        """Create a JSON description of a picking and its products for the Javascript GUI."""
+        _logger.warn(self)
+        self.ensure_one()
+        picking = self.abc_make_records(self)[0]
+        if self.state == 'assigned':
+            action = self.do_enter_transfer_details()
+            wizard = self.env['stock.transfer_details'].browse(action['res_id'])
+            operations = self.abc_make_records(wizard.item_ids)
+            products = self.abc_make_records(wizard.item_ids.mapped('product_id'))
         else:
             operations = []
             products = []
@@ -141,6 +151,7 @@ class stock_picking(models.Model):
     @api.multi
     def abc_do_transfer(self, lines, packages, **data):
         """Complete the picking operation."""
+        _logger.warn('\nabc_do_transfer\n\n%s\n\n%s\n\n%s' % (lines, packages, data))
         self.ensure_one()
         res = {'warnings': [], 'messages': [], 'results': {}}
         params = {}
@@ -148,7 +159,7 @@ class stock_picking(models.Model):
             # Perform all the necessary picking steps
             # lines     Line data from UI
             # packages  Package data from UI
-            # data      Other da<ta from UI
+            # data      Other data from UI
             # params    Parameters accumulated in the picking process. Inject data communicated between steps here.
             # res       The result returned to the UI.
             getattr(self, step)(lines, packages, data, params, res)
@@ -226,7 +237,7 @@ class stock_picking(models.Model):
             cr.commit()
         except Exception as e:
             res['warnings'].append((
-                _(u"Failed to confirm invoice %s!") % (invoice and (invocie.number or invoice.name) or 'Unknown'),
+                _(u"Failed to confirm invoice %s!") % (invoice and (invoice.number or invoice.name) or 'Unknown'),
                 '%s\n\nTraceback:\n%s' % (e.message or 'Unknown Error', traceback.format_exc())))
     
     @api.multi

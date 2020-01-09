@@ -248,6 +248,7 @@ function openerp_picking_alt_widgets(instance){
             var self = this;
             this._super();
             this.$('button.js_do_transfer').click(this.do_transfer);
+            this.toggle_ui_elements();
             _.each(this.getChildren(), function(child){child.renderElement()});
         },
         start: function(){
@@ -261,8 +262,8 @@ function openerp_picking_alt_widgets(instance){
             // Save and load on page reload. Got to connect the data to picking_id when saving.
             var self = this;
             var parent = this.getParent();
-            var rows = this.storage.getItem('rows_' + parent.picking_id);
-            if (! rows) {
+            this.load_fields();
+            if (! this.rows) {
                 var rows = JSON.parse(JSON.stringify(this.getParent().packops));
                 _.each(rows, function(row){
                     row.qty_done = 0.0;
@@ -274,11 +275,9 @@ function openerp_picking_alt_widgets(instance){
                 this.rows = rows;
                 this.save('rows');
             };
-            this.rows = rows;
             console.log('PickingEditorWidget.rows');
             console.log(this.rows);
-            var package_data = this.storage.getItem('package_data_' + parent.picking_id);
-            if (! package_data) {
+            if (! this.package_data) {
                 package_data = JSON.parse(JSON.stringify(parent.packages));
                 package_data.push({id: null, display_name: 'No Package'})
                 _.each(package_data, function(package){
@@ -292,12 +291,10 @@ function openerp_picking_alt_widgets(instance){
                 this.package_data = package_data;
                 this.save('package_data');
             }
-            this.package_data = package_data;
             this.packages = [];
             _.each(this.package_data, function(package){
                 self.packages.push(new module.PackageEditorWidget(self, {package: package}));
             });
-            this.current_package = this.storage.getItem('current_package_' + this.getParent().picking_id);
             this.renderElement();
         },
         get_current_package: function(){
@@ -315,11 +312,30 @@ function openerp_picking_alt_widgets(instance){
             old_package.renderElement();
             this.get_current_package().renderElement();
         },
+        get_saved_fields: function(){
+            console.log('get_saved_fields');
+            return ['current_package', 'rows', 'package_data'];
+        },
+        load_fields: function(fields){
+            var self = this;
+            if (fields === undefined){
+                fields = this.get_saved_fields();
+            }
+            console.log(fields);
+            if (! Array.isArray(fields)){
+                fields = [fields];
+            };
+            console.log('load_fields');
+            console.log(fields);
+            _.each(fields, function(field){
+                self[field] = self.storage.getItem(field + '_' + self.getParent().picking_id);
+            })
+        },
         save: function(fields){
             // Save the data in storage.
             var self = this;
-            if (fields === null){
-                fields = ['current_package', 'rows', 'package_data', 'picking_goals'];
+            if (fields === undefined){
+                fields = this.get_saved_fields();
             }
             if (! Array.isArray(fields)){
                 fields = [fields];
@@ -376,6 +392,19 @@ function openerp_picking_alt_widgets(instance){
             // UNUSED. Package management not implemented yet.
             // Create a new package
         },
+        toggle_ui_elements: function(){
+            // Enable/disable buttons etc.
+            if (this.transfer_button_disabled()){
+                this.$('.js_do_transfer').enable(false);
+            } else {
+                this.$('.js_do_transfer').enable(true);
+            }
+        },
+        transfer_button_disabled: function(){
+            // Check if transfer button should be disabled.
+            // TODO: Disable unless something (everything?) has been moved.
+            return false;
+        },
         get_backend_url: function (){
             // Return the URL to go to this picking in /web
             // TODO: Add menu and action to the url.
@@ -386,14 +415,16 @@ function openerp_picking_alt_widgets(instance){
         },
         delete_picking: function(){
             var self = this;
-            _.each(['package_data_', 'rows_'], function(key){ self.storage.removeItem(key + self.id)})
+            _.each(self.get_saved_fields(), function(key){ self.storage.removeItem(key + '_' + self.id)})
+        },
+        get_extra_transfer_data: function(){
+            return {};
         },
         do_transfer: function(){
             // Complete the picking process.
             var self = this;
-            console.log(this.id);
             new instance.web.Model('stock.picking')
-                .call('abc_do_transfer', [this.id, this.rows, this.package_data])
+                .call('abc_do_transfer', [this.id, this.rows, this.package_data], this.get_extra_transfer_data())
                 .then(function(result){self.transfer_done(result)});
         },
         transfer_done: function(result){
@@ -411,6 +442,9 @@ function openerp_picking_alt_widgets(instance){
             });
             if (result.results.transfer == 'success'){
                 this.delete_picking();
+                _.each(this.packages, function(package){
+                    package.destroy();
+                });
             }
         },
         has_product: function(product_id){
