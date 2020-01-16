@@ -71,6 +71,8 @@ class product_template(models.Model):
         else:
             self.instock_percent = self.sudo().virtual_available_days / (self.virtual_available_delay or 1.0) * 100
         self.last_sales_count = fields.Datetime.now()
+        # update memcached_time to tell memcached to recache page.
+        self.memcached_time = fields.Datetime.now()
 
     def _get_sales_count(self):
         pass
@@ -214,7 +216,8 @@ class product_product(models.Model):
         else:
             self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
         self.last_sales_count = fields.Datetime.now()
-
+        # update memcached_time to tell memcached to recache page.
+        self.memcached_time = fields.Datetime.now()
 
     def _get_sales_count(self):
         pass

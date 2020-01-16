@@ -59,7 +59,8 @@ class StockSquickMove(http.Controller):
                                 'product_uom': product.uom_id.id,
                                 'location_id': location_src_id,
                                 'location_dest_id': location_dest_id,
-                                'picking_id': picking.id
+                                'picking_id': picking.id,
+                                'picking_type_id': picking_type_id
                             })
                 else:
                     # update move lines
@@ -83,7 +84,8 @@ class StockSquickMove(http.Controller):
                                     'product_uom': product.uom_id.id,
                                     'location_id': location_src_id,
                                     'location_dest_id': location_dest_id,
-                                    'picking_id': picking.id
+                                    'picking_id': picking.id,
+                                    'picking_type_id': picking_type_id
                                 })
                     # remove move lines
                     for line in picking.move_lines:
