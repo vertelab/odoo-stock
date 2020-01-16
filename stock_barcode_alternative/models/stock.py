@@ -44,7 +44,7 @@ class StockTransferDetailsItems(models.TransientModel):
 class BarcodeController(http.Controller):
 
     @http.route(['/barcode2/web/'], type='http', auth='user')
-    def a(self, debug=False, **k):
+    def abc_interface(self, debug=False, **k):
         if not request.session.uid:
             return http.local_redirect('/web/login?redirect=/barcode2/web')
 
@@ -128,6 +128,7 @@ class stock_picking(models.Model):
                     'ean13',
                 ]
         return ['id']
+    
     @api.multi
     def abc_load_picking(self):
         """Create a JSON description of a picking and its products for the Javascript GUI."""
@@ -220,12 +221,12 @@ class stock_picking(models.Model):
     @api.multi
     def abc_confirm_invoice(self, lines, packages, data, params, res):
         """Confirm invoice. Split into its own function to not lock the invoice sequence."""
-        cr =self.env.cr
-        cr.commit()
+        cr = self.env.cr
+        self.env.cr.commit()
         try:
             invoice = None
             # Create savepoint in case this fails.
-            with cr.savepoint():
+            with self.env.cr.savepoint():
                 invoice = params.get('invoice')
                 if invoice:
                     # Validate invoice
@@ -234,7 +235,7 @@ class stock_picking(models.Model):
                     res['messages'].append(u"Created and confirmed invoice %s." % invoice.number)
                     res['results']['invoice'] = 'confirmed'
             # Commit to unlock the invoice sequence
-            cr.commit()
+            self.env.cr.commit()
         except Exception as e:
             res['warnings'].append((
                 _(u"Failed to confirm invoice %s!") % (invoice and (invoice.number or invoice.name) or 'Unknown'),
@@ -250,12 +251,13 @@ class stock_picking(models.Model):
     
     @api.model
     def abc_scan(self, code):
-        product = self.env['product.product'].search(['|', ('ean13', '=', code), ('default_code', '=', code)], limit=1)
-        if product:
+        """Perform scan on the supplied barcode."""
+        products = self.env['product.product'].search(['|', ('ean13', '=', code), ('default_code', '=', code)])
+        if products:
             return {
                 'type': 'product.product',
                 'product': self.abc_make_records(
-                    product,
+                    products,
                     ['display_name', 'default_code', 'ean13'])}
         picking = self.env['stock.picking'].search_read([('name', '=', code)], ['id'])
         if picking:

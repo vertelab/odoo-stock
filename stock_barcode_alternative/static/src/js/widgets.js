@@ -192,30 +192,39 @@ function openerp_picking_alt_widgets(instance){
             // Save changes to package data
             this.get_picking_widget().save('package_data')
         },
-        increase: function(product_id){
+        increase: function(product_id, limit_qty = false){
             // Increase quantity of the row containing the given product_id.
+            // limit_qty: set to true to avoid increasing over expected qty.
             // Called from the scanner.
             console.log('PackageEditorWidget(' + this.id + ').increase: ' + product_id);
+            console.log(this)
             var self = this;
-            var row = _.filter(this.rows, function(e, pos, l){
+            var rows = _.filter(this.rows, function(e, pos, l){
                 return e.data.product_id.id == product_id;
             });
-            if (row.length > 0) {
-                row = row[0];
-                row.increase(true);
+            if (rows.length > 0) {
+                var done = false;
+                var row;
+                _.each(rows, function(r){
+                    if (done){return};
+                    if (r.data.qty_remaining > 0){
+                        // row is not done, so we will use it
+                        row = r;
+                        done = true;
+                    } else if (!row && !limit_qty){
+                        // row is done. remember it in case all rows are done.
+                        row = r;
+                    }
+                });
+                
+                if (row){
+                    row.increase(true);
+                    return true;
+                }
             } else {
-                // Find and split original row onto this package.
+                // Find and split/move original row onto this package.
             }
-            
-            
-            //~ console.log(row);
-            //~ if (row.length > 0){
-                //~ row = row[0];
-                //~ ++ row.qty_done;
-                //~ this.renderElement();
-            //~ } else{
-                //~ console.log(this.rows)
-            //~ }
+            return false;
         },
         selected: function(){
             return this.id == this.get_picking_widget().current_package;
@@ -575,6 +584,7 @@ function openerp_picking_alt_widgets(instance){
             // Add new products to the list
             var new_products = [];
             // Filter out the current products that aren't in the new list and save them.
+            // TODO: Don't we link to these objects somewhere else? What happens to that when we replace them here?
             _.filter(
                 this.products,
                 function(e, pos, l){
@@ -656,7 +666,7 @@ function openerp_picking_alt_widgets(instance){
             console.log(product);
             if (product.length > 0){
                 // Matched a known product.
-                this.scanned_product(product[0]);
+                this.scanned_product(product);
             } else {
                 // Contact backend to get result.
                 // May be a product, picking, etc.
@@ -664,7 +674,6 @@ function openerp_picking_alt_widgets(instance){
                 console.log(this.products);
                 new instance.web.Model('stock.picking').call('abc_scan', [code]).then(function(result){self.handle_scan_result(result)});
             }
-            
         },
         handle_scan_result: function(result) {
             // Handle the result from backend scan query
@@ -672,7 +681,7 @@ function openerp_picking_alt_widgets(instance){
             console.log(result);
             if (result.type === 'product.product') {
                 this.add_products(result.product);
-                this.scanned_product(result.product[0]);
+                this.scanned_product(result.product);
             } else if (result.type === 'stock.picking'){
                 this.goto_picking(result.picking.id);
             }
@@ -681,13 +690,36 @@ function openerp_picking_alt_widgets(instance){
                 window.alert(result.term + " didn't match any products or pickings.");
             }
         },
-        scanned_product: function(product){
+        scanned_product: function(products){
             // The user scanned a product. Do something with it.
+            var self = this;
             console.log('scanned_product');
-            console.log(product);
-            if (this.picking_editor.has_product(product.id)){
-                this.picking_editor.get_current_package().increase(product.id);
-            } else {
+            console.log(products);
+            var found = false;
+            var done = false;
+            var candidate;
+            // We can get several products as response. Loop through and check them all.
+            // 1. Check for a matching row that hasn't been completed yet.
+            // 2. Check for a matching row that has been completed.
+            _.each(products, function(product){
+                if (done){return};
+                if (self.picking_editor.has_product(product.id)){
+                    found = true;
+                    // Increase if this row isn't done yet.
+                    if (self.picking_editor.get_current_package().increase(product.id, true)){
+                        // 1. A row was increased. We're done here.
+                        done = true;
+                    } else if (!candidate){
+                        // No row was increased, because all matching rows were done. Remember this product for step 2. 
+                        candidate = product;
+                    }
+                }
+            });
+            if (!done && found){
+                // 2. A completed row was found and is the best match. Increase it.
+                this.picking_editor.get_current_package().increase(candidate.id)
+            } else if (! found) {
+                // This product isn't on the picking
                 this.error_beep.play();
                 // TODO: Translation
                 window.alert(product.display_name + " finns ej på denna plocksedel!")
