@@ -50,7 +50,7 @@ class BarcodeController(http.Controller):
 
         return request.render('stock_barcode_alternative.barcode_index')
 
-class stock_picking(models.Model):
+class StockPicking(models.Model):
     _inherit = 'stock.picking'
     
     # ~ abc_wizard_id = fields.Many2one(comodel_name='stock.transfer_details', string='Move Wizard', ondelete='set null')
@@ -266,3 +266,14 @@ class stock_picking(models.Model):
                 'picking': picking[0]
             }
         return {'type': 'no hit'}
+
+class StockPickingType(models.Model):
+    _inherit = 'stock.picking.type'
+    
+    @api.multi
+    def abc_open_barcode_interface(self):
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'url': '/barcode2/web',
+        }

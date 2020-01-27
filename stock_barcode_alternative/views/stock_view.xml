@@ -14,11 +14,20 @@
                 <field name="model">stock.picking</field>
                 <field name="inherit_id" ref="stock.view_picking_form"/>
                 <field name="arch" type="xml">
-                        <field name="state" position="before">
-<!--
-                                <button name="abc_open_picking" type="object" string="Barcode Scanner" />
--->
-                        </field>
+                        <button name="open_barcode_interface" position="attributes">
+                                <attribute name="name">abc_open_picking</attribute>
+                        </button>
+                </field>
+        </record>
+        
+        <record id="stock_picking_type_kanban" model="ir.ui.view">
+                <field name="name">stock.picking.type.stock_barcode_alternative.kanban</field>
+                <field name="model">stock.picking.type</field>
+                <field name="inherit_id" ref="stock.stock_picking_type_kanban"/>
+                <field name="arch" type="xml">
+                        <a name="open_barcode_interface" position="attributes">
+                                <attribute name="name">abc_open_barcode_interface</attribute>
+                        </a>
                 </field>
         </record>
         
