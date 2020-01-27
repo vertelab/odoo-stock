@@ -721,8 +721,14 @@ function openerp_picking_alt_widgets(instance){
             } else if (! found) {
                 // This product isn't on the picking
                 this.error_beep.play();
+                var product_names = [];
+                _.each(products, function(product){
+                    console.log(product);
+                    product_names.push(product.display_name);
+                });
+                console.log(product_names);
                 // TODO: Translation
-                window.alert(product.display_name + " finns ej på denna plocksedel!")
+                window.alert(product_names.join(' / ') + " finns ej på denna plocksedel!");
             }
         },
         log_message: function(msg, type, details){
