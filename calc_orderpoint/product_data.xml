@@ -54,5 +54,23 @@ for product in env['stock.move'].search([('picking_type_id', '=', internal.id), 
    product.calc_orderpoint()
      </field>
     </record>
+
+    <record id="action_clear_cache_production" model="ir.actions.server">
+      <field name="name">Clear cache production</field>
+      <field name="model_id" ref="mrp.model_mrp_production"/>
+      <field name="code">for move in object.move_created_ids2:
+   move.product_id.calc_orderpoint()
+     </field>
+    </record>
+
+    <record id="action_clear_cache_picking" model="ir.actions.server">
+      <field name="name">Clear cache picking</field>
+      <field name="model_id" ref="stock.model_stock_picking"/>
+      <field name="code">for move in object.move_lines:
+   move.product_id.calc_orderpoint()
+     </field>
+    </record>
+
+
   </data>
 </openerp>
