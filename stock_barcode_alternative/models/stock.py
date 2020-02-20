@@ -27,6 +27,8 @@ from openerp.tools import safe_eval as eval
 from timeit import default_timer as timer
 import traceback
 import base64
+from time import sleep
+from openerp.modules.registry import Registry
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -133,6 +135,7 @@ class StockPicking(models.Model):
     def abc_load_picking(self):
         """Create a JSON description of a picking and its products for the Javascript GUI."""
         _logger.warn(self)
+        _logger.warn(self._context)
         self.ensure_one()
         picking = self.abc_make_records(self)[0]
         if self.state == 'assigned':
@@ -218,28 +221,41 @@ class StockPicking(models.Model):
                 _(u"Failed to create invoice!"),
                 '%s\n\nTraceback:\n%s' % (e.message or 'Unknown Error', traceback.format_exc())))
 
+    # ~ @api.model
+    # ~ def abc_test_lock_invoice(self, invoice, lock_time=5):
+        # ~ _logger.warn('\n\ninvoice locked!\n')
+        # ~ invoice.signal_workflow('invoice_open')
+        # ~ sleep(lock_time)
+        # ~ raise Warning('invoice lock released!')
+    
     @api.multi
     def abc_confirm_invoice(self, lines, packages, data, params, res):
         """Confirm invoice. Split into its own function to not lock the invoice sequence."""
-        cr = self.env.cr
-        self.env.cr.commit()
-        try:
-            invoice = None
-            # Create savepoint in case this fails.
-            with self.env.cr.savepoint():
-                invoice = params.get('invoice')
-                if invoice:
-                    # Validate invoice
-                    invoice.signal_workflow('invoice_open')
-                    res['invoice']['name'] = invoice.number
-                    res['messages'].append(u"Created and confirmed invoice %s." % invoice.number)
-                    res['results']['invoice'] = 'confirmed'
-            # Commit to unlock the invoice sequence
+        invoice = params.get('invoice')
+        if invoice and invoice.state == 'draft':
             self.env.cr.commit()
-        except Exception as e:
-            res['warnings'].append((
-                _(u"Failed to confirm invoice %s!") % (invoice and (invoice.number or invoice.name) or 'Unknown'),
-                '%s\n\nTraceback:\n%s' % (e.message or 'Unknown Error', traceback.format_exc())))
+            env = None
+            try:
+                # Ne cursor doesn't time out when requesting lock.
+                # Could be bad I guess? Works for now.
+                # TODO: Look into setting a more reasonable lock wait time.
+                new_cr = Registry(self.env.cr.dbname).cursor()
+                new_cr.autocommit(True)
+                env = api.Environment(new_cr, self.env.uid, self.env.context)
+                # Validate invoice
+                invoice.signal_workflow('invoice_open')
+                res['invoice']['name'] = invoice.number
+                res['messages'].append(u"Created and confirmed invoice %s." % invoice.number)
+                res['results']['invoice'] = 'confirmed'
+                # Commit to unlock the invoice sequence
+                env.cr.commit()
+            except Exception as e:
+                res['warnings'].append((
+                    _(u"Failed to confirm invoice %s!") % (invoice and (invoice.number or invoice.name) or 'Unknown'),
+                    '%s\n\nTraceback:\n%s' % (e.message or 'Unknown Error', traceback.format_exc())))
+            finally:
+                if env:
+                    env.cr.close()
     
     @api.multi
     def abc_open_picking(self):
@@ -274,6 +290,6 @@ class StockPickingType(models.Model):
     def abc_open_barcode_interface(self):
         return {
             'type': 'ir.actions.act_url',
-            'target': 'new',
+            'target': 'current',
             'url': '/barcode2/web',
         }

@@ -427,7 +427,7 @@ function openerp_picking_alt_widgets(instance){
             _.each(self.get_saved_fields(), function(key){ self.storage.removeItem(key + '_' + self.id)})
         },
         get_extra_transfer_data: function(){
-            return {};
+            return {context: JSON.parse(JSON.stringify(this.session.user_context))};
         },
         do_transfer: function(){
             // Complete the picking process.
@@ -632,7 +632,7 @@ function openerp_picking_alt_widgets(instance){
             }
             console.log('loading picking data from server');
             return new instance.web.Model('stock.picking')
-                .call('abc_load_picking', [[this.picking_id]]);
+                .call('abc_load_picking', [[this.picking_id]], {context: self.session.user_context});
         },
         save: function(fields){
             // Save the data in storage.
@@ -672,7 +672,7 @@ function openerp_picking_alt_widgets(instance){
                 // May be a product, picking, etc.
                 console.log('no product found! products:');
                 console.log(this.products);
-                new instance.web.Model('stock.picking').call('abc_scan', [code]).then(function(result){self.handle_scan_result(result)});
+                new instance.web.Model('stock.picking').call('abc_scan', [code], {context: self.session.user_context}).then(function(result){self.handle_scan_result(result)});
             }
         },
         handle_scan_result: function(result) {

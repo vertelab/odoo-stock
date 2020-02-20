@@ -20,9 +20,6 @@
                         <button name="do_partial_open_barcode" position="attributes">
                                 <attribute name="name">abc_open_picking</attribute>
                         </button>
-                        <button name="open_barcode_interface" position="attributes">
-                                <attribute name="name">abc_open_picking</attribute>
-                        </button>
                 </field>
         </record>
         
