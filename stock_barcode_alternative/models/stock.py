@@ -159,7 +159,7 @@ class StockPicking(models.Model):
         self.ensure_one()
         res = {'warnings': [], 'messages': [], 'results': {}}
         params = {}
-        for step in self.abc_transfer_steps():
+        for step in [s[1] for s in sorted(self.abc_transfer_steps())]:
             # Perform all the necessary picking steps
             # lines     Line data from UI
             # packages  Package data from UI
@@ -172,7 +172,10 @@ class StockPicking(models.Model):
     @api.model
     def abc_transfer_steps(self):
         """Return all the steps (function names) to complete the picking process in the correct order."""
-        return ['abc_transfer_wizard', 'abc_create_invoice', 'abc_confirm_invoice']
+        return [
+            (20, 'abc_transfer_wizard'),
+            (40, 'abc_create_invoice'),
+            (60, 'abc_confirm_invoice')]
     
     @api.multi
     def abc_transfer_wizard(self, lines, packages, data, params, res):

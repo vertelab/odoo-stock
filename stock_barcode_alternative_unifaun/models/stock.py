@@ -44,8 +44,8 @@ class StockPicking(models.Model):
     @api.model
     def abc_transfer_steps(self):
         steps = super(StockPicking, self).abc_transfer_steps()
-        steps.append('abc_unifaun')
-        steps.insert(0, 'abc_unifaun_parcel_data')
+        steps.append((30, 'abc_unifaun'))
+        steps.append((10, 'abc_unifaun_parcel_data'))
         return steps
     
     @api.multi
