@@ -72,9 +72,16 @@
                                 </div>
                                 <div t-if="employee">
                                     <span>
-                                        <strong>Plockansvarig:</strong>
+                                        <strong>Picking Employee:</strong>
                                         <br />
                                         <span t-field="employee.name" />
+                                    </span>
+                                </div>
+                                <div t-if="o.box_label">
+                                    <span>
+                                        <strong>Box:</strong>
+                                        <br />
+                                        <span t-field="o.box_label" />
                                     </span>
                                 </div>
                                 <h2>
@@ -95,13 +102,8 @@
                                                 <strong>Created on</strong>
                                             </th>
                                             <th>
-                                                <strong>Faktura typ</strong>
+                                                <strong>Invoice Type</strong>
                                             </th>
-                                            <!--
-                                                 <th name="td_sched_date_h">
-                                                 <strong>Scheduled Date</strong>
-                                                 </th>
-                                            -->
                                             <th>
                                                 <strong>Carrier</strong>
                                             </th>
@@ -318,6 +320,186 @@
                     </t>
                 </t>
             </t>
+        </template>
+        <report id="picking_operations_group_report" 
+        model="stock.picking" 
+        string="Picking with location" 
+        report_type="qweb-pdf" 
+        name="stock_multiple_picker.picking_operations_group_document" 
+        file="stock_picking_.picking_operations_group_document" />
+        <template id="picking_operations_group_document">
+            <t t-call="report.html_container">
+                <t t-foreach="docs.mapped('employee_ids')" t-as="employee">
+
+
+                    <t t-call="report.external_layout">
+                        <div class="page">
+                            <!-- HEADER -->
+                            <div t-if="employee">
+                                <span>
+                                    <strong>Picking Employee:</strong>
+                                    <br />
+                                    <span t-field="employee.name" />
+                                </span>
+                            </div>
+                            <h2>
+                                <span t-field="docs[0].picking_type_id" />
+                                :
+                                <span t-esc="', '.join(docs.mapped('name'))" />
+                            </h2>
+
+                            <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <strong>Box</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Picking</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Ref</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Created on</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Invoice Type</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Carrier</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Weight</strong>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="docs" t-as="o">
+                                         
+                                            <td>
+                                               <span t-field="o.box_label" />
+                                            </td>
+                                            <td>
+                                               <span t-field="o.name" />
+                                            </td>
+                                            <td>
+                                                <span t-field="o.partner_id.customer_no" />
+                                            </td>
+                                            <td>
+                                                <span t-esc="o.create_date[:10]" />
+                                            </td>
+                                            <td>
+                                                <span t-field="o.invoice_type_id" />
+                                            </td>
+                                            <td>
+                                                <span t-field="o.carrier_id" />
+                                            </td>
+                                            <td>
+                                                <span t-field="o.weight" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                           
+                             <t t-foreach="docs" t-as="o">
+                                
+                                <br />
+                                <br />
+                                <table class="table table-condensed" t-if="not o.pack_operation_ids">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <strong>Source</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Box</strong>
+                                            </th>
+                                            <th class="text-right">
+                                                <strong>Quantity</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Comment</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Product</strong>
+                                            </th>
+
+                                            <t t-if="o.picking_type_id.code != 'outgoing'">
+                                                <th>
+                                                    <strong>Destination</strong>
+                                                </th>
+                                            </t>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!--
+                                             <t t-set="move_lines" t-value="o.move_lines.sorted(key=lambda r: r.reserved_quant_ids[0].location_id.name)"/>
+                                        -->
+                                        <t t-set="total_quantity" t-value="0" />
+                                        <t t-set="total_weight" t-value="0.0" />
+
+
+                                        <!-- PLOCKRADER -->
+                                        
+                                        <tr t-foreach="docs.mapped('move_lines').sorted(key=lambda r: r.quant_source_location)" t-as="move">
+                                            <t t-if="employee == move.employee_id">
+                                                <t t-set="total_quantity" t-value="total_quantity + move.product_qty" />
+                                                <t t-set="line_weight" t-value="move.product_id.weight * move.product_qty" />
+                                                <t t-set="total_weight" t-value="total_weight + line_weight" />
+                                                <t t-if="(o.state != 'partially_available') or (move.reserved_availability &gt; 0)">
+                                                    <td>
+                                                        <span t-field="move.quant_source_location" />
+                                                    </td>
+                                                    <td>
+                                                        <span t-esc="o.box_label" />
+                                                     </td>
+                                                    <td class="text-right">
+                                                        <t t-if="o.state == 'partially_available'">
+                                                            <span t-field="move.reserved_availability" />
+                                                            <span t-field="move.product_id.uom_id" groups="product.group_uom" />
+                                                        </t>
+                                                        <t t-if="o.state != 'partially_available'">
+                                                            <span t-field="move.product_uom_qty" />
+                                                            <span t-field="move.product_uom" groups="product.group_uom" />
+                                                        </t>
+                                                    </td>
+                                                    <td class="text-right">
+                                                         <p t-field="o.note" />
+                                                    </td>
+                                                    <td>
+                                                        <span t-field="move.product_id" />
+                                                    </td>
+         
+                                                    <t t-if="o.picking_type_id.code != 'outgoing'">
+                                                        <td>
+                                                            <span t-field="move.location_dest_id" />
+                                                        </td>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-right">
+                                                <strong>Total</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="total_quantity" />
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="total_weight" />
+                                            </td>
+                                            <td />
+                                            <td />
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </t>
+                            </div>
+                        </t>
+                    </t>
+                </t>
+
         </template>
     </data>
 </openerp>

@@ -14,6 +14,7 @@
                     </group>
                     <footer>
                         <button name="set_picking_employee" string="Set Picking Employees" type="object" class="oe_highlight" />
+                        <button name="bach_picking" string="Bach Picking" type="object" class="oe_highlight" />
                             or
                         <button string="_Cancel" class="oe_link" special="cancel" />
                     </footer>
@@ -35,6 +36,16 @@
             <field name="state">code</field>
             <field name="code">
 action = { 'name':'Set Picking Employee','res_model':'stock.picking.multiple','view_model':'form','view_mode':'form','target':'new','type':'ir.actions.act_window','context':{'active_ids':env.context.get('active_ids', []) }  }
+            </field>
+        </record>
+            <record id="stock_picking_multi_action2" model="ir.actions.server">
+            <field name="name">Bach picking</field>
+            <field name="model_id" ref="stock.model_stock_picking" />
+            <field name="condition">True</field>
+            <field name="type">ir.actions.server</field>
+            <field name="state">code</field>
+            <field name="code">
+action = { 'name':'Bach Picking','res_model':'stock.picking.multiple','view_model':'form','view_mode':'form','target':'new','type':'ir.actions.act_window','context':{'active_ids':env.context.get('active_ids', []) }  }
             </field>
         </record>
         <record model="ir.values" id="stock_picking_menu_action">

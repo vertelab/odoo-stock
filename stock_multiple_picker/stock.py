@@ -32,6 +32,7 @@ class stock_picking(models.Model):
 
     qc_id = fields.Many2one(string='Controlled by', comodel_name='hr.employee')
     employee_ids = fields.Many2many(string="Pickers",comodel_name="hr.employee", compute='_employee_ids', search='_search_employee_ids')
+    box_label = fields.Char(string="Box Label")
 
     @api.one
     def _employee_ids(self):
@@ -51,9 +52,19 @@ class stock_picking(models.Model):
         
     @api.multi
     def print_picking_with_location2(self):
+        if len(self[0].employee_ids) > 0:
+            return self.env['report'].get_action(self, 'stock_multiple_picker.picking_operations_group_document')
+        else:
         # ~ raise Warning(self.context.get('active_ids'))
-        return { 'name':'Set Picking Employee','res_model':'stock.picking.multiple','view_model':'form','view_mode':'form','target':'new','type':'ir.actions.act_window' }
+           return { 'name':'Set Picking Employee','res_model':'stock.picking.multiple','view_model':'form','view_mode':'form','target':'new','type':'ir.actions.act_window' }
 
+    @api.multi
+    def enumerate_picking_boxes(self):
+        box_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+        i = 0
+        for picking in self:
+            picking.box_label = box_labels[i]
+            i += 1
 
 class stock_move(models.Model):
     _inherit = "stock.move"
