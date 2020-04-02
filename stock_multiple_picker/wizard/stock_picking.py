@@ -71,7 +71,7 @@ class stock_picking_wizard(models.TransientModel):
 
             
     @api.multi
-    def bach_picking(self):
+    def batch_picking(self):
 
         if self.force or not self.picking_ids.mapped('employee_id'):
             self.picking_ids.enumerate_picking_boxes()

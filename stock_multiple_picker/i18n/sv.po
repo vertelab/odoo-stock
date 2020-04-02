@@ -17,13 +17,13 @@ msgstr ""
 
 #. module: stock_multiple_picker
 #: view:stock.picking.multiple:stock_multiple_picker.stock_picking_wizard_form
-msgid "Bach Picking"
-msgstr "Bach Plocking"
+msgid "Batch Picking"
+msgstr "Partiplocking"
 
 #. module: stock_multiple_picker
 #: model:ir.actions.server,name:stock_multiple_picker.stock_picking_multi_action2
-msgid "Bach picking"
-msgstr "Bach plockning"
+msgid "Batch picking"
+msgstr "Partiplockning"
 
 #. module: stock_multiple_picker
 #: view:website:stock_multiple_picker.picking_operations_group_document
