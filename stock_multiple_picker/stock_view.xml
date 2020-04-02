@@ -7,7 +7,7 @@
              Koden fungerar lokalt, men inte på Tor. Då blir det konflikt.
              Koden är därför flyttad och skriven i annan fil:
              odoo-stock-extra / stock_dermanord / stock_view.xml
-             // jakob
+             // jako
              
              <record id="vpicktree" model="ir.ui.view">
              <field name="name">stock.picking.tree</field>

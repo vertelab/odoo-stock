@@ -60,14 +60,30 @@ class stock_picking_wizard(models.TransientModel):
                 
                 for idx,line in enumerate(picking.move_lines):
                     line.employee_id = self.employee_ids[idx % picker_count]
+                # TODO: AKTIVERA INNAN PUSH!
                 self.env['report'].print_document(picking, 'stock_multiple_picker.picking_operations_document')
 
-            # ~ self.env['report'].print_document(invoice, default_report)
+            #self.env['report'].print_document(invoice, default_report)
             return {'type': 'ir.actions.act_window_close'}
-            # ~ return self.env['report'].get_action(self.picking_ids, 'stock_multiple_picker.picking_operations_document')
+            # return self.env['report'].get_action(self.picking_ids, 'stock_multiple_picker.picking_operations_document')
         else:
             raise Warning(_('Picking Employee is already set.'))
 
-    # ~ @api.multi
-    # ~ def set_picking_employee2(self):
-        # ~ return {'type': 'ir.actions.act_window_close'}
+            
+    @api.multi
+    def bach_picking(self):
+
+        if self.force or not self.picking_ids.mapped('employee_id'):
+            self.picking_ids.enumerate_picking_boxes()
+            for picking in self.picking_ids:
+                picking.employee_id = self.employee_ids[0]
+                picker_count = len(self.employee_ids)
+                
+                for idx,line in enumerate(picking.move_lines):
+                    line.employee_id = self.employee_ids[idx % picker_count]
+                # TODO: AKTIVERA INNAN PUSH!
+                self.env['report'].print_document(picking, 'stock_multiple_picker.picking_operations_document')
+
+            return self.env['report'].get_action(self.picking_ids, 'stock_multiple_picker.picking_operations_group_document')
+        else:
+            raise Warning(_('Picking Employee is already set.'))
