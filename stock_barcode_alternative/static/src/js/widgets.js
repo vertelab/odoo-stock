@@ -122,6 +122,7 @@ function openerp_picking_alt_widgets(instance){
             if (place_first){
                 parent.place_first(this.id);
             }
+            picking.toggle_ui_elements();
         }
     });
     
@@ -257,6 +258,7 @@ function openerp_picking_alt_widgets(instance){
             var self = this;
             this._super();
             this.$('button.js_do_transfer').click(this.do_transfer);
+            this.$('button.js_pick_done').click(this.do_transfer);
             this.toggle_ui_elements();
             _.each(this.getChildren(), function(child){child.renderElement()});
         },
@@ -403,16 +405,48 @@ function openerp_picking_alt_widgets(instance){
         },
         toggle_ui_elements: function(){
             // Enable/disable buttons etc.
-            if (this.transfer_button_disabled()){
+            let tb_disabled = this.transfer_button_disabled();
+            if (tb_disabled){
                 this.$('.js_do_transfer').enable(false);
             } else {
                 this.$('.js_do_transfer').enable(true);
             }
+            if (this.rest_order_button_disabled(tb_disabled)){
+                this.$('.js_pick_done').enable(false);
+            } else {
+                this.$('.js_pick_done').enable(true);
+            }
         },
         transfer_button_disabled: function(){
             // Check if transfer button should be disabled.
-            // TODO: Disable unless something (everything?) has been moved.
-            return false;
+            // Disable unless everything has been moved.
+            let disabled = false;
+            for (let i = 0; i < this.rows.length; i++) {
+                if (this.rows[i].qty_remaining > 0){
+                    disabled = true;
+                    break;
+                }
+            }
+            return disabled;
+        },
+        rest_order_button_disabled: function(tb_disabled){
+            // Check if transfer button should be disabled.
+            // Disable unless everything has been moved.
+            if (!tb_disabled) {
+                return true;
+            }
+            let disabled = true;
+            let zero_done = true;
+            for (let i = 0; i < this.rows.length; i++) {
+                if (this.rows[i].qty_remaining > 0){
+                    disabled = false;
+                }
+                if (this.rows[i].qty_done > 0){
+                    zero_done = false;
+                }
+            }
+            console.log(this);
+            return zero_done ? true:disabled;
         },
         get_backend_url: function (){
             // Return the URL to go to this picking in /web
@@ -504,45 +538,20 @@ function openerp_picking_alt_widgets(instance){
             this.$('.js_clear_storage').click(function(){ self.storage.clear(); });
             //~ this.$('.js_reload_op').click(function(){ self.reload_pack_operation();});
 
-            $.when(this.loaded).done(function(result){
-                console.log(self);
-                self.set_picking(result.picking);
-                self.set_packages(result.packages);
-                self.set_packops(result.operations);
-                console.log(result.operations);
-                self.add_products(result.products);
-                
-                self.picking_editor = new module.PickingEditorWidget(self);
-                //self.picking_editor.load_rows();
-                self.picking_editor.replace(self.$('.oe_placeholder_picking_editor'));
-                console.log(self.picking_editor);
+            $.when(this.loaded).done(function(result){self.picking_loaded(result)}).fail(function(error) {console.log(error);});
 
-                //~ if( self.picking.id === self.pickings[0]){
-                    //~ self.$('.js_pick_prev').addClass('disabled');
-                //~ }else{
-                    //~ self.$('.js_pick_prev').removeClass('disabled');
-                //~ }
-
-                //~ if( self.picking.id === self.pickings[self.pickings.length-1] ){
-                    //~ self.$('.js_pick_next').addClass('disabled');
-                //~ }else{
-                    //~ self.$('.js_pick_next').removeClass('disabled');
-                //~ }
-                //~ if (self.picking.recompute_pack_op){
-                    //~ self.$('.oe_reload_op').removeClass('hidden');
-                //~ }
-                //~ else {
-                    //~ self.$('.oe_reload_op').addClass('hidden');
-                //~ }
-                //~ if (!self.show_pack){
-                    //~ self.$('.js_pick_pack').addClass('hidden');
-                //~ }
-                //~ if (!self.show_lot){
-                    //~ self.$('.js_create_lot').addClass('hidden');
-                //~ }
-
-            }).fail(function(error) {console.log(error);});
-
+        },
+        picking_loaded: function(result){
+            let self = this;
+            console.log(self);
+            self.set_picking(result.picking);
+            self.set_packages(result.packages);
+            self.set_packops(result.operations);
+            console.log(result.operations);
+            self.add_products(result.products);
+            self.picking_editor = new module.PickingEditorWidget(self);
+            self.picking_editor.replace(self.$('.oe_placeholder_picking_editor'));
+            console.log(self.picking_editor);
         },
         goto_picking: function(picking_id){
             // Switch to the given picking

@@ -38,7 +38,7 @@ class StockPicking(models.Model):
     def abc_get_model_fields(self, record):
         res = super(StockPicking, self).abc_get_model_fields(record)
         if record._name == 'stock.picking':
-            res += ['is_unifaun', 'unifaun_parcel_count', 'unifaun_parcel_weight']
+            res += ['is_unifaun', 'unifaun_parcel_count', 'unifaun_parcel_weight', ('unifaun_id', ['name', ('picking_ids', ['name'])])]
         return res
     
     @api.model

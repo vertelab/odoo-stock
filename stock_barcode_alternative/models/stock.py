@@ -67,7 +67,7 @@ class StockPicking(models.Model):
         def field_type(name):
             """Check the type of a field."""
             if name not in field_types:
-                _logger.warn('\n\n%s\n%s' % (name, records.fields_get([name], attributes=['type'])))
+                #_logger.warn('\n\n%s\n%s' % (name, records.fields_get([name], attributes=['type'])))
                 field_types[name] = records.fields_get([name], attributes=['type'])[name]['type']
             return field_types.get(name)
         for record in records:

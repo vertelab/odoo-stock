@@ -32,7 +32,7 @@ Adds Unifaun functionality to the alternative barcode interface.
     'website': 'http://www.vertel.se',
     'category': 'website',
     'sequence': 0,
-    'depends': ['stock_barcode_alternative'],
+    'depends': ['stock_barcode_alternative', 'delivery_unifaun_improved'],
     'demo': [],
     'data': [
         'views/stock_view.xml',
