@@ -15,8 +15,31 @@ function openerp_picking_alt_widgets_unifaun(instance){
     module.PickingEditorWidget = instance.stock_barcode_alternative.PickingEditorWidget.extend({
         init: function(parent, options){
             this._super(parent, options);
+            let unifaun_order = null;
+            let unifaun_group = false;
+            if (parent.picking){
+                unifaun_order = parent.picking.unifaun_id;
+            }
+            if (unifaun_order && unifaun_order.picking_ids && unifaun_order.picking_ids.length > 1) {
+                unifaun_group = true;
+                // Message not shown for some reason
+                //~ let msg = _t("This picking is a part of the Unifaun Group ") + unifaun_order.name + " (";
+                //~ let first = true;
+                //~ _.each(unifaun_order.picking_ids, function(picking){
+                    //~ if (! first){
+                        //~ msg += ", ";
+                        //~ first = false;
+                    //~ }
+                    //~ msg += picking.name;
+                //~ });
+                //~ parent.log_message(msg + ").", 'info');
+            }
             if (this.unifaun_no_order === null){
-                this.unifaun_no_order = false;
+                if (unifaun_group){
+                    this.unifaun_no_order = true;
+                } else {
+                    this.unifaun_no_order = false;
+                }
             }
             if (this.unifaun_parcel_count === null){
                 this.unifaun_parcel_count = 0;
@@ -38,7 +61,7 @@ function openerp_picking_alt_widgets_unifaun(instance){
             return fields.concat(['unifaun_no_order', 'unifaun_parcel_count', 'unifaun_parcel_weight'])
         },
         unifaun_update_packages: function(){
-            // Update Unifaun data whne changes are made in GUI.
+            // Update Unifaun data when changes are made in GUI.
             console.log('unifaun_update_packages');
             console.log(this);
             var suppress = this.$('#abc_dn_unifaun_active').prop('checked');
@@ -86,6 +109,16 @@ function openerp_picking_alt_widgets_unifaun(instance){
                 return true;
             }
             return this._super();
+        },
+        rest_order_button_disabled: function(tb_disabled){
+            // Check if transfer button should be disabled.
+            var suppress = this.$('#abc_dn_unifaun_active').prop('checked');
+            var parcel_count = parseInt(this.$('#abc_dn_unifaun_nr_packages').val()) || 0;
+            var parcel_weight = parseFloat(this.$('#abc_dn_unifaun_weight').val()) || 0.0;
+            if (!(! this.getParent().picking.is_unifaun || this.unifaun_no_order || (this.unifaun_parcel_count > 0 && this.unifaun_parcel_weight > 0))){
+                return true;
+            }
+            return this._super(tb_disabled);
         }
     });
 }

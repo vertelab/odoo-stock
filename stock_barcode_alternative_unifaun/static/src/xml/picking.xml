@@ -3,7 +3,14 @@
     <t t-extend="AlternativePickingEditorWidget">
         <t t-jquery="#abc_buttons_header" t-operation="after">
             <div t-att-class="widget.getParent().picking.is_unifaun ? 'row' : 'row hidden'" id="abc_dn_packages_area">
-                <h4 class="col-xs-12">Unifaun Data</h4>
+                <h4 class="col-xs-12">
+                    Unifaun Data
+                    <t  t-if="widget.getParent().picking.unifaun_id">
+                        <a target="_blank" t-att-href="'/web#id=' + widget.getParent().picking.unifaun_id.id + '&amp;view_type=form&amp;model=unifaun.order'">
+                            <t t-esc="widget.getParent().picking.unifaun_id.name"/>
+                        </a>
+                    </t>
+                </h4>
                 <div class="col-xs-12 col-sm-4 col-md-4">
                     <input type="checkbox" id="abc_dn_unifaun_active" name="abc_dn_unifaun_active" t-att="{'checked': widget.unifaun_no_order || undefined}"/>
                     <span class="dn_wrapping_label col-xs-12 col-md-6">Do not book transport</span>
