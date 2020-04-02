@@ -749,7 +749,7 @@ function openerp_picking_alt_widgets(instance){
             var first = true;
             _.each(msg.split('\n'), function(m){
                 var p = $('<p class="abc-message-row"></p>');
-                p.text(m);
+                p.html(m);
                 var chevron = $('<span class="abc-message-chevron"></span>');
                 if (first){
                     chevron.append($('<i class="fa fa-chevron-right"></i>'));

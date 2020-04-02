@@ -218,6 +218,9 @@ class StockPicking(models.Model):
             res_invoice['id'] = invoice.id
             res_invoice['name'] = invoice.name
             res['results']['invoice'] = 'created'
+            invoice_menu = self.env.ref('account.menu_action_invoice_tree1')
+            res_invoice['url'] = "/web#id=%s&view_type=form&model=account.invoice&menu_id=%s&action=%s" % (invoice.id, invoice_menu.id, invoice_menu.action.id)
+            res['messages'].append(u'Created an <a taret="_blank" href="%s">invoice</a>.' % res_invoice['url'])
         except Exception as e:
             res['results']['invoice'] = 'failure'
             res['warnings'].append((
