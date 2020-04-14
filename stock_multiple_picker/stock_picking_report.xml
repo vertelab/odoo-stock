@@ -218,7 +218,12 @@
                                                     -->
                                                     <t t-if="o.picking_type_id.code != 'outgoing'">
                                                         <td>
-                                                            <span t-field="move.location_dest_id" />
+                                                            <t t-if="move.product_id.stock_location_id and move.location_dest_id.search_count([('id', '=', move.product_id.stock_location_id.id), ('id', 'child_of', move.location_dest_id.id)])">
+                                                                <span t-field="move.product_id.stock_location_id" />
+                                                            </t>
+                                                            <t t-if="not (move.product_id.stock_location_id and move.location_dest_id.search_count([('id', '=', move.product_id.stock_location_id.id), ('id', 'child_of', move.location_dest_id.id)]))">
+                                                                <span t-field="move.location_dest_id" />
+                                                            </t>
                                                         </td>
                                                     </t>
                                                 </t>
