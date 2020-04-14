@@ -95,6 +95,6 @@ class stock_picking_wizard(models.TransientModel):
                 # TODO: AKTIVERA INNAN PUSH!
                 self.env['report'].print_document(picking, 'stock_multiple_picker.picking_operations_document')
 
-            return self.env['report'].get_action(stock_moves, 'stock_multiple_picker.picking_operations_group_document')
+            return self.env['report'].print_document(stock_moves, 'stock_multiple_picker.picking_operations_group_document')
         else:
             raise Warning(_('Picking Employee is already set.'))
