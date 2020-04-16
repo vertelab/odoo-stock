@@ -1,13 +1,13 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* stock_barcode_wrapping_dermanord
+#	* stock_barcode_alternative
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 8.0-20170901\n"
+"Project-Id-Version: Odoo Server 8.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-23 06:56+0000\n"
-"PO-Revision-Date: 2019-09-23 06:56+0000\n"
+"POT-Creation-Date: 2020-04-14 14:35+0000\n"
+"PO-Revision-Date: 2020-04-14 14:35+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -15,154 +15,121 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
-#. module: stock_barcode_wrapping_dermanord
-#. openerp-web
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:65
+#. module: stock_barcode_alternative
+#: code:addons/stock_barcode_alternative/models/stock.py:254
 #, python-format
-msgid "# of Packages"
-msgstr "Antal paket"
+msgid "Created and confirmed invoice %s"
+msgstr "Skapade och godkände faktura %s"
 
-#. module: stock_barcode_wrapping_dermanord
-#. openerp-web
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:20
-#, python-format
-msgid "Calculated weight"
-msgstr "Beräknad vikt"
+#. module: stock_barcode_alternative
+#: view:website:stock_barcode_alternative.barcode_index
+msgid "Barcode Scanner"
+msgstr "Streckkodsläsare"
 
-#. module: stock_barcode_wrapping_dermanord
+#. module: stock_barcode_alternative
 #. openerp-web
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:73
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:137
 #, python-format
-msgid "Calculated:"
-msgstr "Beräknad:"
+msgid "Clear Data"
+msgstr "Rensa data"
 
-#. module: stock_barcode_wrapping_dermanord
+#. module: stock_barcode_alternative
 #. openerp-web
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:97
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:102
 #, python-format
-msgid "Create Backorder"
+msgid "Create Package"
+msgstr "Skapa paket"
+
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:81
+#, python-format
+msgid "Create backorder"
 msgstr "Skapa restorder"
 
-#. module: stock_barcode_wrapping_dermanord
+#. module: stock_barcode_alternative
 #. openerp-web
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:30
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:93
 #, python-format
 msgid "Filter by location..."
 msgstr "Filtrera efter plats..."
 
-#. module: stock_barcode_wrapping_dermanord
-#: code:addons/stock_barcode_wrapping_dermanord/stock.py:284
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:117
 #, python-format
-msgid "Label printed to %s."
-msgstr "Etikett utskriven på %s."
+msgid "From"
+msgstr "Från"
 
-#. module: stock_barcode_wrapping_dermanord
-#: code:addons/stock_barcode_wrapping_dermanord/stock.py:274
-#, python-format
-msgid "No Unifaun label found!"
-msgstr "Hittade ingen Unifaun-etikett!"
-
-#. module: stock_barcode_wrapping_dermanord
-#: code:addons/stock_barcode_wrapping_dermanord/stock.py:267
-#, python-format
-msgid "No label printer has been defined for you! Please check the print settings on the report 'Unifaun Label Print Settings'"
-msgstr "Ingen etikettskrivare är inställd för dig! Vänligen kontrollera inställningarna på rapporten 'Inställningar för utskrift av Unifaun-etikett'"
-
-#. module: stock_barcode_wrapping_dermanord
-#: field:stock.pack.operation,dn_offer_product:0
-msgid "Offer"
-msgstr "Offer"
-
-#. module: stock_barcode_wrapping_dermanord
-#: model:ir.model,name:stock_barcode_wrapping_dermanord.model_stock_picking
+#. module: stock_barcode_alternative
+#: model:ir.model,name:stock_barcode_alternative.model_stock_picking
 msgid "Packing List"
-msgstr "Plockista"
+msgstr "Plocklista"
 
-#. module: stock_barcode_wrapping_dermanord
-#: model:ir.model,name:stock_barcode_wrapping_dermanord.model_stock_pack_operation
-msgid "Packing Operation"
-msgstr "Packoperation"
+#. module: stock_barcode_alternative
+#: model:ir.model,name:stock_barcode_alternative.model_stock_transfer_details
+msgid "Picking wizard"
+msgstr "Plock wizard"
 
-#. module: stock_barcode_wrapping_dermanord
-#: model:ir.model,name:stock_barcode_wrapping_dermanord.model_stock_quant_package
-msgid "Physical Packages"
-msgstr "Fysiska emballage"
+#. module: stock_barcode_alternative
+#: model:ir.model,name:stock_barcode_alternative.model_stock_transfer_details_items
+msgid "Picking wizard items"
+msgstr "Plock wizard produkter"
 
-#. module: stock_barcode_wrapping_dermanord
+#. module: stock_barcode_alternative
 #. openerp-web
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:46
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:82
 #, python-format
-msgid "Print Invoice"
-msgstr "Fakturautskrift"
+msgid "Print"
+msgstr "Utskrift"
 
-#. module: stock_barcode_wrapping_dermanord
+#. module: stock_barcode_alternative
 #. openerp-web
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:45
-#: view:stock.picking:stock_barcode_wrapping_dermanord.view_picking_unifaun_dn_form
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:113
 #, python-format
-msgid "Print Label"
-msgstr "Skriv ut etikett"
-
-#. module: stock_barcode_wrapping_dermanord
-#: model:ir.model,name:stock_barcode_wrapping_dermanord.model_product_product
 msgid "Product"
 msgstr "Produkt"
 
-#. module: stock_barcode_wrapping_dermanord
-#: code:addons/stock_barcode_wrapping_dermanord/stock.py:281
-#, python-format
-msgid "Report"
-msgstr "Rapport"
-
-#. module: stock_barcode_wrapping_dermanord
+#. module: stock_barcode_alternative
 #. openerp-web
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:47
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:103
 #, python-format
-msgid "Send Invoice E-mail"
-msgstr "Skicka fakturamejl"
+msgid "Put in Cart"
+msgstr "Lägg i kundvagn"
 
-#. module: stock_barcode_wrapping_dermanord
+#. module: stock_barcode_alternative
 #. openerp-web
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:22
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:114
 #, python-format
-msgid "Set Weight"
-msgstr "Sätt vikt"
+msgid "Scanned"
+msgstr "Skannad"
 
-#. module: stock_barcode_wrapping_dermanord
-#: code:addons/stock_barcode_wrapping_dermanord/stock.py:444
-#, python-format
-msgid "The pick list contains deviations"
-msgstr "Plocksedeln innehåller avvikelser"
+#. module: stock_barcode_alternative
+#: model:ir.model,name:stock_barcode_alternative.model_stock_picking_type
+msgid "The picking type determines the picking view"
+msgstr "Plocktypen bestämmer plockvyn"
 
-#. module: stock_barcode_wrapping_dermanord
+#. module: stock_barcode_alternative
 #. openerp-web
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:70
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:118
 #, python-format
-msgid "Total Weight"
-msgstr "Totalvikt"
+msgid "To"
+msgstr "Till"
 
-#. module: stock_barcode_wrapping_dermanord
+#. module: stock_barcode_alternative
 #. openerp-web
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:63
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:116
 #, python-format
-msgid "Unifaun Data"
-msgstr "Unifaundata"
+msgid "Todo"
+msgstr "Att göra"
 
-#. module: stock_barcode_wrapping_dermanord
-#: model:ir.actions.report.xml,name:stock_barcode_wrapping_dermanord.dummy_report_unifaun_label
-msgid "Unifaun Label Print Settings"
-msgstr "Inställningar för utskrift av Unifaun-etikett"
+#. module: stock_barcode_alternative
+#: view:stock.picking.type:stock_barcode_alternative.stock_picking_type_kanban
+msgid "abc_open_barcode_interface"
+msgstr "abc_open_barcode_interface"
 
-#. module: stock_barcode_wrapping_dermanord
-#. openerp-web
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:21
-#: code:addons/stock_barcode_wrapping_dermanord/static/src/xml/picking.xml:73
-#, python-format
-msgid "kg"
-msgstr "kg"
-
-#. module: stock_barcode_wrapping_dermanord
-#: view:stock.picking:stock_barcode_wrapping_dermanord.view_picking_unifaun_dn_form
-msgid "{'invisible': ['|', ('state', 'not in', ('assigned', 'partially_available')), ('pack_operation_ids', '!=', [])]}"
-msgstr "{'invisible': ['|', ('state', 'not in', ('assigned', 'partially_available')), ('pack_operation_ids', '!=', [])]}"
+#. module: stock_barcode_alternative
+#: view:stock.picking:stock_barcode_alternative.view_picking_form
+msgid "abc_open_picking"
+msgstr "abc_open_picking"
 
