@@ -114,7 +114,7 @@ class StockPicking(models.Model):
         if record._name == 'stock.transfer_details_items':
             return [
                     ('product_id', ['display_name']),
-                    ('product_uom_id', ['display_name']),
+                    ('product_uom_id', ['display_name', 'factor']),
                     'quantity',
                     ('package_id', []),
                     ('packop_id', []),
@@ -128,6 +128,8 @@ class StockPicking(models.Model):
                     'display_name',
                     'default_code',
                     'ean13',
+                    'weight',
+                    ('uom_id', ['display_name', 'factor']),
                 ]
         return ['id']
     

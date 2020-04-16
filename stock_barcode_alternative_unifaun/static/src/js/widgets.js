@@ -62,8 +62,6 @@ function openerp_picking_alt_widgets_unifaun(instance){
         },
         unifaun_update_packages: function(){
             // Update Unifaun data when changes are made in GUI.
-            console.log('unifaun_update_packages');
-            console.log(this);
             var suppress = this.$('#abc_dn_unifaun_active').prop('checked');
             if (suppress) {
                 var parcel_count = 0;
@@ -99,6 +97,12 @@ function openerp_picking_alt_widgets_unifaun(instance){
                 return this._super();
             };
             this.getParent().log_message("You must set # of packages and weight to complete a Unifaun order.", 'warning');
+        },
+        toggle_ui_elements: function(){
+            // Update UI when changes are made to Unifaun data.
+            var el_weight = this.$('#dn_wrapping_weight_calculated');
+            el_weight.text(this.get_weight().toFixed(3));
+            return this._super();
         },
         transfer_button_disabled: function(){
             // Check if transfer button should be disabled.
