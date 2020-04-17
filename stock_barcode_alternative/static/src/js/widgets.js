@@ -185,9 +185,9 @@ function openerp_picking_alt_widgets(instance){
                 } else if (el2.id == packop_id) {
                     return 1;
                 }
-                // Calculate row weights for sorting. -1 (red), 0 (green) or 1 (yellow)
-                let weight1 = el1.data.qty_remaining == 0 ? 0 : el1.data.qty_remaining / Math.abs(el1.data.qty_remaining);
-                let weight2 = el2.data.qty_remaining == 0 ? 0 : el2.data.qty_remaining / Math.abs(el2.data.qty_remaining);
+                // Calculate row weights for sorting. -1 (red), 1 (yellow), or 2 (green)
+                let weight1 = el1.data.qty_remaining == 0 ? 2 : el1.data.qty_remaining / Math.abs(el1.data.qty_remaining);
+                let weight2 = el2.data.qty_remaining == 0 ? 2 : el2.data.qty_remaining / Math.abs(el2.data.qty_remaining);
                 if (weight1 < weight2){
                     return -1;
                 } else if (weight1 > weight2){
