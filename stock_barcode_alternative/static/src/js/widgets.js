@@ -185,9 +185,9 @@ function openerp_picking_alt_widgets(instance){
                 } else if (el2.id == packop_id) {
                     return 1;
                 }
-                // Calculate row weights for sorting. -1 (red), 0 (green) or 1 (yellow)
-                let weight1 = el1.data.qty_remaining == 0 ? 0 : el1.data.qty_remaining / Math.abs(el1.data.qty_remaining);
-                let weight2 = el2.data.qty_remaining == 0 ? 0 : el2.data.qty_remaining / Math.abs(el2.data.qty_remaining);
+                // Calculate row weights for sorting. -1 (red), 1 (yellow), or 2 (green)
+                let weight1 = el1.data.qty_remaining == 0 ? 2 : el1.data.qty_remaining / Math.abs(el1.data.qty_remaining);
+                let weight2 = el2.data.qty_remaining == 0 ? 2 : el2.data.qty_remaining / Math.abs(el2.data.qty_remaining);
                 if (weight1 < weight2){
                     return -1;
                 } else if (weight1 > weight2){
@@ -626,19 +626,23 @@ function openerp_picking_alt_widgets(instance){
         },
         add_products: function(products){
             // Add new products to the list
-            var new_products = [];
-            // Filter out the current products that aren't in the new list and save them.
-            // TODO: Don't we link to these objects somewhere else? What happens to that when we replace them here?
-            _.filter(
-                this.products,
-                function(e, pos, l){
-                    return _.filter(products, function(e2, pos2, l2){
-                            return e2.id == e.id;
-                    }).length == 0;
+            let self = this;
+            _.each(products, function(product){
+                // Check if the product is already in the list.
+                let current_product = _.filter(
+                    self.products,
+                    function(e, pos, l){
+                        return e.id == product.id;
+                });
+                current_product = current_product.length > 0 ? current_product[0]: null;
+                if (current_product){
+                    // Update the existing product
+                    $.extend(current_product, product);
+                } else {
+                    // Add the new product
+                    self.products.push(product);
                 }
-            )
-            _.each(products, function(product){new_products.push(product);})
-            this.products = new_products;
+            })
             this.save('products');
         },
         quit: function(){
