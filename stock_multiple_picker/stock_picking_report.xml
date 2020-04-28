@@ -464,9 +464,12 @@
                             <td style="border-style:dashed;">
                               <span t-esc="o.picking_id.box_label" />
                             </td>
+
+
                             <td style="border-style:dashed;" class="text-right">
-                              <p t-field="o.picking_id.note" />
+                           <p t-field="o.product_id.picking_comment"/>
                             </td>
+                  
                   
                           </t>
                           <t t-if="not o.quant_source_location == sorted_docs[o_index - 1].quant_source_location">
@@ -490,7 +493,7 @@
                               <span t-esc="o.picking_id.box_label" />
                             </td>
                             <td class="text-right">
-                              <p t-field="o.picking_id.note" />
+                               <p t-field="o.product_id.picking_comment"/>
                             </td>
                           </t>
                         </t>
@@ -515,7 +518,7 @@
                             <span t-esc="o.picking_id.box_label" />
                           </td>
                          <td class="text-right">
-                            <p t-field="o.picking_id.note" />
+                            <p t-field="o.product_id.picking_comment"/>
                           </td>
                         </t>
                       </t>
