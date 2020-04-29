@@ -71,4 +71,23 @@ class stock_move(models.Model):
 
     employee_id = fields.Many2one(string='Picking employee', comodel_name='hr.employee')
 
+    @api.multi
+    def batch_report_get_lines(self):
+        res = []
+        qty = 0
+        last_move = None
+        for i, move in enumerate(self):
+            next_move = i + 1 < len(self) and self[i + 1]
+            if next_move and move.product_id == next_move.product_id and move.picking_id.box_label == next_move.picking_id.box_label and move.quant_source_location == next_move.quant_source_location:
+                qty += move.product_uom_qty
+            else:
+                qty += move.product_uom_qty
+                same_location = False
+                if last_move and last_move.quant_source_location == move.quant_source_location:
+                    same_location = True
+                res.append((move, int(qty), same_location))
+                last_move = move
+                qty = 0.0
+        return res
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

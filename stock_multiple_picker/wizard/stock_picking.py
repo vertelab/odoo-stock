@@ -42,12 +42,11 @@ class stock_picking_wizard(models.TransientModel):
         return picking_id
 
     def _default_picking_ids(self):
-        # ~ raise Warning(self._context )
         picking_ids = self._context.get('active_ids')
         return picking_ids
+
     employee_ids = fields.Many2many(comodel_name='hr.employee', string='Picking Employee', default=_default_employee_id, required=True)
-    # ~ picking_id = fields.Many2one('stock.picking', 'Stock Picking', default=_default_picking_id, required=True)
-    picking_ids = fields.Many2many( comodel_name='stock.picking', string='Stock Picking', default=_default_picking_ids, required=True)
+    picking_ids = fields.Many2many(comodel_name='stock.picking', string='Stock Picking', default=_default_picking_ids, required=True)
     force = fields.Boolean('Replace Current Picking Employee')
 
     @api.multi
@@ -56,13 +55,20 @@ class stock_picking_wizard(models.TransientModel):
         if self.force or not self.picking_ids.mapped('employee_id'):
             for picking in self.picking_ids:
                 picking.employee_id = self.employee_ids[0]
-                picker_count = len(self.employee_ids)
-                
-                for idx,line in enumerate(picking.move_lines):
-                    line.employee_id = self.employee_ids[idx % picker_count]
-                # TODO: AKTIVERA INNAN PUSH!
-                self.env['report'].print_document(picking, 'stock_multiple_picker.picking_operations_document')
-
+                picking.employee_ids = self.employee_ids
+            last_move = None
+            picker_count = len(self.employee_ids)
+            i = 0
+            for move in self.picking_ids.mapped('move_lines').sorted(lambda m: m.product_id):
+                if last_move and last_move.product_id == move.product_id:
+                    move.employee_id = last_move.employee_id
+                else:
+                    move.employee_id = self.employee_ids[i]
+                    i += 1
+                    if i == picker_count:
+                        i = 0
+                last_move = move
+            self.env['report'].print_document(self.picking_ids, 'stock_multiple_picker.picking_operations_document')
             #self.env['report'].print_document(invoice, default_report)
             return {'type': 'ir.actions.act_window_close'}
             # return self.env['report'].get_action(self.picking_ids, 'stock_multiple_picker.picking_operations_document')
@@ -73,7 +79,7 @@ class stock_picking_wizard(models.TransientModel):
     @api.multi
     def batch_picking(self):
 
-        """
+        """§
         We use stock_moves as our "docs" variable in the xml. For sorting reasons.
         With picking_id we reach the parent (stock.picking).
 
@@ -81,20 +87,9 @@ class stock_picking_wizard(models.TransientModel):
 
         if self.force or not self.picking_ids.mapped('employee_id'):
             self.picking_ids.enumerate_picking_boxes()
-
             stock_moves = self.env['stock.move'].search([('picking_id', 'in', self.picking_ids.ids)])
+            self.set_picking_employee()
 
-            for picking in self.picking_ids:
-                picking.employee_id = self.employee_ids[0]
-                picker_count = len(self.employee_ids)
-                
-                for idx,line in enumerate(picking.move_lines):
-                    line.employee_id = self.employee_ids[idx % picker_count]
-                
-
-                # TODO: AKTIVERA INNAN PUSH!
-                self.env['report'].print_document(picking, 'stock_multiple_picker.picking_operations_document')
-
-            return self.env['report'].print_document(stock_moves, 'stock_multiple_picker.picking_operations_group_document')
+            return self.env['report'].get_action(stock_moves, 'stock_multiple_picker.picking_operations_group_document')
         else:
             raise Warning(_('Picking Employee is already set.'))
