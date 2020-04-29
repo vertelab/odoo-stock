@@ -319,7 +319,9 @@ $(document).ready(function() {
                 })
         }
         }, 500);
-        
-        
+    
+    $('form').submit(function() {
+        $('.odoo-qm-transfer-button').addClass('disabled');
+    })
         
 });
