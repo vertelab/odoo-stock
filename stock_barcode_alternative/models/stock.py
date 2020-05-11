@@ -298,6 +298,6 @@ class StockPickingType(models.Model):
     def abc_open_barcode_interface(self):
         return {
             'type': 'ir.actions.act_url',
-            'target': 'current',
+            'target': 'self',
             'url': '/barcode2/web',
         }
