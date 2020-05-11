@@ -28,7 +28,10 @@ _logger = logging.getLogger(__name__)
 
 class StockSquickMove(http.Controller):
 
-    @http.route(['/stock/quickmove', '/stock/quickmove/picking/<model("stock.picking"):picking>','/stock/quickmove/pickingtype/<model("stock.picking.type"):picking_type_id>'], type='http', auth='user', website=True)
+    @http.route(['/stock/quickmove',
+                 '/stock/quickmove/picking/<model("stock.picking"):picking>',
+                 '/stock/quickmove/pickingtype/<model("stock.picking.type"):picking_type_id>'],
+                type='http', auth='user', website=True)
     def stock_quickmove(self, picking=None, picking_type_id = None, **post):
         if request.httprequest.method == 'POST':
             _logger.warn(post)
