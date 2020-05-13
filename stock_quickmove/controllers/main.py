@@ -220,7 +220,7 @@ class StockSquickMove(http.Controller):
         stock_warehouse_ids = request.env['stock.warehouse'].search([])
         # stock_location = request.env.ref('stock.stock_location_stock')
         # ~ quants = request.env['stock.quant'].search([('product_id','=',product_id),('location_id','child_of',stock_location.id)])
-        quants = request.env['stock.quant'].search([('product_id','=',int(product_id)),('location_id','child_of',stock_warehouse_ids.mapped('lot_stock_id.id'))])
+        quants = request.env['stock.quant'].search([('product_id','=',int(product_id)), ('location_id', 'child_of', stock_warehouse_ids.mapped('lot_stock_id.id') + stock_warehouse_ids.mapped('wh_qc_stock_loc_id.id'))])
         for location in quants.mapped('location_id'):
             product_locations.append({
                 'qty':sum(quants.filtered(lambda q: q.location_id == location).mapped('qty')),
