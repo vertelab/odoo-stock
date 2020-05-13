@@ -214,6 +214,7 @@ class product_template(models.Model):
 
 class product_product(models.Model):
     _inherit = "product.product"  
+    is_offer = fields.Boolean(string='Offer')
         
     @api.model
     def offer_bom_account_create(self, line):
