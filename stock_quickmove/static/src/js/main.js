@@ -196,6 +196,8 @@ function quickmove_start_scanner() {
                 location_src_scanned = false;
             }
             $(".red-alert-message-undefined").addClass("hidden");
+            $('#quickmove_location_src_id').select9('focus'); 
+
         })
         })
 }
@@ -220,6 +222,7 @@ function quickmove_inventory_start_scanner() {
                 $('select#inventory_product_search').append(newOption).trigger('change');
                 location_src_scanned = true;
                 $(".red-alert-message-undefined").addClass("hidden");
+                    
                 } else {
                     $(".red-alert-message-undefined").removeClass("hidden");
                 }
@@ -233,6 +236,7 @@ function quickmove_inventory_start_scanner() {
 
     })
 };
+
 
 $(document).ready(function() {
     var website = openerp.website;
@@ -280,10 +284,14 @@ $(document).ready(function() {
                     }
                     else {
                     update_product_lines(result);
+                    if ($('select#quickmove_location_src_id').val()){
+                        $('#quickmove_location_dest_id').select9('focus');
+                    }
                 }
             });
         }
     }
+
     $("select#quickmove_product_search").on('change.select9', quickmove_product_change);
     $("select#quickmove_location_src_id").on('change.select9', quickmove_product_change);
         
@@ -316,6 +324,13 @@ $(document).ready(function() {
                     }).done(function(result){
                         var newOption = new Option(result.location_name, result.location_id, false, true);
                         $('select#quickmove_location_src_id').append(newOption).trigger('change');
+
+                    if ($('select#quickmove_location_src_id').val()){
+                        $('#quickmove_location_dest_id').select9('focus');
+                     }
+                     else{
+                        $('#quickmove_location_src_id').select9('focus');
+                     }
                 })
         }
         }, 500);
