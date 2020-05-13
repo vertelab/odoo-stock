@@ -424,7 +424,7 @@
                 <tbody>
                   <t t-set="total_quantity" t-value="0" />
                   <t t-set="total_weight" t-value="0.0" />
-                  <t t-set="sorted_docs" t-value="docs.with_context(employee_id=employee.id).filtered(lambda m: m.employee_id.id == m.env.context.get('employee_id') and ((m.picking_id.state != 'partially_available') or (m.reserved_availability &gt; 0)))" />
+                  <t t-set="sorted_docs" t-value="docs.with_context(employee_id=employee.id).filtered(lambda m: m.employee_id.id == m.env.context.get('employee_id') and not m.product_id.is_offer and ((m.picking_id.state != 'partially_available') or (m.reserved_availability &gt; 0)))" />
                   <!-- PLOCKRADER -->
                   <tr t-foreach="sorted_docs.batch_report_get_lines()" t-as="line">
                     <t t-set="o" t-value="line[0]" />
