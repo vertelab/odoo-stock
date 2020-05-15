@@ -269,7 +269,7 @@ class StockPicking(models.Model):
     def abc_open_picking(self):
         return {
             'type': 'ir.actions.act_url',
-            'target': 'new',
+            'target': 'self',
             'url': '/barcode2/web#picking_id=%s' % self.id,
         }
     
