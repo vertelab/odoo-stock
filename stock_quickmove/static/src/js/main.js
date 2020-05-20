@@ -310,7 +310,7 @@ $(document).ready(function() {
     // focus = focus ? focus : 'quickmove_product_search';
     $('#' + focus).select9('open');
     if ($('#' + focus).val()){
-         $('#quickmove_location_dest_id').select9('focus');
+         $('#quickmove_location_dest_id').select9('open');
     }
 
 
