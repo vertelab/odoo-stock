@@ -198,7 +198,7 @@ function quickmove_start_scanner() {
                 location_src_scanned = false;
             }
             $(".red-alert-message-undefined").addClass("hidden");
-            $('#quickmove_location_src_id').select9('focus'); 
+            $('#quickmove_location_src_id').select9('open'); 
 
         })
         })
@@ -308,7 +308,10 @@ $(document).ready(function() {
 
     var focus = $.bbq.getState('focus');
     // focus = focus ? focus : 'quickmove_product_search';
-    $('#' + focus).select9('focus');
+    $('#' + focus).select9('open');
+    if ($('#' + focus).val()){
+         $('#quickmove_location_dest_id').select9('focus');
+    }
 
 
     // fix for random problem with templates not loaded in time
@@ -332,10 +335,10 @@ $(document).ready(function() {
                         $('select#quickmove_location_src_id').append(newOption).trigger('change');
 
                     if ($('select#quickmove_location_src_id').val()){
-                        $('#quickmove_location_dest_id').select9('focus');
+                        $('#quickmove_location_dest_id').select9('open');
                      }
                      else{
-                        $('#quickmove_location_src_id').select9('focus');
+                        $('#quickmove_location_src_id').select9('open');
                      }
                 })
         }
