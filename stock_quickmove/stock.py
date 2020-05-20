@@ -30,5 +30,6 @@ class stock_picking_type(models.Model):
     _inherit = "stock.picking.type"
     @api.multi
     def open_quickmove_interface(self):
-        final_url = "/stock/quickmove/pickingtype/%s"%self.id
+        final_url = "/stock/quickmove/pickingtype/%s#focus=quickmove_location_src_id"%self.id
         return {'type': 'ir.actions.act_url', 'url': final_url, 'target': 'self'}
+

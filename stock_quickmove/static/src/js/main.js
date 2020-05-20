@@ -54,6 +54,8 @@ function quickmove_remove(e) {
     var tr = e.closest("tr").remove();
 }
 
+
+
 // inventory
 function quickmove_adjust(e) {
     var tr = e.parents('tr'),
@@ -78,7 +80,7 @@ function set_confirm_enabled(e) {
     elm.addClass('red_icon');
 }
 
-(function($){
+(function($){       
 
     $.barcodeListener = function(context, options){
 
@@ -270,7 +272,6 @@ $(document).ready(function() {
     function quickmove_product_change(){
     
         var self = $(this);
-
         var product_id = $('select#quickmove_product_search').val();
         var location_id = $('select#quickmove_location_src_id').val();
         
@@ -304,7 +305,12 @@ $(document).ready(function() {
             dataType: 'json'
         }
     });
-    
+
+    var focus = $.bbq.getState('focus');
+    // focus = focus ? focus : 'quickmove_product_search';
+    $('#' + focus).select9('focus');
+
+
     // fix for random problem with templates not loaded in time
     setTimeout(function () {
         $("select#inventory_product_search").on('change.select9', function() {
