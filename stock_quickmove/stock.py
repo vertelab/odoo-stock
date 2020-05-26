@@ -26,9 +26,19 @@ import simplejson
 import logging
 _logger = logging.getLogger(__name__)
 
-class stock_picking_type(models.Model):
-    _inherit = "stock.picking.type"
+class StockPickingType(models.Model):
+    _inherit = 'stock.picking.type'
+
     @api.multi
     def open_quickmove_interface(self):
-        final_url = "/stock/quickmove/pickingtype/%s"%self.id
+        final_url = "/stock/quickmove/pickingtype/%s" % self.id
+        return {'type': 'ir.actions.act_url', 'url': final_url, 'target': 'self'}
+
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    @api.multi
+    def open_quickmove_interface(self):
+        final_url = "/stock/quickmove/picking/%s" % self.id
         return {'type': 'ir.actions.act_url', 'url': final_url, 'target': 'self'}

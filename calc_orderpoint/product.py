@@ -45,6 +45,7 @@ class product_template(models.Model):
     last_sales_count = fields.Datetime('Last Sales Compute', help="The last point in time when # Sales, Consumption per Day, Orderpoint, Virtual Available Days, and Instock Percent were computed.")
     earliest_sales_count = fields.Datetime('Earliest Sales Compute', help="Don't try to recompute before this time. Set when compute fails for a product.")
     virtual_available_delay = fields.Float('Delay', default=0,help="Number of days before refill of stock")
+    virtual_available_netto = fields.Float('Virtual available netto', default=0,help="virtual available minus incoming")
     is_out_of_stock = fields.Boolean(string='Is out of stock',help='Check this box to ensure not to sell this product due to stock outage (instock_percent = 0)')
     
     @api.one
@@ -59,8 +60,10 @@ class product_template(models.Model):
         self.consumption_per_year = sum([p.consumption_per_year for p in self.product_variant_ids])
         delay = min([p.virtual_available_delay for p in self.product_variant_ids])
         self.virtual_available_delay = delay
+        self.virtual_available_netto = self.virtual_available - self.incoming_qty
+        raise Warning(self.virtual_available, self.incoming_qty)
         self.orderpoint_computed = self.consumption_per_day * delay
-        self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
+        self.virtual_available_days = self.virtual_available_netto/ (self.consumption_per_day or 1.0)
         
         if self.is_out_of_stock:
             self.instock_percent = 0
@@ -205,7 +208,8 @@ class product_product(models.Model):
             delay = self.produce_delay + (self.company_id.manufacturing_lead if self.company_id else self.env.user.company_id.manufacturing_lead)
         self.virtual_available_delay = delay
         self.orderpoint_computed =  self.consumption_per_day * delay
-        self.virtual_available_days = self.virtual_available / (self.consumption_per_day or 1.0)
+        self.virtual_available_netto = self.virtual_available - self.incoming_qty
+        self.virtual_available_days = self.virtual_available_netto / (self.consumption_per_day or 1.0)
 
         if self.is_out_of_stock:
             self.instock_percent = 0

@@ -1,0 +1,231 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* calc_orderpoint
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-26 09:06+0000\n"
+"PO-Revision-Date: 2020-05-26 09:06+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: calc_orderpoint
+#: view:stock.warehouse.orderpoint:calc_orderpoint.view_warehouse_orderpoint_form
+msgid "( computed"
+msgstr ""
+
+#. module: calc_orderpoint
+#: model:ir.actions.server,name:calc_orderpoint.product_instock_percent
+msgid "Calc Instock Percent"
+msgstr ""
+
+#. module: calc_orderpoint
+#: view:product.template:calc_orderpoint.view_template_property_form
+msgid "Calc Orderpoint"
+msgstr ""
+
+#. module: calc_orderpoint
+#: help:product.product,is_out_of_stock:0
+#: help:product.template,is_out_of_stock:0
+msgid "Check this box to ensure not to sell this product due to stock outage (instock_percent = 0)"
+msgstr ""
+
+#. module: calc_orderpoint
+#: model:ir.actions.server,name:calc_orderpoint.action_clear_cache_moves
+msgid "Clear cache for moves"
+msgstr ""
+
+#. module: calc_orderpoint
+#: model:ir.actions.server,name:calc_orderpoint.action_clear_cache_picking
+msgid "Clear cache picking"
+msgstr ""
+
+#. module: calc_orderpoint
+#: model:ir.actions.server,name:calc_orderpoint.action_clear_cache_production
+msgid "Clear cache production"
+msgstr ""
+
+#. module: calc_orderpoint
+#: field:product.product,consumption_per_day:0
+#: field:product.template,consumption_per_day:0
+msgid "Consumption per Day"
+msgstr ""
+
+#. module: calc_orderpoint
+#: field:product.product,consumption_per_month:0
+#: field:product.template,consumption_per_month:0
+msgid "Consumption per Month"
+msgstr ""
+
+#. module: calc_orderpoint
+#: field:product.product,consumption_per_year:0
+#: field:product.template,consumption_per_year:0
+msgid "Consumption per Year"
+msgstr ""
+
+#. module: calc_orderpoint
+#: view:product.product:calc_orderpoint.product_product_tree_view
+msgid "CpD"
+msgstr ""
+
+#. module: calc_orderpoint
+#: view:product.product:calc_orderpoint.product_product_tree_view
+msgid "CpM"
+msgstr ""
+
+#. module: calc_orderpoint
+#: view:product.product:calc_orderpoint.product_product_tree_view
+msgid "CpY"
+msgstr ""
+
+#. module: calc_orderpoint
+#: help:product.product,orderpoint_computed:0
+#: help:stock.warehouse.orderpoint,orderpoint_computed:0
+msgid "Delay * Consumption per day, delay is sellers delay or produce delay"
+msgstr ""
+
+#. module: calc_orderpoint
+#: help:product.product,earliest_sales_count:0
+#: help:product.template,earliest_sales_count:0
+msgid "Don't try to recompute before this time. Set when compute fails for a product."
+msgstr ""
+
+#. module: calc_orderpoint
+#: field:product.product,earliest_sales_count:0
+#: field:product.template,earliest_sales_count:0
+msgid "Earliest Sales Compute"
+msgstr ""
+
+#. module: calc_orderpoint
+#: view:product.template:calc_orderpoint.product_template_search_view
+msgid "Extreme High Stock Percent"
+msgstr ""
+
+#. module: calc_orderpoint
+#: help:product.product,instock_percent:0
+msgid "Forcast Quantity / Computed Order point * 100"
+msgstr ""
+
+#. module: calc_orderpoint
+#: view:product.template:calc_orderpoint.product_template_search_view
+msgid "High Stock Percent"
+msgstr ""
+
+#. module: calc_orderpoint
+#: field:product.product,instock_percent:0
+#: field:product.template,instock_percent:0
+msgid "Instock Percent"
+msgstr ""
+
+#. module: calc_orderpoint
+#: field:product.product,is_out_of_stock:0
+#: field:product.template,is_out_of_stock:0
+msgid "Is out of stock"
+msgstr ""
+
+#. module: calc_orderpoint
+#: field:product.product,last_sales_count:0
+#: field:product.template,last_sales_count:0
+msgid "Last Sales Compute"
+msgstr ""
+
+#. module: calc_orderpoint
+#: view:product.template:calc_orderpoint.product_template_search_view
+msgid "Low Stock Percent"
+msgstr ""
+
+#. module: calc_orderpoint
+#: help:product.product,virtual_available_days:0
+msgid "Number of days that Forcast Quantity will last with this Consumtion per day"
+msgstr ""
+
+#. module: calc_orderpoint
+#: help:product.product,consumption_per_day:0
+msgid "Number of items that is consumed per day"
+msgstr ""
+
+#. module: calc_orderpoint
+#: help:product.product,consumption_per_month:0
+#: help:product.template,consumption_per_month:0
+msgid "Number of items that is consumed per month"
+msgstr ""
+
+#. module: calc_orderpoint
+#: help:product.product,consumption_per_year:0
+#: help:product.template,consumption_per_year:0
+msgid "Number of items that is consumed per year"
+msgstr ""
+
+#. module: calc_orderpoint
+#: field:product.product,orderpoint_computed:0
+#: field:product.template,orderpoint_computed:0
+#: field:stock.warehouse.orderpoint,orderpoint_computed:0
+msgid "Orderpoint"
+msgstr ""
+
+#. module: calc_orderpoint
+#: model:ir.model,name:calc_orderpoint.model_stock_warehouse_orderpoint
+msgid "Orderpoint minimum rule"
+msgstr ""
+
+#. module: calc_orderpoint
+#: model:ir.model,name:calc_orderpoint.model_product_product
+msgid "Product"
+msgstr ""
+
+#. module: calc_orderpoint
+#: model:ir.model,name:calc_orderpoint.model_product_template
+msgid "Product Template"
+msgstr ""
+
+#. module: calc_orderpoint
+#: view:product.template:calc_orderpoint.product_template_search_view
+msgid "Shortage Stock Percent"
+msgstr ""
+
+#. module: calc_orderpoint
+#: help:product.product,last_sales_count:0
+#: help:product.template,last_sales_count:0
+msgid "The last point in time when # Sales, Consumption per Day, Orderpoint, Virtual Available Days, and Instock Percent were computed."
+msgstr ""
+
+#. module: calc_orderpoint
+#: model:ir.actions.act_window,name:calc_orderpoint.action_product_product_consumption
+#: model:ir.ui.menu,name:calc_orderpoint.menu_product_product_consumption
+msgid "Variant (Consumption)"
+msgstr ""
+
+#. module: calc_orderpoint
+#: field:product.product,virtual_available_days:0
+#: field:product.template,virtual_available_days:0
+msgid "Virtual Available Days"
+msgstr ""
+
+#. module: calc_orderpoint
+#: field:product.product,virtual_available_netto:0
+#: field:product.template,virtual_available_netto:0
+msgid "Virtual available netto"
+msgstr ""
+
+#. module: calc_orderpoint
+#: view:product.template:calc_orderpoint.view_template_property_form
+msgid "days /"
+msgstr ""
+
+#. module: calc_orderpoint
+#: view:product.template:calc_orderpoint.view_template_property_form
+msgid "days delay ⇒"
+msgstr ""
+
+#. module: calc_orderpoint
+#: help:product.product,virtual_available_netto:0
+#: help:product.template,virtual_available_netto:0
+msgid "virtual available minus incoming"
+msgstr ""
+
