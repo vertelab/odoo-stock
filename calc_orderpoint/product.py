@@ -61,11 +61,11 @@ class product_template(models.Model):
         delay = min([p.virtual_available_delay for p in self.product_variant_ids])
         self.virtual_available_delay = delay
         self.virtual_available_netto = self.virtual_available - self.incoming_qty
-        raise Warning(self.virtual_available, self.incoming_qty)
+        #raise Warning(self.virtual_available, self.incoming_qty)
         self.orderpoint_computed = self.consumption_per_day * delay
-        self.virtual_available_days = self.virtual_available_netto/ (self.consumption_per_day or 1.0)
+        self.virtual_available_days = 0 if self.virtual_available_netto <=0 else self.virtual_available_netto/ (self.consumption_per_day or 1.0)
         
-        if self.is_out_of_stock:
+        if self.is_out_of_stock or self.virtual_available_netto <= 0:
             self.instock_percent = 0
         elif self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
             self.instock_percent = 100
