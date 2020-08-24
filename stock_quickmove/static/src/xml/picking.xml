@@ -57,6 +57,9 @@
             </a>
           </p>
         </td>
+        <th class="text-center">
+        <span class="quickmove_qty reserved_qty" t-att-name="'reserved_qty_' + location.reserved_qty" t-esc="location.reserved_qty"></span> 
+        </th>
         <td>
           <div class="input-group">
             <span class="input-group-addon quickmove_minus input-sm" onclick="quickmove_minus($(this));">

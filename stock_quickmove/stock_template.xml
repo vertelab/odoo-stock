@@ -281,6 +281,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="text-left">Name</th>
+                                                <th class="text-center" style="width: 150px;">Booked</th>
                                                 <th class="text-center" style="width: 150px;">Quantity</th>
                                                 <th style="width: 30px;"/>
                                             </tr>

@@ -224,6 +224,7 @@ class StockSquickMove(http.Controller):
         for location in quants.mapped('location_id'):
             product_locations.append({
                 'qty':sum(quants.filtered(lambda q: q.location_id == location).mapped('qty')),
+                'reserved_qty': sum(quants.filtered(lambda q: True if q.reservation_id else False).mapped('qty')),
                 'name': location.name,
                 'location_id': location.id})
         
