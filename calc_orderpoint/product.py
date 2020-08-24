@@ -61,11 +61,11 @@ class product_template(models.Model):
         delay = min([p.virtual_available_delay for p in self.product_variant_ids])
         self.virtual_available_delay = delay
         self.virtual_available_netto = self.virtual_available - self.incoming_qty
-        raise Warning(self.virtual_available, self.incoming_qty)
+        #raise Warning(self.virtual_available, self.incoming_qty)
         self.orderpoint_computed = self.consumption_per_day * delay
-        self.virtual_available_days = self.virtual_available_netto/ (self.consumption_per_day or 1.0)
+        self.virtual_available_days = 0 if self.virtual_available_netto <=0 else self.virtual_available_netto/ (self.consumption_per_day or 1.0)
         
-        if self.is_out_of_stock:
+        if self.is_out_of_stock or self.virtual_available_netto <= 0:
             self.instock_percent = 0
         elif self.env.ref('stock.route_warehouse0_mto') in self.route_ids: # Make To Order are always in stock
             self.instock_percent = 100
@@ -233,8 +233,11 @@ class product_product(models.Model):
     orderpoint_computed = fields.Float('Orderpoint', default=0,help="Delay * Consumption per day, delay is sellers delay or produce delay")
     virtual_available_days = fields.Float('Virtual Available Days', default=0,help="Number of days that Forcast Quantity will last with this Consumtion per day")
     virtual_available_delay = fields.Float('Delay', default=0,help="Number of days before refill of stock")
+    virtual_available_netto = fields.Float('Virtual available netto', default=0,help="virtual available minus incoming")
     instock_percent = fields.Integer('Instock Percent', default=0,help="Forcast Quantity / Computed Order point * 100")
     is_out_of_stock = fields.Boolean(string='Is out of stock',help='Check this box to ensure not to sell this product due to stock outage (instock_percent = 0)')
+    
+    
 
 
     #~ sale_order_lines = fields.One2many(comodel_name='sale.order.line', inverse_name="product_id")  # performance hog, do we need it?

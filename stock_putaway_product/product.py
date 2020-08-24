@@ -43,7 +43,6 @@ class ProductPutawayStrategy(models.Model):
 
     @api.model
     def putaway_apply(self, putaway_strat, product):
-        _logger.warn('\n\nputaway_apply\n\n')
         if putaway_strat.method == 'fixed_per_product':
             if product.stock_location_id:
                 return product.stock_location_id.id

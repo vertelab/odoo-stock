@@ -33,16 +33,6 @@ from openerp.modules.registry import Registry
 import logging
 _logger = logging.getLogger(__name__)
 
-# Increasing persistance time for packop wizards.
-# TODO: Remove this when we implement better transfer method.
-class StockTransferDetails(models.TransientModel):
-    _inherit = 'stock.transfer_details'
-    _transient_max_hours = 24
-
-class StockTransferDetailsItems(models.TransientModel):
-    _inherit = 'stock.transfer_details_items'
-    _transient_max_hours = 24
-
 class BarcodeController(http.Controller):
 
     @http.route(['/barcode2/web/'], type='http', auth='user')
@@ -54,20 +44,16 @@ class BarcodeController(http.Controller):
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
-    
-    # ~ abc_wizard_id = fields.Many2one(comodel_name='stock.transfer_details', string='Move Wizard', ondelete='set null')
-    
+
     @api.model
     def abc_make_records(self, records, fields=None):
         """Build a record description for return to the JS interface."""
         fields = fields or self.abc_get_model_fields(records)
-        # ~ model = records._name
         result = []
         field_types = {}
         def field_type(name):
             """Check the type of a field."""
             if name not in field_types:
-                #_logger.warn('\n\n%s\n%s' % (name, records.fields_get([name], attributes=['type'])))
                 field_types[name] = records.fields_get([name], attributes=['type'])[name]['type']
             return field_types.get(name)
         for record in records:
@@ -86,21 +72,6 @@ class StockPicking(models.Model):
                 rec[field] = value
             result.append(rec)
         return result
-    
-    # ~ @api.multi
-    # ~ def abc_do_enter_transfer_details(self):
-        # ~ """Reuse the same wizard to handle package data and stuff.
-        # ~ Try to make do without this first.
-        # ~ """
-        # ~ self.ensure_one()
-        # ~ if not self.abc_wizard_id:
-            # ~ context ={
-                # ~ 'active_model': self._name,
-                # ~ 'active_ids': [self.id],
-                # ~ 'active_id': self.id
-            # ~ }
-            # ~ self.abc_wizard_id = self.env['stock.transfer_details'].with_context(**context).create({'picking_id': self.id})
-        # ~ return self.abc_wizard_id.wizard_view()
 
     @api.model
     def abc_get_model_fields(self, record):
@@ -131,13 +102,22 @@ class StockPicking(models.Model):
                     'weight',
                     ('uom_id', ['display_name', 'factor']),
                 ]
+        if record._name == 'stock.location':
+            return [
+                    'display_name',
+                ]
+        if record._name == 'product.uom':
+            return [
+                    'display_name',
+                    'factor'
+                ]
         return ['id']
-    
+
     @api.multi
     def abc_load_picking(self):
         """Create a JSON description of a picking and its products for the Javascript GUI."""
-        _logger.warn(self)
-        _logger.warn(self._context)
+        # ~ _logger.warn(self)
+        # ~ _logger.warn(self._context)
         self.ensure_one()
         picking = self.abc_make_records(self)[0]
         if self.state == 'assigned':
@@ -151,13 +131,13 @@ class StockPicking(models.Model):
         # TODO: Find packages
         packages = []
         res = {'picking': picking, 'operations': operations, 'products': products, 'packages': packages}
-        _logger.warn(res)
+        # ~ _logger.warn(res)
         return res
-    
+
     @api.multi
     def abc_do_transfer(self, lines, packages, **data):
         """Complete the picking operation."""
-        _logger.warn('\nabc_do_transfer\n\n%s\n\n%s\n\n%s' % (lines, packages, data))
+        # ~ _logger.warn('\nabc_do_transfer\n\n%s\n\n%s\n\n%s' % (lines, packages, data))
         self.ensure_one()
         res = {'warnings': [], 'messages': [], 'results': {}}
         params = {}
@@ -170,7 +150,34 @@ class StockPicking(models.Model):
             # res       The result returned to the UI.
             getattr(self, step)(lines, packages, data, params, res)
         return res
-            
+
+    @api.multi
+    def abc_create_row(self, row):
+        """Provide default locations and other data """
+        # Lifted from action_assign on stock.move
+        product = self.env['product.product'].browse(row['product_id'])
+        location = self.location_id
+        main_domain = [('reservation_id', '=', False), ('qty', '>', 0)]
+        quants = self.env['stock.quant'].quants_get_prefered_domain(
+            location,
+            product,
+            row['quantity'] or 1.0,
+            domain=main_domain,
+            prefered_domain_list=[])
+        # Find suggested location. Could be more than one given quantity > 0.
+        # All that stuff remains to be solved.
+        for quant in quants:
+            if quant[0]:
+                location = quant[0].location_id
+        row.update({
+            '_name': 'stock.transfer_detailsitems',
+            'product_id': self.abc_make_records(product, ['display_name'])[0],
+            'destinationloc_id': self.abc_make_records(self.location_dest_id)[0],
+            'sourceloc_id': self.abc_make_records(location)[0],
+            'product_uom_id': self.abc_make_records(product.uom_id)[0],
+        })
+        return row
+
     @api.model
     def abc_transfer_steps(self):
         """Return all the steps (function names) to complete the picking process in the correct order."""
@@ -178,23 +185,49 @@ class StockPicking(models.Model):
             (20, 'abc_transfer_wizard'),
             (40, 'abc_create_invoice'),
             (60, 'abc_confirm_invoice')]
-    
+
     @api.multi
     def abc_transfer_wizard(self, lines, packages, data, params, res):
-        # Attempt to find the wizard used to create the data
-        # TODO: Don't rely on the old wizard. Match the lines through packop_id.
-        _logger.warn(lines)
+        """Run the transfer wizard on the given lines."""
+        # TODO: Add support for packages.
+        # ~ _logger.warn(lines)
         res['results']['transfer'] = 'failure'
-        wizard = self.env['stock.transfer_details'].search([('item_ids', 'in', [l['id'] for l in lines])])
-        if not wizard:
-            raise Warning('The wizard has been deleted. Please restart the picking process. This will be fixed in future versions.')
-        for item in wizard.item_ids:
-            line = filter(lambda l: l['id'] == item.id, lines)[0]
-            item.quantity = line['qty_done']
+        action = self.do_enter_transfer_details()
+        wizard = self.env['stock.transfer_details'].browse(action['res_id'])
+        # Keep track of matched transfer items
+        matched_ids = []
+        for line in lines:
+            if line['id'] > 0:
+                # Original line. Match against item in wizard.
+                if line['packop_id']:
+                    item = wizard.item_ids.filtered(lambda i: i.packop_id.id == line['packop_id']['id'])
+                    item.quantity = line['qty_done']
+                    matched_ids.append(item.id)
+                else:
+                    # What if we don't have packop_id. Will this ever occur?
+                    _logger.warn(_("Couldn't match line (id %s) against existing transfer item!\nlines:%s\ntransfer items:%s") % (line['id'], lines, wizard.item_ids.read()))
+            else:
+                # New line. Create a new item.
+                # TODO: Split item based on original line from another package.
+                item = wizard.item_ids.create({
+                    'transfer_id': wizard.id,
+                    'product_id': line['product_id']['id'],
+                    'product_uom_id': line['product_uom_id']['id'],
+                    'quantity': line['qty_done'],
+                    'sourceloc_id': line['sourceloc_id']['id'],
+                    'destinationloc_id': line['destinationloc_id']['id'],
+                    # 'result_package_id': line['result_package_id']['id'],
+                    # 'destinationloc_id': line['destinationloc_id']['id'],
+                })
+                matched_ids.append(item.id)
+        extra_items = wizard.item_ids.filtered(lambda i: i.id not in matched_ids)
+        if extra_items:
+            _logger.warn(_("Found and deleted extra transfer items! %s" % extra_items.read()))
+            extra_items.unlink()
         wizard.do_detailed_transfer()
         res['results']['transfer'] = 'success'
         params['wizard'] = wizard
-    
+
     @api.multi
     def abc_create_invoice(self, lines, packages, data, params, res):
         res_invoice = {'id': None, 'name': ''}
@@ -235,7 +268,7 @@ class StockPicking(models.Model):
         # ~ invoice.signal_workflow('invoice_open')
         # ~ sleep(lock_time)
         # ~ raise Warning('invoice lock released!')
-    
+
     @api.multi
     def abc_confirm_invoice(self, lines, packages, data, params, res):
         """Confirm invoice. Split into its own function to not lock the invoice sequence."""
@@ -264,7 +297,7 @@ class StockPicking(models.Model):
             finally:
                 if env:
                     env.cr.close()
-    
+
     @api.multi
     def abc_open_picking(self):
         return {
@@ -272,7 +305,7 @@ class StockPicking(models.Model):
             'target': 'self',
             'url': '/barcode2/web#picking_id=%s' % self.id,
         }
-    
+
     @api.model
     def abc_scan(self, code):
         """Perform scan on the supplied barcode."""
@@ -280,9 +313,7 @@ class StockPicking(models.Model):
         if products:
             return {
                 'type': 'product.product',
-                'product': self.abc_make_records(
-                    products,
-                    ['display_name', 'default_code', 'ean13'])}
+                'product': self.abc_make_records(products)}
         picking = self.env['stock.picking'].search_read([('name', '=', code)], ['id'])
         if picking:
             return {
@@ -293,7 +324,7 @@ class StockPicking(models.Model):
 
 class StockPickingType(models.Model):
     _inherit = 'stock.picking.type'
-    
+
     @api.multi
     def abc_open_barcode_interface(self):
         return {

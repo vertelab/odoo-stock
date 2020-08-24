@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <record id="view_batch_list" model="ir.ui.view">
+      <field name="name">batch.list</field>
+      <field name="model">product.batch_list</field>
+      <field name="arch" type="xml">
+        <form string="Update quantity">
+          <group>
+            <field name="product_id" />
+            <field name="location_id" />
+            <field name="quant_ids" >
+                <tree editable="top">
+                    <field name="name" readonly="1"/>
+                    <field name="qty" />
+                    <field name="lot_id" />
+                    <field name="removal_date" />
+                </tree>
+            </field>
+          </group>
+          <footer>
+            <button name="get_quants" string="Calculate" type="object">Calculate</button>
+            <button name="choose_batch" string="_Apply" type="object" class="oe_highlight">Apply</button>
+            <button name="Cancel" string="_Cancel" class="oe_link" special="cancel">Cancel</button>
+            <button name="empty_location_id" string="Empty location" type="object" class="oe_highlight">Empty Location</button>
+          </footer>
+        </form>
+      </field>
+    </record>
+    <record id="ir_actions_server_batch_list" model="ir.actions.server">
+      <field name="name">Update Quantity Batch</field>
+      <field name="model_id" ref="product.model_product_product" />
+      <field name="state">code</field>
+      <field name="code">action = model.batch_wizard()</field>
+    </record>
+    <record id="action_batch_list" model="ir.actions.act_window">
+      <field name="name">Update Quantity Batch</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">product.batch_list</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="view_batch_list" />
+      <field name="target">new</field>
+    </record>
+    <record id="view_template_property_form" model="ir.ui.view">
+      <field name="name">Batch List</field>
+      <field name="model">product.template</field>
+      <field name="inherit_id" ref="stock.view_template_property_form" />
+      <field name="arch" type="xml">
+        <button name="%(stock.action_view_change_product_quantity)d" position="after">
+          <button name="%(action_batch_list)d" string="⇒ Batch Update" type="action" class="oe_link" />
+        </button>
+      </field>
+    </record>
+  </data>
+</openerp>
