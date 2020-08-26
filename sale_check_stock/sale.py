@@ -40,12 +40,12 @@ class sale_order(models.Model):
                 #check if product is available, and if not: raise a warning, but do this only for products that aren't processed in MTO
                 if not is_available and (product.virtual_available_days < 5 or product.consumption_per_day < line.product_uom_qty):
                     uom_record = line.product_uom
-                    compare_qty = float_compare(line.product_id.virtual_available, line.product_uom_qty, precision_rounding=uom_record.rounding)
+                    compare_qty = float_compare(line.product_id.virtual_available_netto, line.product_uom_qty, precision_rounding=uom_record.rounding)
                     if compare_qty == -1:
                         out_of_stock.append(_('%s: You plan to sell %.2f %s but you only have %.2f %s available!\nThe real stock is %.2f %s. (without reservations)') % \
                             (line.product_id.name_get()[0][1],
                             line.product_uom_qty, uom_record.name,
-                            max(0,product.virtual_available), uom_record.name,
+                            max(0,product.virtual_available_netto), uom_record.name,
                             max(0,product.qty_available), uom_record.name))
         
         if out_of_stock:
