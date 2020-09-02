@@ -37,7 +37,6 @@ class sale_order(models.Model):
                 #determine if the product needs further check for stock availibility
                 # is_available = line._check_routing(product, self.warehouse_id.id)
                 
-                #check if product is available, and if not: raise a warning, but do this only for products that aren't processed in MTO
                 if  product.virtual_available_days < 5 or product.consumption_per_day < line.product_uom_qty:
                     uom_record = line.product_uom
                     compare_qty = float_compare(line.product_id.virtual_available_netto, line.product_uom_qty, precision_rounding=uom_record.rounding)
@@ -50,4 +49,22 @@ class sale_order(models.Model):
         
         if out_of_stock:
             raise Warning(_('Missing stock:\n') + '\n'.join(out_of_stock))
-            
+
+class sale_order_line(models.Model):
+    _inherit = 'sale.order.line'
+
+    @api.one
+    @api.onchange('product_uom_qty')
+    def check_product_uom_qty(self, product_id):
+        if self.product_uom_qty:
+            if self.product_id.type == 'product':
+                if  self.product_id.virtual_available_days < 5 or self.product_id.consumption_per_day < self.product_uom_qty:
+                    compare_qty = float_compare(self.product_id.virtual_available_netto, self.product_uom_qty, precision_rounding=self.product_uom.rounding)
+                    if compare_qty == -1:
+                        raise Warning(_('Missing stock:\n%s: You plan to sell %.2f %s but you only have %.2f %s available!\nThe real stock is %.2f %s. (without reservations)') % \
+                            (self.product_id.name_get()[0][1],
+                            self.product_uom_qty, self.product_uom.name,
+                            max(0,self.product_id.virtual_available_netto), self.product_uom.name,
+                            max(0,self.product_id.qty_available), self.product_uom.name))
+
+

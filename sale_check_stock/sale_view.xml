@@ -9,6 +9,9 @@
 		  <field name="state" position="before">
 			<button name="check_order_stock" class="oe_read_only" states="draft,sent" string="Check order stock" type="object" groups="base.group_user"/>
 		  </field>
+        <xpath expr="//field[@name='product_uom_qty']" position="attributes">
+            <attribute name="on_change">check_product_uom_qty(product_id)</attribute>
+        </xpath>
       </field>
     </record>
   </data>
