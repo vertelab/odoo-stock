@@ -48,6 +48,7 @@ class stock_picking_wizard(models.TransientModel):
     employee_ids = fields.Many2many(comodel_name='hr.employee', string='Picking Employee', default=_default_employee_id, required=True)
     picking_ids = fields.Many2many(comodel_name='stock.picking', string='Stock Picking', default=_default_picking_ids, required=True)
     force = fields.Boolean('Replace Current Picking Employee')
+    no_print = fields.Boolean(string="No Print", help="This is for not print out")
 
     @api.multi
     def set_picking_employee(self):
@@ -68,7 +69,8 @@ class stock_picking_wizard(models.TransientModel):
                     if i == picker_count:
                         i = 0
                 last_move = move
-            self.env['report'].print_document(self.picking_ids, 'stock_multiple_picker.picking_operations_document')
+            if not self.no_print:
+                self.env['report'].print_document(self.picking_ids, 'stock_multiple_picker.picking_operations_document')
             #self.env['report'].print_document(invoice, default_report)
             return {'type': 'ir.actions.act_window_close'}
             # return self.env['report'].get_action(self.picking_ids, 'stock_multiple_picker.picking_operations_document')

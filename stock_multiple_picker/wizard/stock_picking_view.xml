@@ -11,6 +11,7 @@
                         <field name="picking_ids" widget="many2many_tags" />
                         <field name="employee_ids" widget="many2many_tags" />
                         <field name="force" />
+                        <field name="no_print" />
                     </group>
                     <footer>
                         <button name="set_picking_employee" string="Set Picking Employees" type="object" class="oe_highlight" />
