@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 8.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-01 14:44+0000\n"
-"PO-Revision-Date: 2020-04-01 14:44+0000\n"
+"POT-Creation-Date: 2020-11-10 11:04+0000\n"
+"PO-Revision-Date: 2020-11-10 11:04+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -66,23 +66,22 @@ msgstr "Skapades på"
 #. module: stock_multiple_picker
 #: view:website:stock_multiple_picker.picking_operations_document
 msgid "Customer Address:"
-msgstr "Kundadress:"
+msgstr "Customer Address:"
 
 #. module: stock_multiple_picker
 #: view:website:stock_multiple_picker.picking_operations_document
 msgid "Delivery Address:"
-msgstr "Leveransadress:"
+msgstr "Delivery Address:"
 
 #. module: stock_multiple_picker
 #: view:website:stock_multiple_picker.picking_operations_document
-#: view:website:stock_multiple_picker.picking_operations_group_document
 msgid "Destination"
 msgstr "Destination"
 
 #. module: stock_multiple_picker
 #: field:stock.picking.multiple,display_name:0
 msgid "Display Name"
-msgstr "Visa namn"
+msgstr "Display Name"
 
 #. module: stock_multiple_picker
 #: field:stock.picking.multiple,id:0
@@ -103,7 +102,7 @@ msgstr "Last Modified on"
 #. module: stock_multiple_picker
 #: field:stock.picking.multiple,write_uid:0
 msgid "Last Updated by"
-msgstr "Senast uppdaterad av"
+msgstr "Last Updated by"
 
 #. module: stock_multiple_picker
 #: field:stock.picking.multiple,write_date:0
@@ -116,6 +115,11 @@ msgid "Meddelande:"
 msgstr "Meddelande:"
 
 #. module: stock_multiple_picker
+#: field:stock.picking.multiple,no_print:0
+msgid "No Print"
+msgstr "Ingen Utskrift"
+
+#. module: stock_multiple_picker
 #: view:website:stock_multiple_picker.picking_operations_document
 msgid "Order (Origin)"
 msgstr "Order (Origin)"
@@ -123,7 +127,7 @@ msgstr "Order (Origin)"
 #. module: stock_multiple_picker
 #: model:ir.model,name:stock_multiple_picker.model_stock_picking
 msgid "Packing List"
-msgstr "Packningslista"
+msgstr "Packing List"
 
 #. module: stock_multiple_picker
 #: field:stock.picking,employee_ids:0
@@ -141,8 +145,8 @@ msgid "Picking Employee"
 msgstr "Plockansvarig"
 
 #. module: stock_multiple_picker
-#: code:addons/stock_multiple_picker/wizard/stock_picking.py:70
-#: code:addons/stock_multiple_picker/wizard/stock_picking.py:89
+#: code:addons/stock_multiple_picker/wizard/stock_picking.py:78
+#: code:addons/stock_multiple_picker/wizard/stock_picking.py:97
 #, python-format
 msgid "Picking Employee is already set."
 msgstr "Plockansvarig har redan satt."
@@ -175,6 +179,11 @@ msgstr "Produkt"
 #: view:website:stock_multiple_picker.picking_operations_group_document
 msgid "Quantity"
 msgstr "Antal"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Quantity:"
+msgstr "Quantity:"
 
 #. module: stock_multiple_picker
 #: view:website:stock_multiple_picker.picking_operations_document
@@ -226,6 +235,11 @@ msgid "Supplier Address:"
 msgstr "Supplier Address:"
 
 #. module: stock_multiple_picker
+#: help:stock.picking.multiple,no_print:0
+msgid "This is for not print out"
+msgstr "This is for not print out"
+
+#. module: stock_multiple_picker
 #: view:website:stock_multiple_picker.picking_operations_document
 #: view:website:stock_multiple_picker.picking_operations_group_document
 msgid "Total"
@@ -248,6 +262,11 @@ msgid "Weight"
 msgstr "Vikt"
 
 #. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Weight:"
+msgstr "Vikt:"
+
+#. module: stock_multiple_picker
 #: view:stock.picking.multiple:stock_multiple_picker.stock_picking_wizard_form
 msgid "_Cancel"
 msgstr "_Cancel"
@@ -256,4 +275,3 @@ msgstr "_Cancel"
 #: view:stock.picking.multiple:stock_multiple_picker.stock_picking_wizard_form
 msgid "or"
 msgstr "eller"
-
