@@ -11,6 +11,7 @@
                 <group name="website_and_pos" position="inside">
                     <group name="picking" string="Picking">
                         <field name="picking_comment"/>
+                        <field name="picking_comment_offer"/>
                     </group>
                 </group>
             </field>
