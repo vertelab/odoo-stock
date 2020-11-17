@@ -29,7 +29,13 @@ _logger = logging.getLogger(__name__)
 class product_product(models.Model):
     _inherit="product.product"
 
-    picking_comment = fields.Text(String='Comment', help="Add instructions for picking")
+    # picking_comment = fields.Text(String='Comment', help="Add instructions for picking")
+    def picking_comment(self):
+	    product = self.env['product.template'].search_read(fields=['name', 'dv_ribbon','is_offer_product_reseller', 'is_offer_product_consumer','dv_image_src', 'product_variant_count'])
+	    pricelist = self.env['product.pricelist'].sudo().browse(pricelist)
+	    
+	    if (product['is_offer_product_reseller'] and pricelist.for_reseller == True) or (product['is_offer_product_consumer'] and pricelist.for_reseller == False): 
+	    	picking_comment = fields.Text(String='Comment', help="Add instructions for picking")
 
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
