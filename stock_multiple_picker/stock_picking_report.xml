@@ -455,7 +455,7 @@
                     </td>
                     <td t-att="{'style': line_style}" class="text-right">
                        <t t-if="o.product_id.is_offer">
-                        <p t-field="o.product_id.picking_comment" />
+                        <p t-field="o.product_id.bom_ids.bom_id.product_id.picking_comment" />
                       </t>
                     </td>
                   </tr>
