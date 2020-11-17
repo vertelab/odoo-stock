@@ -454,7 +454,9 @@
                       <span t-esc="o.picking_id.box_label" />
                     </td>
                     <td t-att="{'style': line_style}" class="text-right">
-                       <t t-if="o.product_id.is_offer">
+
+
+                       <t t-if="o.product_id.is_offer_product_reseller or o.product_id.is_offer_product_consumer">
                         <p t-field="o.product_id.picking_comment" />
                       </t>
                     </td>
