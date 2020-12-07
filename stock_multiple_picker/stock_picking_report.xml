@@ -454,9 +454,7 @@
                       <span t-esc="o.picking_id.box_label" />
                     </td>
                     <td t-att="{'style': line_style}" class="text-right">
-    
-                        <p t-field="o.product_id.bom_ids.bom_id.product_id.picking_comment" />
-               
+                       <p t-field="o.product_id.picking_comment"/>
                     </td>
                   </tr>
                   <tr>
