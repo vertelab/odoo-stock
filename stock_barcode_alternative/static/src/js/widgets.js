@@ -33,6 +33,8 @@ function openerp_picking_alt_widgets(instance){
             // Any instantiated widgets or similar objects should be stored on this, not in data.
             this.data = options.row;
             this.id = this.data.id;
+            console.log("MyTag1.5: ",this.data)
+
         },
         renderElement: function(){
             var self = this;
@@ -69,20 +71,51 @@ function openerp_picking_alt_widgets(instance){
             this.set_qty(this.data.qty_done - 1, reorder);
         },
         get_classes: function(){
+            var self = this;
             // Return the classes decorating this row in the UI
             var classes = 'abc-packop';
+            
+            //~ console.log(this.data.product_id['is_offer']);
+            console.log('Lukas', this.data);
+            
+            let ui = this.get_picking_widget().getParent();
+            
+            _.each(ui.products, function(product){
+                console.log("Product: ", product)
+                if(product.id == self.data.product_id.id){
+                    if(product.is_offer){
+                        self.data['qty_done'] = self.data['quantity'];
+                        console.log('QTY', self.data['qty_done'])
+                        self.data.qty_remaining = 0;
+                        classes += ' hidden';
+                    }
+                }
+                //~ return classes
+                console.log("MyTag3: ", classes)
+            })
+            //~ var classes = 'abc-packop';
+            //~ console.log("MyTag4: ", classes)
             if (this.data.qty_remaining < 0) {
                 classes += ' qty-over';
             } else if (this.data.qty_remaining == 0) {
                 classes += ' finished';
             } else if (this.data.qty_done > 0) {
                 classes += ' unfinished';
-            }
+            } 
+            //~ else if (this.data.product_id.id == 10289){
+                //~ console.log('Haze log',this.data.product_id.is_offer)
+                //~ classes += ' hidden';
+            //~ } 
+            //~ if(this.data.product_id.id == 10289)){
+                //~ console.log('Haze 2', this.data.product_id.is_offer)
+                //~ classes += ' hidden';
+            //~ }
             if (this.newly_scanned) {
                 // This is the most recently scanned line. Mark it as such for CSS.
                 classes += ' abc_newly_scanned';
                 this.newly_scanned = false;
             }
+            //~ console.log('Haze 2', this.data.product.is_offer)
             return classes;
         },
         set_qty: function(qty, reorder){
@@ -128,10 +161,19 @@ function openerp_picking_alt_widgets(instance){
             // Return complete product data for this row
             let self = this;
             let ui = this.get_picking_widget().getParent();
+            
+            //~ _.each(ui.products, function(product){
+                //~ if(product.is_offer == true){
+                    //~ console.log('Haze 1', product)
+                    //~ console.log('Haze 1', classes)
+                //~ }
+            //~ })
+        
             return _.filter(ui.products, function(product){
+                
                 return product.id == self.data.product_id.id;
             })[0];
-        }
+        },
     });
     
     module.PackageEditorWidget = instance.web.Widget.extend({
@@ -139,7 +181,7 @@ function openerp_picking_alt_widgets(instance){
         init: function(parent, options){
             this._super(parent, options);
             //~ console.log('PackageEditorWidget.init');
-            //~ console.log(options);
+            //~ console.log("MyTag0",options);
             //~ console.log(parent.rows);
             var self = this;
             // this.data contains pure data ({}, [], strings, integers, floats etc) describing this package, destined for storage.
@@ -255,10 +297,12 @@ function openerp_picking_alt_widgets(instance){
                         'packop_id': null,
                         'lot_id': null,
                         'product_id': product_id,
+                        'is_offer': product_id['is_offer'],
                         'quantity': 0.0,
                         'qty_done': 1.0,
                         'qty_remaining': -1.0
                     };
+                //~ console.log('Lukas2', row_data)
                 new instance.web.Model('stock.picking')
                     .call('abc_create_row', [picking_editor.id, row_data])
                     .then(function(result){
@@ -270,6 +314,7 @@ function openerp_picking_alt_widgets(instance){
                         self.rows.push(row_widget);
                         self.renderElement();
                     });
+                //~ console.log('Lukas2', row_data)
                 return true;
             }
             return false;
@@ -286,6 +331,7 @@ function openerp_picking_alt_widgets(instance){
             //~ console.log(this);
             _.each(this.rows, function(row){
                 let product = row.get_product();
+                console.log('Haze weight', product)
                 weight += row.data.qty_done * product.weight;
             })
             return weight;
