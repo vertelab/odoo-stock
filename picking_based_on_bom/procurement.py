@@ -231,7 +231,7 @@ class product_product(models.Model):
                         total += bom_line.product_id.lst_price * bom_line.product_qty
                 for bom_line in bom.bom_line_ids:
                     if bom_line.product_id.sale_ok:
-                        if total:
+                        if total > 0:
                             amount = line.price_subtotal * bom_line.product_id.lst_price * bom_line.product_qty / total
                             self.env['account.analytic.line'].create({
                                 'move_id': line.invoice_id.move_id.id,
