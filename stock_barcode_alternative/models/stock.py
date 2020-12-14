@@ -88,7 +88,6 @@ class StockPicking(models.Model):
             _logger.warn("Lukas2 %s" % record.mapped('product_id').mapped('is_offer'))
             return [
                     ('product_id', ['display_name']),
-                    #('product_id', ['is_offer']),
                     ('product_uom_id', ['display_name', 'factor']),
                     'quantity',
                     ('package_id', []),
@@ -110,13 +109,11 @@ class StockPicking(models.Model):
         if record._name == 'stock.location':
             return [
                     'display_name',
-                    ('product_id', ['is_offer'])
                 ]
         if record._name == 'product.uom':
             return [
                     'display_name',
                     'factor',
-                    ('product_id', ['is_offer'])
                 ]
         return ['id']
 
@@ -126,8 +123,6 @@ class StockPicking(models.Model):
         # ~ _logger.warn(self)
         # ~ _logger.warn(self._context)
         self.ensure_one()
-        self.check_offer_operations()
-        _logger.warn('Haze offer %s' %self.check_offer_operations())
         picking = self.abc_make_records(self)[0]
         if self.state == 'assigned':
             action = self.do_enter_transfer_details()

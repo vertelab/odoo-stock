@@ -79,21 +79,28 @@ function openerp_picking_alt_widgets(instance){
             console.log('Lukas', this.data);
             
             let ui = this.get_picking_widget().getParent();
-            
-            _.each(ui.products, function(product){
-                console.log("Product: ", product)
-                if(product.id == self.data.product_id.id){
-                    if(product.is_offer){
-                        self.data['qty_done'] = self.data['quantity'];
-                        console.log('QTY', self.data['qty_done'])
-                        self.data.qty_remaining = 0;
-                        classes += ' hidden';
+            if(ui.products){
+                _.each(ui.products, function(product){
+                    console.log("Product: ", product)
+                    if(product.id == self.data.product_id.id){
+                        if(product.is_offer){
+                            self.data['qty_done'] = self.data['quantity'];
+                            console.log('QTY', self.data['qty_done'])
+                            self.data.qty_remaining = 0;
+                            classes += ' hidden';
+                        }else{
+                            if (self.data.qty_remaining < 0) {
+                                classes += ' qty-over';
+                            } else if (self.data.qty_remaining == 0) {
+                                classes += ' finished';
+                            } else if (self.data.qty_done > 0) {
+                                classes += ' unfinished';
+                            }
+                        }
                     }
-                }
-                //~ return classes
-                console.log("MyTag3: ", classes)
-            })
-            //~ var classes = 'abc-packop';
+                    console.log("MyTag3: ", classes)
+                })
+            }
             //~ console.log("MyTag4: ", classes)
             if (this.data.qty_remaining < 0) {
                 classes += ' qty-over';
@@ -102,14 +109,7 @@ function openerp_picking_alt_widgets(instance){
             } else if (this.data.qty_done > 0) {
                 classes += ' unfinished';
             } 
-            //~ else if (this.data.product_id.id == 10289){
-                //~ console.log('Haze log',this.data.product_id.is_offer)
-                //~ classes += ' hidden';
-            //~ } 
-            //~ if(this.data.product_id.id == 10289)){
-                //~ console.log('Haze 2', this.data.product_id.is_offer)
-                //~ classes += ' hidden';
-            //~ }
+            
             if (this.newly_scanned) {
                 // This is the most recently scanned line. Mark it as such for CSS.
                 classes += ' abc_newly_scanned';
@@ -161,14 +161,6 @@ function openerp_picking_alt_widgets(instance){
             // Return complete product data for this row
             let self = this;
             let ui = this.get_picking_widget().getParent();
-            
-            //~ _.each(ui.products, function(product){
-                //~ if(product.is_offer == true){
-                    //~ console.log('Haze 1', product)
-                    //~ console.log('Haze 1', classes)
-                //~ }
-            //~ })
-        
             return _.filter(ui.products, function(product){
                 
                 return product.id == self.data.product_id.id;
