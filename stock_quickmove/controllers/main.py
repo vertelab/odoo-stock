@@ -53,12 +53,14 @@ class StockSquickMove(http.Controller):
                     if description:
                         picking.name = '%s - %s' % (picking.name, description)
                     for k, v in post.items():
+                        _logger.warn("~ k = %s, v = %s" % (k,v))
+                        _logger.warn("~ type k = %s, type v = %s" % (type(k),type(v)))
                         if k.startswith('total_qty_'):
                             product = request.env['product.product'].browse(int(k.split('_')[-1]))
                             request.env['stock.move'].create({
                                 'product_id': product.id,
                                 'name': product.name,
-                                'product_uom_qty': float(int(v)),
+                                'product_uom_qty': float(v),
                                 'product_uom': product.uom_id.id,
                                 'location_id': location_src_id,
                                 'location_dest_id': location_dest_id,
@@ -74,7 +76,7 @@ class StockSquickMove(http.Controller):
                             if move:
                                 move.write({
                                     'name': product.name,
-                                    'product_uom_qty': float(int(v)),
+                                    'product_uom_qty': float(v),
                                     'product_uom': product.uom_id.id,
                                     'location_id': location_src_id,
                                     'location_dest_id': location_dest_id,
@@ -83,7 +85,7 @@ class StockSquickMove(http.Controller):
                                 request.env['stock.move'].create({
                                     'product_id': product.id,
                                     'name': product.name,
-                                    'product_uom_qty': float(int(v)),
+                                    'product_uom_qty': float(v),
                                     'product_uom': product.uom_id.id,
                                     'location_id': location_src_id,
                                     'location_dest_id': location_dest_id,

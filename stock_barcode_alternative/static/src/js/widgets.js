@@ -33,7 +33,7 @@ function openerp_picking_alt_widgets(instance){
             // Any instantiated widgets or similar objects should be stored on this, not in data.
             this.data = options.row;
             this.id = this.data.id;
-            console.log("MyTag1.5: ",this.data)
+            //~ console.log("MyTag1.5: ",this.data)
 
         },
         renderElement: function(){
@@ -76,32 +76,40 @@ function openerp_picking_alt_widgets(instance){
             var classes = 'abc-packop';
             
             //~ console.log(this.data.product_id['is_offer']);
-            console.log('Lukas', this.data);
+            //~ console.log('LukasQ', this.data.quantity);
             
             let ui = this.get_picking_widget().getParent();
-            if(ui.products){
-                _.each(ui.products, function(product){
-                    console.log("Product: ", product)
-                    if(product.id == self.data.product_id.id){
-                        if(product.is_offer){
-                            self.data['qty_done'] = self.data['quantity'];
-                            console.log('QTY', self.data['qty_done'])
-                            self.data.qty_remaining = 0;
-                            classes += ' hidden';
-                        }else{
-                            if (self.data.qty_remaining < 0) {
-                                classes += ' qty-over';
-                            } else if (self.data.qty_remaining == 0) {
-                                classes += ' finished';
-                            } else if (self.data.qty_done > 0) {
-                                classes += ' unfinished';
-                            }
-                        }
+            
+            _.each(ui.products, function(product){
+                //~ console.log("Product: ", product)
+                if(product.id == self.data.product_id.id){
+                    
+                    console.log('tagtag',product.ean13)
+                    console.log('tagtag222222',self.data)
+                    if(self.data['qty_remaining'] < 0){
+                            //~ console.log('Eye cream', self.data['qty_remaining'])
+                            classes += ' qty-over';}
+                    if(product.is_offer){
+                        self.data['qty_done'] = self.data['quantity'];
+                        console.log('QTY',self.data.quantity)
+                        console.log('QTY1', self.data['qty_done'])
+                        
+                        console.log('QTY2', self.data['qty_remaining'])
+                        console.log('QTY3', self.data['quantity'])
+                        //~ self.data['qty_remaining'] = self.data['quantity'] - self.data['qty_done'];
+                        classes += ' hidden';
+                        
                     }
-                    console.log("MyTag3: ", classes)
-                })
-            }
+                //~ if(product.ean13 = self.data.product_id.ean13)
+                    
+                }
+                    
+                
+                //~ console.log("MyTag3: ", classes)
+            })
+            
             //~ console.log("MyTag4: ", classes)
+        
             if (this.data.qty_remaining < 0) {
                 classes += ' qty-over';
             } else if (this.data.qty_remaining == 0) {
@@ -110,10 +118,12 @@ function openerp_picking_alt_widgets(instance){
                 classes += ' unfinished';
             } 
             
+            
             if (this.newly_scanned) {
                 // This is the most recently scanned line. Mark it as such for CSS.
                 classes += ' abc_newly_scanned';
                 this.newly_scanned = false;
+                //~ console.log('Haze X')
             }
             //~ console.log('Haze 2', this.data.product.is_offer)
             return classes;
@@ -122,6 +132,7 @@ function openerp_picking_alt_widgets(instance){
             // Update quantity for this row.
             // qty: the new quantity
             // reorder: boolean. set to true to reorder te rows
+            
             if (qty === NaN) {
                 qty = 0.0;
             } else if (qty < 0.0) {
@@ -146,9 +157,9 @@ function openerp_picking_alt_widgets(instance){
                     this.destroy(); //funkar detta?
                     //parent.renderElement()
                 }
-            } else if (this.data.qty_remaining < 0){
+            } else if (this.data.qty_remaining < 0 ){
                 picking.getParent().error_beep.play();
-            }
+            } 
             // Save changes to storage
             picking.save('rows');
             this.newly_scanned = true;
@@ -323,7 +334,7 @@ function openerp_picking_alt_widgets(instance){
             //~ console.log(this);
             _.each(this.rows, function(row){
                 let product = row.get_product();
-                console.log('Haze weight', product)
+                //~ console.log('Haze weight', product)
                 weight += row.data.qty_done * product.weight;
             })
             return weight;
