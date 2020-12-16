@@ -88,14 +88,6 @@ function openerp_picking_alt_widgets(instance){
                             console.log('QTY', self.data['qty_done'])
                             self.data.qty_remaining = 0;
                             classes += ' hidden';
-                        }else{
-                            if (self.data.qty_remaining < 0) {
-                                classes += ' qty-over';
-                            } else if (self.data.qty_remaining == 0) {
-                                classes += ' finished';
-                            } else if (self.data.qty_done > 0) {
-                                classes += ' unfinished';
-                            }
                         }
                     }
                     console.log("MyTag3: ", classes)
