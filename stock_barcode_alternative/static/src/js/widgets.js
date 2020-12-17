@@ -79,28 +79,17 @@ function openerp_picking_alt_widgets(instance){
             //~ console.log('LukasQ', this.data.quantity);
             
             let ui = this.get_picking_widget().getParent();
-            
-            _.each(ui.products, function(product){
-                //~ console.log("Product: ", product)
-                if(product.id == self.data.product_id.id){
-                    
-                    console.log('tagtag',product.ean13)
-                    console.log('tagtag222222',self.data)
-                    if(self.data['qty_remaining'] < 0){
-                            //~ console.log('Eye cream', self.data['qty_remaining'])
-                            classes += ' qty-over';}
-                    if(product.is_offer){
-                        self.data['qty_done'] = self.data['quantity'];
-                        console.log('QTY',self.data.quantity)
-                        console.log('QTY1', self.data['qty_done'])
-                        
-                        console.log('QTY2', self.data['qty_remaining'])
-                        console.log('QTY3', self.data['quantity'])
-                        //~ self.data['qty_remaining'] = self.data['quantity'] - self.data['qty_done'];
-                        classes += ' hidden';
-                        
+            if(ui.products){
+                _.each(ui.products, function(product){
+                    console.log("Product: ", product)
+                    if(product.id == self.data.product_id.id){
+                        if(product.is_offer){
+                            self.data['qty_done'] = self.data['quantity'];
+                            console.log('QTY', self.data['qty_done'])
+                            self.data.qty_remaining = 0;
+                            classes += ' hidden';
+                        }
                     }
-                //~ if(product.ean13 = self.data.product_id.ean13)
                     
                 }
                     
