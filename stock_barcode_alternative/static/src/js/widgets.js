@@ -91,11 +91,11 @@ function openerp_picking_alt_widgets(instance){
                         }
                     }
                     
-                }
+                })
                     
                 
                 //~ console.log("MyTag3: ", classes)
-            })
+            };
             
             //~ console.log("MyTag4: ", classes)
         
