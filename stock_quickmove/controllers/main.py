@@ -60,7 +60,7 @@ class StockSquickMove(http.Controller):
                             request.env['stock.move'].create({
                                 'product_id': product.id,
                                 'name': product.name,
-                                'product_uom_qty': float(v),
+                                'product_uom_qty': float(v.replace(',','.')),
                                 'product_uom': product.uom_id.id,
                                 'location_id': location_src_id,
                                 'location_dest_id': location_dest_id,
@@ -76,7 +76,7 @@ class StockSquickMove(http.Controller):
                             if move:
                                 move.write({
                                     'name': product.name,
-                                    'product_uom_qty': float(v),
+                                    'product_uom_qty': float(v.replace(',','.')),
                                     'product_uom': product.uom_id.id,
                                     'location_id': location_src_id,
                                     'location_dest_id': location_dest_id,
@@ -85,7 +85,7 @@ class StockSquickMove(http.Controller):
                                 request.env['stock.move'].create({
                                     'product_id': product.id,
                                     'name': product.name,
-                                    'product_uom_qty': float(v),
+                                    'product_uom_qty': float(v.replace(',','.')),
                                     'product_uom': product.uom_id.id,
                                     'location_id': location_src_id,
                                     'location_dest_id': location_dest_id,
