@@ -59,12 +59,32 @@ Plockning per rad?
 
 class stock_picking(models.Model):
     _inherit = 'stock.picking'
-    
+
+    # To speed up report building:
     nbr_lines = fields.Integer('# lines', compute='_get_nbr_lines', store=True)
+    pcs_count = fields.Integer("Item count", compute="_get_item_count", store=True, help="Number of countable (pcs) items in the picking.")
     @api.one
     @api.depends('pack_operation_ids','carrier_tracking_ref')
     def _get_nbr_lines(self):
         self.nbr_lines = len(self.pack_operation_ids)
+
+    @api.one
+    @api.depends("move_lines") # Might need a few more
+    def _get_item_count(self):
+        '''
+        Count the number of countable (pcs) items in the picking.
+        '''
+        qty = 0
+        ignore_count = 0
+        pcs_id = self.env["product.uom"].search([["name","=","st"]]).id # Locale issue: Apparently pcs is translated to st at some point
+        for ml in self.move_lines:
+            if ml.product_uom.id == pcs_id:
+                qty += ml.product_uom_qty # Note product_uom_qty instead of product_qty
+            else:
+                ignore_count += 1
+        if ignore_count:
+            _logger.info("Calculation of pcs_count in picking {} ignored {} non pcs lines".format(self.id, ignore_count))
+        self.pcs_count = qty
 
 class stock_picking_report(models.Model):
     _name = "stock_picking.report"
@@ -86,7 +106,7 @@ class stock_picking_report(models.Model):
     move_type = fields.Selection([('direct', 'Partial'), ('one', 'All at once')],string="Move Type", readonly=True)
     #~ location_id = fields.Many2one(comodel_name='stock.location', string='Location', readonly=True)
     #~ location_dest_id = fields.Many2one(comodel_name='stock.location', string='Destination', readonly=True)
-        
+
     partner_id = fields.Many2one(comodel_name='res.partner', string='Partner', readonly=True)
     company_id = fields.Many2one(comodel_name='res.company', string='Company', readonly=True)
     delay = fields.Float(string='Commitment Delay', digits=(16,2), readonly=True)
@@ -95,7 +115,8 @@ class stock_picking_report(models.Model):
     nbr_lines = fields.Integer(string='# of Lines', readonly=True)
     nbr_group = fields.Integer(string='# of Group', readonly=True)
     nbr_pickings = fields.Integer(string='# of Pickings', readonly=True)
-        
+    pcs_count = fields.Integer(string="Item count", readonly=True,)
+
     state = fields.Selection([
                 ('draft', 'Draft'),
                 ('cancel', 'Cancelled'),
@@ -104,7 +125,7 @@ class stock_picking_report(models.Model):
                 ('partially_available', 'Partially Available'),
                 ('assigned', 'Ready to Transfer'),
                 ('done', 'Transferred')], readonly=True)
-    
+
     _order = 'date desc'
 
 #~ (select count(*) from stock_pack_operation where picking_id = sp.id) as nbr_lines,
@@ -117,15 +138,13 @@ class stock_picking_report(models.Model):
                     count(distinct sp.group_id) as nbr_group,
                     count(distinct sp.id) as nbr_pickings,
                     sp.nbr_lines as nbr_lines,
+                    sp.pcs_count as pcs_count,
                     sp.date as date,
                     sp.date_done as date_done,
                     sp.partner_id as partner_id,
                     sp.company_id as company_id,
                     extract(epoch from avg(date_trunc('day',sp.date_done)-date_trunc('day',sp.min_date)))/(24*60*60)::decimal(16,2) as delay,
                     extract(epoch from avg(date_trunc('day',sp.date_done)-date_trunc('day',sp.date)))/(24*60*60)::decimal(16,2) as leadtime,
-                    
-
-                    
                     sp.state,
                     sp.picking_type_id as picking_type_id,
                     sp.move_type as move_type
@@ -142,7 +161,7 @@ class stock_picking_report(models.Model):
 
     def _group_by(self):
         group_by_str = """
-            GROUP BY 
+            GROUP BY
                     sp.group_id,
                     sp.date,
                     sp.date_done,
