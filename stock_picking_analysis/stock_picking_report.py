@@ -86,6 +86,57 @@ class stock_picking(models.Model):
             _logger.info("Calculation of pcs_count in picking {} ignored {} non pcs lines".format(self.id, ignore_count))
         self.pcs_count = qty
 
+    @api.model
+    def pcs_piecewise_recount_job(self):
+        '''
+        Force recount of pcs_count in a piecemeal fashion. Automatically
+        deactivates at the end of calculation.
+
+        Useful if module update failed for some reason. Eg: Tried to update too
+        many rows at once.
+        '''
+        param_strs = self.env["ir.config_parameter"].get_param(
+            "stock_picking_recalc_pcs_count_control").split(",")
+        if param_strs[0] == '#':
+            return
+        # else:
+        start = int(param_strs[0])
+        step  = int(param_strs[1])+start
+        stop  = int(param_strs[2])
+
+
+        if stop <= 0:
+            stop = self.env["stock.picking"].search([],order="id desc",limit=1).id
+
+        rs = self.env["stock.picking"].search(
+            [["id",">=",start],["id","<",step]],order="id asc")
+        _logger.info("Starting pcs recount for {}..{}".format(rs[0].id,rs[1].id))
+        for r in rs:
+            #r._get_item_count()
+            pass
+        _logger.info("pcs recount done for {}..{}".format(rs[0].id,rs[1].id))
+
+        # Deactivate if passed the stop condition
+        if step > stop:
+            # TODO: Make workaround - Can't edit cron while running
+            #self.env.ref('stock_picking_analysis.stock_picking_recalc_pcs_count_cron').active = False
+            #_logger.info("Deactivating cronjob...")
+            self.env["ir.config_parameter"].set_param(
+                "stock_picking_recalc_pcs_count_control",",".join(
+                    ('#',"0",param_strs[1],param_strs[2]))) # #-symbol stop the recount, "0" for start reset
+            _logger.info("pcs_count recount done. Disabling cronjob.".format(rs[0].id,rs[1].id))
+
+        else:
+            self.env["ir.config_parameter"].set_param(
+                "stock_picking_recalc_pcs_count_control",",".join(
+                    (str(step),param_strs[1],param_strs[2])))
+            _logger.info("pcs_count recount iteration done".format(rs[0].id,rs[1].id))
+
+
+
+
+
+
 class stock_picking_report(models.Model):
     _name = "stock_picking.report"
     _description = "Stock Picking Statistics"
