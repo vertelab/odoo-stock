@@ -113,7 +113,7 @@ class stock_picking(models.Model):
             [["id",">=",start],["id","<",step]],order="id asc")
         _logger.info("Starting pcs recount for {}..{}".format(rs[0].id,rs[1].id))
         for r in rs:
-            #r._get_item_count()
+            r._get_item_count()
             pass
         _logger.info("pcs recount done for {}..{}".format(rs[0].id,rs[1].id))
 
