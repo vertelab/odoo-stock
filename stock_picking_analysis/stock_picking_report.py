@@ -76,7 +76,8 @@ class stock_picking(models.Model):
         '''
         qty = 0
         ignore_count = 0
-        pcs_id = self.env["product.uom"].search([["name","=","st"]]).id # Locale issue: Apparently pcs is translated to st at some point
+
+        pcs_id = self.env.ref('product.product_uom_unit').id # (Units) by default, pcs in db and st by translate :/
         for ml in self.move_lines:
             if ml.product_uom.id == pcs_id:
                 qty += ml.product_uom_qty # Note product_uom_qty instead of product_qty
