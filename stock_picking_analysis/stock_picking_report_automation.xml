@@ -5,7 +5,7 @@
         <record id="stock_picking_recalc_pcs_count_control" model="ir.config_parameter">
              <field name="key">stock_picking_recalc_pcs_count_control</field>
              <!-- start,step,stop -->
-             <field name="value">0,1000,-1</field>
+             <field name="value">0,5000,-1</field>
         </record>
         <record id="stock_picking_recalc_pcs_count_cron" model="ir.cron">
             <field name="name">Recalculate pcs_count</field>
@@ -24,7 +24,7 @@
             <field name="state">code</field>
             <field name="code">
 # Calculate number of runs stock_picking_recalc_pcs_count_cron
-# need to recalculate pcs_count and reset the control-parameter.
+# need to recalculate pcs_count, activate cron and reset the control-parameter.
 
 # Retreive params
 param_strs = env["ir.config_parameter"].get_param(
@@ -47,7 +47,7 @@ env["ir.config_parameter"].set_param(
         (str(start),param_strs[1],str(stop))))
 
 env.ref('stock_picking_analysis.stock_picking_recalc_pcs_count_cron').numbercall = nbr_of_iters
-#env.ref('stock_picking_analysis.stock_picking_recalc_pcs_count_cron').active = True
+env.ref('stock_picking_analysis.stock_picking_recalc_pcs_count_cron').active = True
             </field>
         </record>
     </data>

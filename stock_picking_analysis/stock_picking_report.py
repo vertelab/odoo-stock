@@ -105,23 +105,18 @@ class stock_picking(models.Model):
         step  = int(param_strs[1])+start
         stop  = int(param_strs[2])
 
-
         if stop <= 0:
             stop = self.env["stock.picking"].search([],order="id desc",limit=1).id
 
         rs = self.env["stock.picking"].search(
             [["id",">=",start],["id","<",step]],order="id asc")
-        _logger.info("Starting pcs recount for {}..{}".format(rs[0].id,rs[1].id))
+        _logger.info("Starting pcs recount for id's in range: {}..{}".format(rs[0].id,rs[-1].id))
         for r in rs:
             r._get_item_count()
-            pass
-        _logger.info("pcs recount done for {}..{}".format(rs[0].id,rs[1].id))
+        _logger.info("pcs recount done for id's in range {}..{}".format(rs[0].id,rs[-1].id))
 
         # Deactivate if passed the stop condition
         if step > stop:
-            # TODO: Make workaround - Can't edit cron while running
-            #self.env.ref('stock_picking_analysis.stock_picking_recalc_pcs_count_cron').active = False
-            #_logger.info("Deactivating cronjob...")
             self.env["ir.config_parameter"].set_param(
                 "stock_picking_recalc_pcs_count_control",",".join(
                     ('#',"0",param_strs[1],param_strs[2]))) # #-symbol stop the recount, "0" for start reset
