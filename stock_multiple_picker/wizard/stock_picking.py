@@ -45,7 +45,7 @@ class stock_picking_wizard(models.TransientModel):
         picking_ids = self._context.get('active_ids')
         return picking_ids
 
-    employee_ids = fields.Many2many(comodel_name='hr.employee', string='Picking Employee', default=_default_employee_id, required=True)
+    employee_ids = fields.Many2many(comodel_name='hr.employee', string='Picking Employee', default=_default_employee_id, required=False)
     picking_ids = fields.Many2many(comodel_name='stock.picking', string='Stock Picking', default=_default_picking_ids, required=True)
     force = fields.Boolean('Replace Current Picking Employee')
     no_print = fields.Boolean(string="No Print", help="This is for not print out")
@@ -55,8 +55,12 @@ class stock_picking_wizard(models.TransientModel):
 
         if self.force or not self.picking_ids.mapped('employee_id'):
             for picking in self.picking_ids:
-                picking.employee_id = self.employee_ids[0]
-                picking.employee_ids = self.employee_ids
+                if len(self.employee_ids) > 0:
+                    picking.employee_id = self.employee_ids[0]
+                    picking.employee_ids = self.employee_ids
+                else:
+                    picking.employee_id = None
+                    picking.employee_ids = None
             last_move = None
             picker_count = len(self.employee_ids)
             i = 0
@@ -64,10 +68,13 @@ class stock_picking_wizard(models.TransientModel):
                 if last_move and last_move.product_id == move.product_id:
                     move.employee_id = last_move.employee_id
                 else:
-                    move.employee_id = self.employee_ids[i]
-                    i += 1
-                    if i == picker_count:
-                        i = 0
+                    if len(self.employee_ids) > 0:
+                        move.employee_id = self.employee_ids[i]
+                        i += 1
+                        if i == picker_count:
+                            i = 0
+                    else:
+                        move.employee_id = None
                 last_move = move
             if not self.no_print:
                 self.env['report'].print_document(self.picking_ids, 'stock_multiple_picker.picking_operations_document')
