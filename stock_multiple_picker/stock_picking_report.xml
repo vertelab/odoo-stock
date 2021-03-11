@@ -146,11 +146,11 @@
                       <th class="text-right">
                         <strong>Quantity</strong>
                       </th>
-                      <th class="text-right">
-                        <strong>Weight</strong>
-                      </th>
                       <th>
                         <strong>Product</strong>
+                      </th>
+                      <th class="text-right">
+                        <strong>Weight</strong>
                       </th>
                       <!--
                            <t t-if="o.picking_type_id.code != 'incoming'"><th><strong>Source</strong></th></t>
@@ -188,11 +188,11 @@
                               <span t-field="move.product_uom" groups="product.group_uom" />
                             </t>
                           </td>
-                          <td class="text-right">
-                            <span t-field="move.weight" />
-                          </td>
                           <td>
                             <span t-field="move.product_id" />
+                          </td>
+                          <td class="text-right">
+                            <span t-field="move.weight" />
                           </td>
                           <!--
                                <t t-if="o.picking_type_id.code != 'incoming'">
@@ -250,11 +250,11 @@
                       <th class="text-right">
                         <strong>Quantity</strong>
                       </th>
-                      <th class="text-right">
-                        <strong>Weight</strong>
-                      </th>
                       <th>
                         <strong>Product</strong>
+                      </th>
+                      <th class="text-right">
+                        <strong>Weight</strong>
                       </th>
                       <t t-if="o.picking_type_id.code != 'outgoing'">
                         <th>
@@ -283,14 +283,14 @@
                         <span t-field="pack_operation.product_qty" />
                         <span t-field="pack_operation.product_uom_id" groups="product.group_uom" />
                       </td>
-                      <td class="text-right">
-                        <span t-esc="line_weight" />
-                      </td>
                       <td>
                         <span t-field="pack_operation.product_id" />
                         <t t-if="not pack_operation.product_id and pack_operation.package_id">
                           <span t-field="pack_operation.package_id" />
                         </t>
+                      </td>
+                      <td class="text-right">
+                        <span t-esc="line_weight" />
                       </td>
                       <t t-if="o.picking_type_id.code != 'outgoing'">
                         <td>
