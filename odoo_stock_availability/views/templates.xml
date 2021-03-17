@@ -13,13 +13,5 @@
                 </div>
             </field>
     </record>
-    <template id="iproduct_stock_availability" inherit_id="website_sale.product">
-        <xpath expr="//a[@id='add_to_cart']" position="before">
-            <div>
-                <t t-esc="(tuple(filter(lambda value: value[0] == product.product_availability,
-                    product._fields['product_availability']._description_selection(env)))[0][1])"/>
-            </div>
-        </xpath>
-    </template>
 </odoo>
 
