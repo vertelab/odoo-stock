@@ -36,11 +36,6 @@ class ProductTemplate(models.Model):
         info = {"virtual_available": {"in_stock": unlimited, "limited": unlimited, "out_of_stock": 0},
             "available_threshold": {"in_stock": 0, "limited": unlimited, "out_of_stock": 0},
             }
-        _logger.warning("ENTER"*10)
-        _logger.warning("combo"*30)
-        _logger.warning(product.inventory_availability)
-        _logger.warning("combo"*30)
-
         combination_info.update({
             'virtual_available': info['virtual_available'][product_availability],
             'virtual_available_formatted': "Limited",
@@ -57,11 +52,10 @@ class ProductTemplate(models.Model):
 
 class WebsiteSaleMaVariantController(WebsiteSaleStockVariantController):
     @http.route()
-    def get_combination_info_website(self, product_template_id, product_id, combination, add_qty, **kw):
+    def get_combination_info_website(self, product_template_id, 
+        product_id, combination, add_qty, **kw):
         kw['context'] = kw.get('context', {})
         kw['context'].update(website_sale_stock_ma=True)
-        combination = super(WebsiteSaleStockVariantController, self).get_combination_info_website(product_template_id, product_id, combination, add_qty, **kw)
-        _logger.warning("v"*99)
-        _logger.warning(combination)
-        _logger.warning("^"*99)
+        combination = super(WebsiteSaleStockVariantController, self).get_combination_info_website(product_template_id,
+            product_id, combination, add_qty, **kw)
         return combination
