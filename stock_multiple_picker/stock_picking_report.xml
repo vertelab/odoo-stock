@@ -149,6 +149,9 @@
                                <th style="padding-left: 50px;">
                                   <strong>Product</strong>
                                </th>
+                               <th class="text-right">
+                                  <strong>Weight</strong>
+                               </th>
                                <!--
                                <t t-if="o.picking_type_id.code != 'incoming'"><th><strong>Source</strong></th></t>
                                <th><strong>Barcode</strong></th>
@@ -189,6 +192,9 @@
                                         <td style="padding-left: 50px;">
                                            <span t-field="move.product_id" />
                                         </td>
+                                        <td style="text-right">
+                                           <span t-field="move.weight" />
+                                        </td>
                                      </t>
                                      <!--
                                    <t t-if="o.picking_type_id.code != 'incoming'">
@@ -227,9 +233,9 @@
                                <td class="text-right">
                                   <span t-esc="total_quantity" />
                                </td>
-                               <!-- <td class="text-right">
+                               <td class="text-right">
                             <span t-esc="total_weight"/>
-                          </td> -->
+                          </td>
                                <td />
                                <td />
                             </tr>
