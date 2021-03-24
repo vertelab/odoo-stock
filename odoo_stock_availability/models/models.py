@@ -6,14 +6,19 @@ import logging
 _logger = logging.getLogger(__name__)
 
 from odoo.addons.website_sale_stock.controllers.variant import WebsiteSaleStockVariantController
+from odoo.addons.website_sale_stock.models.product_template import ProductTemplate
 
 
-class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+class Product(models.Model):
+    _inherit = 'product.product'
 
     product_availability = fields.Selection([("in_stock", "In stock"),
         ("limited", "Limited"), ("out_of_stock", "Out of stock")],
         default="in_stock", required=True)
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
 
     def _get_combination_info(self, combination=False, product_id=False,add_qty=1,
         pricelist=False, parent_combination=False, only_template=False):
@@ -47,6 +52,7 @@ class ProductTemplate(models.Model):
             'cart_qty': product.cart_qty,
             'uom_name': product.uom_id.name,
         })
+        _logger.warning("#"*99)
         return combination_info
 
 
