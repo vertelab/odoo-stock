@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record model="ir.ui.view" id="product_stock_availability">
-            <field name="name">stock-availability.template</field>
-            <field name="model">product.product</field>
-            <field name="inherit_id" ref="product.product_normal_form_view"/>
-            <field name="arch" type="xml">
-                <div name="options" position="inside">
-                    <div>
-                        <label for="product_availability" string="Stock Availability:"/>
-                        <field name="product_availability"></field>
-                    </div>
-                </div>
-            </field>
-    </record>
+    <template inherit_id="web.assets_frontend" id="assets_frontend">
+        <xpath position="after" expr="//script[last()]">
+            <script type="text/javascript" src="/odoo_stock_availability/static/src/js/availability_variant_mixin.js"/>
+        </xpath>
+    </template>
 </odoo>
 

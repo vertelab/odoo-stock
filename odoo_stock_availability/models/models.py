@@ -52,7 +52,10 @@ class ProductTemplate(models.Model):
             'cart_qty': product.cart_qty,
             'uom_name': product.uom_id.name,
         })
-        _logger.warning("#"*99)
+        _logger.warning("v"*99)
+        _logger.warning(combination_info)
+        _logger.warning("^"*99)
+        combination.product_type === 'product' && _.contains(['always', 'threshold'], combination.inventory_availability)
         return combination_info
 
 

@@ -1,60 +1,15 @@
 <odoo>
-  <data>
-    <!-- explicit list view definition -->
-<!--
-    <record model="ir.ui.view" id="odoo-stock-availability.list">
-      <field name="name">odoo-stock-availability list</field>
-      <field name="model">odoo-stock-availability.odoo-stock-availability</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </tree>
-      </field>
+    <record model="ir.ui.view" id="product_stock_availability">
+            <field name="name">stock-availability.template</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <div name="options" position="inside">
+                    <div>
+                        <label for="product_availability" string="Stock Availability:"/>
+                        <field name="product_availability"></field>
+                    </div>
+                </div>
+            </field>
     </record>
--->
-
-    <!-- actions opening views on models -->
-<!--
-    <record model="ir.actions.act_window" id="odoo-stock-availability.action_window">
-      <field name="name">odoo-stock-availability window</field>
-      <field name="res_model">odoo-stock-availability.odoo-stock-availability</field>
-      <field name="view_mode">tree,form</field>
-    </record>
--->
-
-    <!-- server action to the one above -->
-<!--
-    <record model="ir.actions.server" id="odoo-stock-availability.action_server">
-      <field name="name">odoo-stock-availability server</field>
-      <field name="model_id" ref="model_odoo-stock-availability_odoo-stock-availability"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": model._name,
-        }
-      </field>
-    </record>
--->
-
-    <!-- Top menu item -->
-<!--
-    <menuitem name="odoo-stock-availability" id="odoo-stock-availability.menu_root"/>
--->
-    <!-- menu categories -->
-<!--
-    <menuitem name="Menu 1" id="odoo-stock-availability.menu_1" parent="odoo-stock-availability.menu_root"/>
-    <menuitem name="Menu 2" id="odoo-stock-availability.menu_2" parent="odoo-stock-availability.menu_root"/>
--->
-    <!-- actions -->
-<!--
-    <menuitem name="List" id="odoo-stock-availability.menu_1_list" parent="odoo-stock-availability.menu_1"
-              action="odoo-stock-availability.action_window"/>
-    <menuitem name="Server to list" id="odoo-stock-availability" parent="odoo-stock-availability.menu_2"
-              action="odoo-stock-availability.action_server"/>
--->
-  </data>
 </odoo>
