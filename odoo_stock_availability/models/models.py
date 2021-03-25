@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, http
+from odoo.addons.website_sale_stock.controllers.variant import WebsiteSaleStockVariantController
+from odoo.addons.website_sale_stock.models.product_template import ProductTemplate
 
 import logging
 _logger = logging.getLogger(__name__)
-
-from odoo.addons.website_sale_stock.controllers.variant import WebsiteSaleStockVariantController
-from odoo.addons.website_sale_stock.models.product_template import ProductTemplate
 
 
 class Product(models.Model):
@@ -16,9 +15,9 @@ class Product(models.Model):
         ("limited", "Limited"), ("out_of_stock", "Out of stock")],
         default="in_stock", required=True)
 
+
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
-
 
     def _get_combination_info(self, combination=False, product_id=False,add_qty=1,
         pricelist=False, parent_combination=False, only_template=False):
@@ -36,7 +35,6 @@ class ProductTemplate(models.Model):
             product = self.sudo()
 
         product_availability = product.product_availability
-        website = self.env['website'].get_current_website()
         unlimited = 2147483648
         info = {"virtual_available": {"in_stock": unlimited, "limited": unlimited, "out_of_stock": 0},
             "available_threshold": {"in_stock": 0, "limited": unlimited, "out_of_stock": 0},
@@ -52,11 +50,11 @@ class ProductTemplate(models.Model):
             'cart_qty': product.cart_qty,
             'uom_name': product.uom_id.name,
         })
-        combination.product_type === 'product' && _.contains(['always', 'threshold'], combination.inventory_availability)
         return combination_info
 
 
 class WebsiteSaleMaVariantController(WebsiteSaleStockVariantController):
+    
     @http.route()
     def get_combination_info_website(self, product_template_id, 
         product_id, combination, add_qty, **kw):
