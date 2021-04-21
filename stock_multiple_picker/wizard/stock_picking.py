@@ -84,7 +84,6 @@ class stock_picking_wizard(models.TransientModel):
         else:
             raise Warning(_('Picking Employee is already set.'))
 
-            
     def batch_picking(self):
 
         """§

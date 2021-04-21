@@ -32,6 +32,7 @@
     'website': 'http://www.vertel.se',
     'depends': ['stock', 'hr', 'base_report_to_printer'],
     'data': [
+        'security/ir.model.access.csv',
         'wizard/stock_picking_view.xml',
         'views/stock_view.xml',
         'views/stock_picking_report.xml',
