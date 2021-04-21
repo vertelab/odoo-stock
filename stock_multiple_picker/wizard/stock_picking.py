@@ -19,9 +19,9 @@
 #
 ##############################################################################
 
-import openerp.exceptions
-from openerp.exceptions import except_orm, Warning, RedirectWarning,MissingError
-from openerp import models, fields, api, _
+import odoo.exceptions
+from odoo.exceptions import except_orm, Warning, RedirectWarning,MissingError
+from odoo import models, fields, api, _
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ class stock_picking_wizard(models.TransientModel):
     
     def _default_employee_id(self):
         hr = self.env['hr.employee'].search([('user_id', '=', self.env.uid if self.env.uid else '')])
-        return [(6,0,[hr[0].id])] if len(hr) > 0 else None
+        return [(6, 0 ,[hr[0].id])] if len(hr) > 0 else None
     
     def _default_picking_id(self):
         picking_id = self._context.get('active_id')
@@ -45,14 +45,14 @@ class stock_picking_wizard(models.TransientModel):
         picking_ids = self._context.get('active_ids')
         return picking_ids
 
-    employee_ids = fields.Many2many(comodel_name='hr.employee', string='Picking Employee', default=_default_employee_id, required=False)
-    picking_ids = fields.Many2many(comodel_name='stock.picking', string='Stock Picking', default=_default_picking_ids, required=True)
+    employee_ids = fields.Many2many(comodel_name='hr.employee', string='Picking Employee', default=_default_employee_id,
+                                    required=False)
+    picking_ids = fields.Many2many(comodel_name='stock.picking', string='Stock Picking', default=_default_picking_ids,
+                                   required=True)
     force = fields.Boolean('Replace Current Picking Employee')
     no_print = fields.Boolean(string="No Print", help="This is for not print out")
 
-    @api.multi
     def set_picking_employee(self):
-
         if self.force or not self.picking_ids.mapped('employee_id'):
             for picking in self.picking_ids:
                 if len(self.employee_ids) > 0:
@@ -85,7 +85,6 @@ class stock_picking_wizard(models.TransientModel):
             raise Warning(_('Picking Employee is already set.'))
 
             
-    @api.multi
     def batch_picking(self):
 
         """§

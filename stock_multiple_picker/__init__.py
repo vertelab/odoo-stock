@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
-import stock
-import wizard
+from . import models
+from . import wizard

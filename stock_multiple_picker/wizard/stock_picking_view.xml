@@ -25,14 +25,12 @@
         <record id="stock_picking_wizard_form_act" model="ir.actions.act_window">
             <field name="name">Set Picking Employee</field>
             <field name="res_model">stock.picking.multiple</field>
-            <field name="view_type">form</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
         </record>
         <record id="stock_picking_multi_action" model="ir.actions.server">
             <field name="name">Set Picking Employee</field>
             <field name="model_id" ref="stock.model_stock_picking" />
-            <field name="condition">True</field>
             <field name="type">ir.actions.server</field>
             <field name="state">code</field>
             <field name="code">
@@ -42,22 +40,21 @@ action = { 'name':'Set Picking Employee','res_model':'stock.picking.multiple','v
             <record id="stock_picking_multi_action2" model="ir.actions.server">
             <field name="name">Batch picking</field>
             <field name="model_id" ref="stock.model_stock_picking" />
-            <field name="condition">True</field>
             <field name="type">ir.actions.server</field>
             <field name="state">code</field>
             <field name="code">
 action = { 'name':'Batch Picking','res_model':'stock.picking.multiple','view_model':'form','view_mode':'form','target':'new','type':'ir.actions.act_window','context':{'active_ids':env.context.get('active_ids', []) }  }
             </field>
         </record>
-        <record model="ir.values" id="stock_picking_menu_action">
-            <field name="name">Set Picking employee</field>
-            <field name="model">stock.picking</field>
-            <field name="model_id" ref="stock.model_stock_picking" />
-            <field name="key2">client_action_multi</field>
-            <field name="value" eval="'ir.actions.server,%d' % stock_picking_multi_action" />
-        </record>
-        <record model="ir.actions.server" id="stock_picking_multi_action">
-            <field name="menu_ir_values_id" ref="stock_picking_menu_action" />
-        </record>
+<!--        <record model="ir.values" id="stock_picking_menu_action">-->
+<!--            <field name="name">Set Picking employee</field>-->
+<!--            <field name="model">stock.picking</field>-->
+<!--            <field name="model_id" ref="stock.model_stock_picking" />-->
+<!--            <field name="key2">client_action_multi</field>-->
+<!--            <field name="value" eval="'ir.actions.server,%d' % stock_picking_multi_action" />-->
+<!--        </record>-->
+<!--        <record model="ir.actions.server" id="stock_picking_multi_action">-->
+<!--            <field name="menu_ir_values_id" ref="stock_picking_menu_action" />-->
+<!--        </record>-->
     </data>
 </openerp>
