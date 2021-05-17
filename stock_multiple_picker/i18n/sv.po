@@ -1,0 +1,277 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* stock_multiple_picker
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-11-10 11:04+0000\n"
+"PO-Revision-Date: 2020-11-10 11:04+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_multiple_picker
+#: view:stock.picking.multiple:stock_multiple_picker.stock_picking_wizard_form
+msgid "Batch Picking"
+msgstr "Partiplocking"
+
+#. module: stock_multiple_picker
+#: model:ir.actions.server,name:stock_multiple_picker.stock_picking_multi_action2
+msgid "Batch picking"
+msgstr "Partiplockning"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Box"
+msgstr "Fack"
+
+#. module: stock_multiple_picker
+#: field:stock.picking,box_label:0
+msgid "Box Label"
+msgstr "Box etikett"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+msgid "Box:"
+msgstr "Box:"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Carrier"
+msgstr "Speditör"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Comment"
+msgstr "Kommentar"
+
+#. module: stock_multiple_picker
+#: field:stock.picking.multiple,create_uid:0
+msgid "Created by"
+msgstr "Skapades av"
+
+#. module: stock_multiple_picker
+#: field:stock.picking.multiple,create_date:0
+#: view:website:stock_multiple_picker.picking_operations_document
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Created on"
+msgstr "Skapades på"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+msgid "Customer Address:"
+msgstr "Customer Address:"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+msgid "Delivery Address:"
+msgstr "Delivery Address:"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+msgid "Destination"
+msgstr "Destination"
+
+#. module: stock_multiple_picker
+#: field:stock.picking.multiple,display_name:0
+msgid "Display Name"
+msgstr "Display Name"
+
+#. module: stock_multiple_picker
+#: field:stock.picking.multiple,id:0
+msgid "ID"
+msgstr "ID"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Invoice Type"
+msgstr "Fakturatyp"
+
+#. module: stock_multiple_picker
+#: field:stock.picking.multiple,__last_update:0
+msgid "Last Modified on"
+msgstr "Last Modified on"
+
+#. module: stock_multiple_picker
+#: field:stock.picking.multiple,write_uid:0
+msgid "Last Updated by"
+msgstr "Last Updated by"
+
+#. module: stock_multiple_picker
+#: field:stock.picking.multiple,write_date:0
+msgid "Last Updated on"
+msgstr "Last Updated on"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+msgid "Meddelande:"
+msgstr "Meddelande:"
+
+#. module: stock_multiple_picker
+#: field:stock.picking.multiple,no_print:0
+msgid "No Print"
+msgstr "Ingen Utskrift"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+msgid "Order (Origin)"
+msgstr "Order (Origin)"
+
+#. module: stock_multiple_picker
+#: model:ir.model,name:stock_multiple_picker.model_stock_picking
+msgid "Packing List"
+msgstr "Packing List"
+
+#. module: stock_multiple_picker
+#: field:stock.picking,employee_ids:0
+msgid "Pickers"
+msgstr "Plockare"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Picking"
+msgstr "Plockning"
+
+#. module: stock_multiple_picker
+#: field:stock.picking.multiple,employee_ids:0
+msgid "Picking Employee"
+msgstr "Plockansvarig"
+
+#. module: stock_multiple_picker
+#: code:addons/stock_multiple_picker/wizard/stock_picking.py:78
+#: code:addons/stock_multiple_picker/wizard/stock_picking.py:97
+#, python-format
+msgid "Picking Employee is already set."
+msgstr "Plockansvarig har redan satt."
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Picking Employee:"
+msgstr "Plockansvarig:"
+
+#. module: stock_multiple_picker
+#: field:stock.move,employee_id:0
+msgid "Picking employee"
+msgstr "Plockare"
+
+#. module: stock_multiple_picker
+#: model:ir.actions.report.xml,name:stock_multiple_picker.picking_operations_group_report
+#: model:ir.actions.report.xml,name:stock_multiple_picker.picking_operations_report
+msgid "Picking with location"
+msgstr "Plocka med plats"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Product"
+msgstr "Produkt"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Quantity"
+msgstr "Antal"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Quantity:"
+msgstr "Quantity:"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Ref"
+msgstr "Ref"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+msgid "Ref:"
+msgstr "Ref:"
+
+#. module: stock_multiple_picker
+#: field:stock.picking.multiple,force:0
+msgid "Replace Current Picking Employee"
+msgstr "Skriv om aktuella plockare"
+
+#. module: stock_multiple_picker
+#: model:ir.actions.act_window,name:stock_multiple_picker.stock_picking_wizard_form_act
+#: model:ir.actions.server,name:stock_multiple_picker.stock_picking_multi_action
+msgid "Set Picking Employee"
+msgstr "Sätt Plockansvarig"
+
+#. module: stock_multiple_picker
+#: model:ir.model,name:stock_multiple_picker.model_stock_picking_multiple
+#: view:stock.picking.multiple:stock_multiple_picker.stock_picking_wizard_form
+msgid "Set Picking Employees"
+msgstr "Sätta plockare"
+
+#. module: stock_multiple_picker
+#: view:stock.picking:stock_multiple_picker.view_picking_form
+msgid "Set Picking Users"
+msgstr "Sätta plockare"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Source"
+msgstr "Källa"
+
+#. module: stock_multiple_picker
+#: model:ir.model,name:stock_multiple_picker.model_stock_move
+msgid "Stock Move"
+msgstr "Lagerflytt"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+msgid "Supplier Address:"
+msgstr "Supplier Address:"
+
+#. module: stock_multiple_picker
+#: help:stock.picking.multiple,no_print:0
+msgid "This is for not print out"
+msgstr "This is for not print out"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Total"
+msgstr "Total"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+msgid "VAT:"
+msgstr "Moms:"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+msgid "Warehouse Address:"
+msgstr "Lageradress:"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_document
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Weight"
+msgstr "Vikt"
+
+#. module: stock_multiple_picker
+#: view:website:stock_multiple_picker.picking_operations_group_document
+msgid "Weight:"
+msgstr "Vikt:"
+
+#. module: stock_multiple_picker
+#: view:stock.picking.multiple:stock_multiple_picker.stock_picking_wizard_form
+msgid "_Cancel"
+msgstr "_Cancel"
+
+#. module: stock_multiple_picker
+#: view:stock.picking.multiple:stock_multiple_picker.stock_picking_wizard_form
+msgid "or"
+msgstr "eller"

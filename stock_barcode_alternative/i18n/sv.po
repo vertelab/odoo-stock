@@ -1,0 +1,135 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* stock_barcode_alternative
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-14 14:35+0000\n"
+"PO-Revision-Date: 2020-04-14 14:35+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_barcode_alternative
+#: code:addons/stock_barcode_alternative/models/stock.py:254
+#, python-format
+msgid "Created and confirmed invoice %s"
+msgstr "Skapade och godkände faktura %s"
+
+#. module: stock_barcode_alternative
+#: view:website:stock_barcode_alternative.barcode_index
+msgid "Barcode Scanner"
+msgstr "Streckkodsläsare"
+
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:137
+#, python-format
+msgid "Clear Data"
+msgstr "Rensa data"
+
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:102
+#, python-format
+msgid "Create Package"
+msgstr "Skapa paket"
+
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:81
+#, python-format
+msgid "Create backorder"
+msgstr "Skapa restorder"
+
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:93
+#, python-format
+msgid "Filter by location..."
+msgstr "Filtrera efter plats..."
+
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:117
+#, python-format
+msgid "From"
+msgstr "Från"
+
+#. module: stock_barcode_alternative
+#: model:ir.model,name:stock_barcode_alternative.model_stock_picking
+msgid "Packing List"
+msgstr "Plocklista"
+
+#. module: stock_barcode_alternative
+#: model:ir.model,name:stock_barcode_alternative.model_stock_transfer_details
+msgid "Picking wizard"
+msgstr "Plock wizard"
+
+#. module: stock_barcode_alternative
+#: model:ir.model,name:stock_barcode_alternative.model_stock_transfer_details_items
+msgid "Picking wizard items"
+msgstr "Plock wizard produkter"
+
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:82
+#, python-format
+msgid "Print"
+msgstr "Utskrift"
+
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:113
+#, python-format
+msgid "Product"
+msgstr "Produkt"
+
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:103
+#, python-format
+msgid "Put in Cart"
+msgstr "Lägg i kundvagn"
+
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:114
+#, python-format
+msgid "Scanned"
+msgstr "Skannad"
+
+#. module: stock_barcode_alternative
+#: model:ir.model,name:stock_barcode_alternative.model_stock_picking_type
+msgid "The picking type determines the picking view"
+msgstr "Plocktypen bestämmer plockvyn"
+
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:118
+#, python-format
+msgid "To"
+msgstr "Till"
+
+#. module: stock_barcode_alternative
+#. openerp-web
+#: code:addons/stock_barcode_alternative/static/src/xml/picking.xml:116
+#, python-format
+msgid "Todo"
+msgstr "Att göra"
+
+#. module: stock_barcode_alternative
+#: view:stock.picking.type:stock_barcode_alternative.stock_picking_type_kanban
+msgid "abc_open_barcode_interface"
+msgstr "abc_open_barcode_interface"
+
+#. module: stock_barcode_alternative
+#: view:stock.picking:stock_barcode_alternative.view_picking_form
+msgid "abc_open_picking"
+msgstr "abc_open_picking"
+
