@@ -14,11 +14,16 @@ thus speeding up the process.
     'author': 'Vertel AB',
     'website': 'http://www.vertel.se',
     'category': 'website',
-    'depends': ['stock'],
+    'depends': ['stock', 'website'],
     'data': [
+        'views/assets.xml',
         'views/stock_view.xml',
+        'views/barcode_index.xml',
     ],
     'installable': True,
+    'application': True,
     'auto_install': False,
-    'qweb': ['static/src/xml/picking.xml'],
+    'qweb': [
+        'static/src/xml/picking.xml'
+    ],
 }

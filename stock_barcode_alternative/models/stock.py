@@ -29,13 +29,14 @@ class StockPicking(models.Model):
         fields = fields or self.abc_get_model_fields(records)
         result = []
         field_types = {}
+
         def field_type(name):
             """Check the type of a field."""
             if name not in field_types:
                 field_types[name] = records.fields_get([name], attributes=['type'])[name]['type']
             return field_types.get(name)
         for record in records:
-            rec ={'_name': record._name, 'id': record.id}
+            rec = {'_name': record._name, 'id': record.id}
             for field in fields:
                 child_fields = None
                 # Relational field
@@ -49,7 +50,7 @@ class StockPicking(models.Model):
                         value = value and value[0] or None
                 rec[field] = value
             result.append(rec)
-            _logger.debug('Lukas1: field %s %s' %(result,fields))
+            _logger.debug('Lukas1: field %s %s' % (result, fields))
         return result
 
     @api.model
@@ -58,12 +59,12 @@ class StockPicking(models.Model):
         if record._name == 'stock.picking':
             return [
                 'name',
-                ('product_id', ['is_offer']),
+                ('product_id', ['sale_ok']),
                 'state',
                 ('partner_id', ['display_name']),
             ]
         if record._name == 'stock.transfer_details_items':
-            _logger.warn("Lukas2 %s" % record.mapped('product_id').mapped('is_offer'))
+            _logger.warn("Lukas2 %s" % record.mapped('product_id').mapped('sale_ok'))
             return [
                     ('product_id', ['display_name']),
                     ('product_uom_id', ['display_name', 'factor']),
@@ -80,7 +81,7 @@ class StockPicking(models.Model):
                     'display_name',
                     'default_code',
                     'ean13',
-                    'is_offer',
+                    'sale_ok',
                     'weight',
                     ('uom_id', ['display_name', 'factor']),
                 ]
@@ -95,15 +96,16 @@ class StockPicking(models.Model):
                 ]
         return ['id']
 
-    def abc_load_picking(self):
+    def abc_load_picking(self, picking_id):
         """Create a JSON description of a picking and its products for the Javascript GUI."""
         # ~ _logger.warn(self)
         # ~ _logger.warn(self._context)
-        self.ensure_one()
-        picking = self.abc_make_records(self)[0]
+        stock_picking_id = self.env['stock.picking'].browse(picking_id)
+        picking = self.abc_make_records(stock_picking_id)
         if self.state == 'assigned':
-            action = self.do_enter_transfer_details()
-            wizard = self.env['stock.transfer_details'].browse(action['res_id'])
+            action = self.button_validate()
+            # wizard = self.env['stock.transfer_details'].browse(action['res_id'])
+            wizard = self.env['stock.immediate.transfer'].browse(action['res_id'])
             operations = self.abc_make_records(wizard.item_ids)
             products = self.abc_make_records(wizard.item_ids.mapped('product_id'))
         else:
@@ -119,7 +121,6 @@ class StockPicking(models.Model):
     def abc_do_transfer(self, lines, packages, **data):
         """Complete the picking operation."""
         # ~ _logger.warn('\nabc_do_transfer\n\n%s\n\n%s\n\n%s' % (lines, packages, data))
-        self.ensure_one()
         res = {'warnings': [], 'messages': [], 'results': {}}
         params = {}
         for step in [s[1] for s in sorted(self.abc_transfer_steps())]:
@@ -130,14 +131,14 @@ class StockPicking(models.Model):
             # params    Parameters accumulated in the picking process. Inject data communicated between steps here.
             # res       The result returned to the UI.
             getattr(self, step)(lines, packages, data, params, res)
-        _logger.debug('Lukas4: %s %s' %(lines,packages))
+        _logger.debug('Lukas4: %s %s' % (lines, packages))
         return res
 
     def abc_create_row(self, row):
         """Provide default locations and other data """
         # Lifted from action_assign on stock.move
         product = self.env['product.product'].browse(row['product_id'])
-        _logger.warning("Lukas5: %s" % product['is_offer'])
+        _logger.warning("Lukas5: %s" % product['sale_ok'])
         location = self.location_id
         main_domain = [('reservation_id', '=', False), ('qty', '>', 0)]
         quants = self.env['stock.quant'].quants_get_prefered_domain(
@@ -151,16 +152,16 @@ class StockPicking(models.Model):
         for quant in quants:
             if quant[0]:
                 location = quant[0].location_id
-        _logger.warning("Lukas6: %s" % self.abc_make_records(product, ['is_offer']))
+        _logger.warning("Lukas6: %s" % self.abc_make_records(product, ['sale_ok']))
         row.update({
             '_name': 'stock.transfer_detailsitems',
             'product_id': self.abc_make_records(product, ['display_name'])[0],
-            'is_offer' : self.abc_make_records(product, ['is_offer'])[0],
+            'sale_ok' : self.abc_make_records(product, ['sale_ok'])[0],
             'destinationloc_id': self.abc_make_records(self.location_dest_id)[0],
             'sourceloc_id': self.abc_make_records(location)[0],
             'product_uom_id': self.abc_make_records(product.uom_id)[0],
         })
-        #_logger.warn('Haze %s' %row['is_offer'])
+        #_logger.warn('Haze %s' %row['sale_ok'])
         return row
 
     @api.model
@@ -176,8 +177,10 @@ class StockPicking(models.Model):
         # TODO: Add support for packages.
         # ~ _logger.warn(lines)
         res['results']['transfer'] = 'failure'
-        action = self.do_enter_transfer_details()
-        wizard = self.env['stock.transfer_details'].browse(action['res_id'])
+        # action = self.do_enter_transfer_details()
+        action = self.button_validate()
+        # wizard = self.env['stock.transfer_details'].browse(action['res_id'])
+        wizard = self.env['stock.immediate.transfer'].browse(action['res_id'])
         # Keep track of matched transfer items
         matched_ids = []
         for line in lines:

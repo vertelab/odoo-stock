@@ -72,43 +72,51 @@
     </t>
     
     <t t-name='AlternativePickingEditorWidget'>
-        <div class="row" id="abc_header">
-                <div>
-                    <div class="col-sm-4 col-xs-6">
-                        <h2 class="oe_pick_app_header"><a id="picking_url_backend" t-att-href="widget.get_backend_url()"><t t-esc="widget.getParent().picking.name"/></a></h2>
-                    </div>
-                    <div class="col-sm-8 col-xs⁻6 text-right">
-                        <button type="button" class='btn btn-default js_pick_done'> Create backorder </button>
-                        <button type="button" class='btn btn-default js_pick_print'> Print </button>
-                    </div>
+        <div class="container" id="abc_header">
+            <div style="display:flex;">
+                <div class="col-lg-6">
+                    <h2 class="oe_pick_app_header">
+                        <a id="picking_url_backend" t-att-href="widget.get_backend_url()">
+                            <t t-esc="widget.getParent().picking"/>
+<!--                            <t t-esc="widget.getParent().picking.name"/>-->
+                        </a>
+                    </h2>
                 </div>
-                <div><ul class="abc-message-area"></ul></div>
+                <div class="col-lg-6 text-right">
+                    <button type="button" class='btn btn-default js_pick_done'> Create backorder </button>
+                    <button type="button" class='btn btn-default js_pick_print'> Print </button>
+                </div>
+            </div>
+            <div>
+                <ul class="abc-message-area"></ul>
+            </div>
         </div>
 
-        <div class="row" id="abc_buttons_header">
+        <div class="container" id="abc_buttons_header">
             <div>
-                <div class="col-md-3 col-sm-4 col-xs-6">
-                    <h2>
-                        <div class="input-group">
+<!--                <div class="col-lg-6 text-left">-->
+<!--                    <h2>-->
+                
+<!--                        <div class="input-group">-->
                         <!--Hidden on request-->
                             <!-- <input type="text" class="form-control oe_searchbox" placeholder="Filter by location..."/>
                             <span class="input-group-btn">
                                 <button class="btn btn-danger js_clear_search" type="button">x</button>
                             </span> -->
-                        </div>
-                    </h2>
-                </div>
-                <div class="col-md-6 col-sm-4 col-xs-12 text-right">
-                    <h3>
+<!--                        </div>-->
+<!--                    </h2>-->
+<!--                </div>-->
+                <div class="col-lg-12">
+                    <h3 style="float:right">
                     <!--Hidden on request-->
-                        <!-- <button type="button" class='btn btn-default js_create_package'> Create Package </button> -->
+<!--                         <button type="button" class='btn btn-default js_create_package'> Create Package </button>-->
                         <button type="button" class='btn btn-danger js_do_transfer fa fa-download'> Put in Cart </button>
                     </h3>
                 </div>
             </div>
         </div>
-        
-        <div>
+
+        <div style="width:100%">
             <table class='table table-condensed js_op_table_todo'>
                 <thead>
                     <tr>
@@ -121,39 +129,34 @@
                     </tr>
                 </thead>
 
-                
-                    <t t-foreach="widget.packages" t-as="package">
-                        <tbody class="abc-packop-package" t-att-data-package-id="'' + package.data.id"/>
-                    </t>
+                <t t-foreach="widget.packages" t-as="package">
+                    <tbody class="abc-packop-package" t-att-data-package-id="'' + package.data.id"/>
+                </t>
             </table>
         </div>
     </t>
     
     <t t-name="AlternativeBarcodeInterface">
-        <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <div class="navbar navbar-inverse navbar-static-top" role="navigation" style="background-color: #222;">
             <div class="container">
                 <div class="navbar-left">
-<!--
-                    <button type="button" class="btn btn-primary navbar-btn js_pick_menu">Menu</button>
--->
-                    <button type="button" class="btn navbar-btn js_clear_storage">Clear Data</button>
+                    <button type="button" class="btn navbar-btn js_clear_storage" style="color: white;">Clear Data</button>
                 </div>
-                <div class="navbar-right">
-<!--
-                    <button type="button" class="btn btn-default navbar-btn js_pick_prev">&lt; Previous</button>
-                    <button type="button" class="btn btn-default navbar-btn js_pick_next">Next &gt;</button>
--->
-                </div>
+<!--                <div class="navbar-right">-->
+<!--                    <t t-call="AlternativePickingEditorWidget"/>-->
+<!--                    <button type="button" class="btn btn-default navbar-btn js_pick_prev">&lt; Previous</button>-->
+<!--                    <button type="button" class="btn btn-default navbar-btn js_pick_next">Next &gt;</button>-->
+<!--                </div>-->
             </div>
+
         </div>
 
         <div class="container">
             <div class='oe_placeholder_picking_editor'/>
-<!--
-            <div class="text-right small oe_reload_op">
-                The reserved stock changed. You might want to <button class="btn btn-default js_reload_op"> Recompute </button> the operations.
-            </div>
--->
+
+<!--            <div class="text-right small oe_reload_op">-->
+<!--                The reserved stock changed. You might want to <button class="btn btn-default js_reload_op"> Recompute </button> the operations.-->
+<!--            </div>-->
         </div>
     </t>
     
