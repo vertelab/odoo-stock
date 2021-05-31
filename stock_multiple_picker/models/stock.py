@@ -29,12 +29,13 @@ class stock_picking(models.Model):
     _inherit = "stock.picking"
 
     qc_id = fields.Many2one(string='Controlled by', comodel_name='hr.employee')
-    employee_ids = fields.Many2many(string="Pickers",comodel_name="hr.employee", compute='_employee_ids',
+    employee_id = fields.Many2one(string='Employee', comodel_name='hr.employee')
+    employee_ids = fields.Many2many(string="Pickers", comodel_name="hr.employee", compute='_employee_ids',
                                     search='_search_employee_ids')
     box_label = fields.Char(string="Box Label")
 
     def _employee_ids(self):
-        self.employee_ids = [(6,0,self.move_lines.mapped('employee_id.id'))]
+        self.employee_ids = [(6, 0, self.move_lines.mapped('employee_id.id'))]
 
     @api.model
     def _search_employee_ids(self, operator, value):

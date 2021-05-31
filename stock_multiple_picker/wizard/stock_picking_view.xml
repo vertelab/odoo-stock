@@ -31,6 +31,8 @@
         <record id="stock_picking_multi_action" model="ir.actions.server">
             <field name="name">Set Picking Employee</field>
             <field name="model_id" ref="stock.model_stock_picking" />
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list</field>
             <field name="type">ir.actions.server</field>
             <field name="state">code</field>
             <field name="code">

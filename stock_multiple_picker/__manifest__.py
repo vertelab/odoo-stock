@@ -30,7 +30,7 @@
     'author': 'Vertel AB',
     'license': 'AGPL-3',
     'website': 'http://www.vertel.se',
-    'depends': ['stock', 'hr', 'base_report_to_printer'],
+    'depends': ['stock', 'hr', 'base_report_to_printer', 'delivery'],
     'data': [
         'security/ir.model.access.csv',
         'wizard/stock_picking_view.xml',

@@ -14,10 +14,10 @@
 <!--        <report id="picking_operations_report" model="stock.picking" string="Picking with location" report_type="qweb-pdf" name="stock_multiple_picker.picking_operations_document" file="stock_picking_.picking_operations_document" />-->
 
         <template id="picking_operations_document">
-            <t t-call="report.html_container">
+            <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
                     <t t-foreach="o.employee_ids" t-as="employee">
-                        <t t-call="report.external_layout">
+                        <t t-call="web.external_layout">
                             <div class="page">
                                 <div class="row">
                                     <div class="col-xs-4 pull-right">
@@ -42,9 +42,14 @@
                                             </span>
                                         </div>
                                         <div t-if="o.partner_id" name="partner_header">
-                                            <t t-if="o.address_id">
-                                                <div t-field="o.address_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: true}" />
+                                            <t t-set="address">
+                                                <div t-field="o.partner_id"
+                                                t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+                                                <p t-if="o.partner_id.vat"><t t-esc="o.company_id.country_id.vat_label or 'Tax ID'"/>: <span t-field="o.partner_id.vat"/></p>
                                             </t>
+<!--                                            <t t-if="o.partner_id.address_id">-->
+<!--                                                <div t-field="o.address_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: true}" />-->
+<!--                                            </t>-->
                                             <p t-if="o.partner_id.vat">
                                                 VAT:
                                                 <span t-field="o.partner_id.vat" />
@@ -121,7 +126,7 @@
                                     <tbody>
                                         <tr>
                                             <td>
-                                                <span t-field="o.partner_id.customer_no" />
+                                                <span t-field="o.partner_id.name" />
                                             </td>
                                             <td>
                                                 <span t-field="o.origin" />
@@ -130,13 +135,9 @@
                                                 <span t-field="o.create_date" />
                                             </td>
                                             <td>
-                                                <span t-field="o.invoice_type_id" />
+                                                <span t-field="o.picking_type_id" />
                                             </td>
-                                            <!--
-                                            <td name="td_sched_date">
-                                            <span t-field="o.min_date" />
-                                            </td>
-                                       -->
+
                                             <td>
                                                 <span t-field="o.carrier_id" />
                                             </td>
@@ -148,7 +149,8 @@
                                 </table>
                                 <br />
                                 <br />
-                                <table class="table table-condensed" t-if="not o.pack_operation_ids">
+<!--                                <table class="table table-condensed" t-if="not o.pack_operation_ids">-->
+                                <table class="table table-condensed" t-if="not o.move_line_ids">
                                     <thead>
                                         <tr>
                                             <th>
@@ -163,10 +165,7 @@
                                             <th class="text-right">
                                                 <strong>Weight</strong>
                                             </th>
-                                            <!--
-                                            <t t-if="o.picking_type_id.code != 'incoming'"><th><strong>Source</strong></th></t>
-                                            <th><strong>Barcode</strong></th>
-                                       -->
+
                                             <t t-if="o.picking_type_id.code != 'outgoing'">
                                                 <th>
                                                     <strong>Destination</strong>
@@ -175,20 +174,20 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!--
-                                         <t t-set="move_lines" t-value="o.move_lines.sorted(key=lambda r: r.reserved_quant_ids[0].location_id.name)"/>
-                                    -->
+
                                         <t t-set="total_quantity" t-value="0" />
                                         <t t-set="total_weight" t-value="0.0" />
-                                        <tr t-foreach="o.move_lines.sorted(key=lambda r: r.quant_source_location)" t-as="move">
+<!--                                        <tr t-foreach="o.move_lines.sorted(key=lambda r: r.quant_source_location)" t-as="move">-->
+                                        <tr t-foreach="o.move_lines.sorted(key=lambda r: r.move_orig_ids)" t-as="move">
                                             <t t-if="employee == move.employee_id">
-                                                <t t-if="not move.is_offer">
+<!--                                                <t t-if="not move.is_offer">-->
+                                                <t>
                                                     <t t-set="total_quantity" t-value="total_quantity + move.product_qty" />
                                                     <t t-set="line_weight" t-value="move.product_id.weight * move.product_qty" />
                                                     <t t-set="total_weight" t-value="total_weight + line_weight" />
                                                     <t t-if="(o.state != 'partially_available') or (move.reserved_availability &gt; 0)">
                                                         <td>
-                                                            <span t-field="move.quant_source_location" />
+                                                            <span t-field="move.move_orig_ids" />
                                                         </td>
                                                         <td class="text-right">
                                                             <t t-if="o.state == 'partially_available'">
@@ -207,27 +206,12 @@
                                                             <span t-field="move.weight" />
                                                         </td>
                                                     </t>
-                                                    <!--
-                                                  <t t-if="o.picking_type_id.code != 'incoming'">
-                                                  <td>
-                                                  <span t-field="move.quant_source_location" />
 
-                                                  <span t-if="move.package_id">:</span><span t-field="move.package_id" />
-                                                  <span t-if="move.lot_id">:</span><span t-field="move.lot_id" />
-
-                                                  </td>
-                                                  </t>
-
-                                                  <td>
-                                                  <span t-if="move.product_id and move.product_id.ean13">
-                                                  <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', move.product_id.ean13, 600, 100)" style="width:300px;height:50px"/>
-                                                  </span>
-                                                  </td>
-                                             -->
                                                     <t t-if="o.picking_type_id.code != 'outgoing'">
                                                         <td>
                                                             <t t-if="move.product_id.stock_location_id and move.location_dest_id.search_count([('id', '=', move.product_id.stock_location_id.id), ('id', 'child_of', move.location_dest_id.id)])">
-                                                                <span t-field="move.product_id.stock_location_id" />
+<!--                                                                <span t-field="move.product_id.stock_location_id" />-->
+                                                                <span t-field="move.product_id.property_stock_inventory" />
                                                             </t>
                                                             <t t-if="not (move.product_id.stock_location_id and move.location_dest_id.search_count([('id', '=', move.product_id.stock_location_id.id), ('id', 'child_of', move.location_dest_id.id)]))">
                                                                 <span t-field="move.location_dest_id" />
@@ -252,7 +236,8 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                <table class="table table-condensed" t-if="o.pack_operation_ids">
+<!--                                <table class="table table-condensed" t-if="o.pack_operation_ids">-->
+                                <table class="table table-condensed" t-if="o.move_line_ids">
                                     <thead>
                                         <tr>
                                             <t t-if="o.picking_type_id.code != 'incoming'">
@@ -279,7 +264,8 @@
                                     <tbody>
                                         <t t-set="total_quantity" t-value="0" />
                                         <t t-set="total_weight" t-value="0.0" />
-                                        <tr t-foreach="o.pack_operation_ids" t-as="pack_operation">
+<!--                                        <tr t-foreach="o.pack_operation_ids" t-as="pack_operation">-->
+                                        <tr t-foreach="o.move_line_ids" t-as="pack_operation">
                                             <t t-set="total_quantity" t-value="total_quantity + pack_operation.product_qty" />
                                             <t t-set="line_weight" t-value="pack_operation.product_id.weight * pack_operation.product_qty" />
                                             <t t-set="total_weight" t-value="total_weight + line_weight" />
@@ -346,14 +332,12 @@
             <field name="binding_type">report</field>
         </record>
 
-<!--        <report id="picking_operations_group_report" model="stock.move" string="Picking with location" report_type="qweb-pdf" name="stock_multiple_picker.picking_operations_group_document" file="stock_picking_.picking_operations_group_document"/>-->
-
         <template id="picking_operations_group_document">
-            <t t-call="report.html_container">
-                <t t-set="docs" t-value="docs.sorted(key=lambda r : '%s%s'%(r.quant_source_location, r.picking_id.box_label))" />
+            <t t-call="web.html_container">
+                <t t-set="docs" t-value="docs.sorted(key=lambda r : '%s%s'%(r.move_orig_ids, r.picking_id.box_label))" />
                 <!--  Print a picking list for each employee  -->
                 <t t-foreach="docs.mapped('employee_id')" t-as="employee">
-                    <t t-call="report.external_layout">
+                    <t t-call="web.external_layout">
                         <div class="page">
                             <!--  HEADER  -->
                             <div t-if="employee">
@@ -406,14 +390,15 @@
                                                 <span t-field="o.picking_id.name" />
                                             </td>
                                             <td>
-                                                <span t-field="o.picking_id.partner_id.customer_no" />
+                                                <span t-field="o.picking_id.partner_id.name" />
                                             </td>
                                             <td>
-                                                <span t-esc="o.picking_id.create_date[:10]" />
+<!--                                                <span t-esc="o.picking_id.create_date[:10]" />-->
+                                                <span t-esc="o.picking_id.create_date"/>
                                             </td>
-                                            <td>
-                                                <span t-field="o.picking_id.invoice_type_id" />
-                                            </td>
+<!--                                            <td>-->
+<!--                                                <span t-field="o.picking_id.invoice_type_id" />-->
+<!--                                            </td>-->
                                             <td>
                                                 <span t-field="o.picking_id.carrier_id" />
                                             </td>
@@ -450,7 +435,8 @@
                                 <tbody>
                                     <t t-set="total_quantity" t-value="0" />
                                     <t t-set="total_weight" t-value="0.0" />
-                                    <t t-set="sorted_docs" t-value="docs.with_context(employee_id=employee.id).filtered(lambda m: m.employee_id.id == m.env.context.get('employee_id') and not m.product_id.is_offer and ((m.picking_id.state != 'partially_available') or (m.reserved_availability &gt; 0)))" />
+<!--                                    <t t-set="sorted_docs" t-value="docs.with_context(employee_id=employee.id).filtered(lambda m: m.employee_id.id == m.env.context.get('employee_id') and not m.product_id.is_offer and ((m.picking_id.state != 'partially_available') or (m.reserved_availability &gt; 0)))" />-->
+                                    <t t-set="sorted_docs" t-value="docs.with_context(employee_id=employee.id).filtered(lambda m: m.employee_id.id == m.env.context.get('employee_id') and not m.product_id and ((m.picking_id.state != 'partially_available') or (m.reserved_availability &gt; 0)))" />
                                     <!--  PLOCKRADER  -->
                                     <tr t-foreach="sorted_docs.batch_report_get_lines()" t-as="line">
                                         <t t-set="o" t-value="line[0]" />
@@ -461,7 +447,7 @@
                                         <t t-set="total_weight" t-value="total_weight + line_weight" />
                                         <!--  Kollar så att vi inte är på sista iterationen.  -->
                                         <td t-att="{'style': line_style}">
-                                            <span t-field="o.quant_source_location" />
+                                            <span t-field="o.move_orig_ids" />
                                         </td>
                                         <td t-att="{'style': line_style}" class="text-center">
                                             <t t-if="o.picking_id.state == 'partially_available'">
@@ -508,3 +494,4 @@
         </template>
     </data>
 </odoo>
+
