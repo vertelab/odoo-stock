@@ -56,8 +56,8 @@ start and stop hours, e.g. "0 4 18 24" (between 00:00 and 04:00, and
     'website': 'http://www.vertel.se',
     'depends': ['stock', 'mrp', 'sale', 'point_of_sale'],
     'data': [
-        'product_view.xml',
-        'product_data.xml',
+        'views/product_view.xml',
+        'data/product_data.xml',
     ],
     'installable': True,
 }

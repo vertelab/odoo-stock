@@ -27,26 +27,22 @@ import traceback
 import logging
 _logger = logging.getLogger(__name__)
 
-#~ 20,00       sales_count
-#~ 1,981039     so_line_ids
-#~ 1,022867     sale_order_lines
-#~ 0,390086     code
 
 class product_template(models.Model):
     _inherit = 'product.template'
     
     sales_count = fields.Integer('# Sales', compute='_get_sales_count', store=True, readonly=True, default=0)  # Initially defined in sale-module
     consumption_per_day = fields.Float('Consumption per Day', default=0)
-    consumption_per_month = fields.Float(string='Consumption per Month', default=0,help="Number of items that is consumed per month")
-    consumption_per_year = fields.Float(string='Consumption per Year', default=0,help="Number of items that is consumed per year")
+    consumption_per_month = fields.Float(string='Consumption per Month', default=0, help="Number of items that is consumed per month")
+    consumption_per_year = fields.Float(string='Consumption per Year', default=0, help="Number of items that is consumed per year")
     orderpoint_computed = fields.Float('Orderpoint', default=0)
     virtual_available_days = fields.Float('Virtual Available Days', default=0)
     instock_percent = fields.Integer('Instock Percent', default=0)
     last_sales_count = fields.Datetime('Last Sales Compute', help="The last point in time when # Sales, Consumption per Day, Orderpoint, Virtual Available Days, and Instock Percent were computed.")
     earliest_sales_count = fields.Datetime('Earliest Sales Compute', help="Don't try to recompute before this time. Set when compute fails for a product.")
-    virtual_available_delay = fields.Float('Delay', default=0,help="Number of days before refill of stock")
-    virtual_available_netto = fields.Float('Virtual available netto', default=0,help="virtual available minus incoming")
-    is_out_of_stock = fields.Boolean(string='Is out of stock',help='Check this box to ensure not to sell this product due to stock outage (instock_percent = 0)')
+    virtual_available_delay = fields.Float('Delay', default=0, help="Number of days before refill of stock")
+    virtual_available_netto = fields.Float('Virtual available netto', default=0, help="virtual available minus incoming")
+    is_out_of_stock = fields.Boolean(string='Is out of stock', help='Check this box to ensure not to sell this product due to stock outage (instock_percent = 0)')
     
     def _consumption_per_day(self, location_ids=None):
         _logger.warn('Computing _consumption_per_day for product.template %s, %s' % (self.id, self.name))
@@ -153,11 +149,12 @@ class product_template(models.Model):
     def calc_orderpoint(self):
         self._consumption_per_day()
 
+
 class product_product(models.Model):
     _inherit = 'product.product'
 
     def _consumption_per_day(self, location_ids=None):
-        _logger.warn('Computing _consumption_per_day for product.product %s, %s' % (self.id, self.name))
+        _logger.warning('Computing _consumption_per_day for product.product %s, %s' % (self.id, self.name))
         location_ids = location_ids or []
         if self.env.context.get('location_ids'):
             locations = self.env['stock.picking.type'].browse()
@@ -165,8 +162,9 @@ class product_product(models.Model):
                 locations |= loc.default_location_dest_id
         else:
             locations = self.env.ref('stock.picking_type_out').default_location_dest_id
-            locations |= self.env.ref('point_of_sale.picking_type_posout').default_location_dest_id
-            locations |= self.env.ref('stock.location_production')
+            # locations |= self.env.ref('point_of_sale.picking_type_posout').default_location_dest_id
+            locations |= self.env.ref('stock.picking_type_in').default_location_dest_id
+            # locations |= self.env.ref('stock.location_production')
         stocks_year = self.env['stock.move'].search_read(
             [
                 ('product_id', '=', self.id),
@@ -199,12 +197,12 @@ class product_product(models.Model):
             self.consumption_per_month = 0
             self.consumption_per_year = 0
             self.sales_count = 0
-        if min(self.seller_ids.mapped('delay') or [0.0])>0.0:
+        if min(self.seller_ids.mapped('delay') or [0.0]) > 0.0:
             delay = min(self.seller_ids.mapped('delay')) + (self.company_id.po_lead if self.company_id else self.env.user.company_id.po_lead)
         else:
             delay = self.produce_delay + (self.company_id.manufacturing_lead if self.company_id else self.env.user.company_id.manufacturing_lead)
         self.virtual_available_delay = delay
-        self.orderpoint_computed =  self.consumption_per_day * delay
+        self.orderpoint_computed = self.consumption_per_day * delay
         self.virtual_available_netto = self.virtual_available - self.incoming_qty
         self.virtual_available_days = self.virtual_available_netto / (self.consumption_per_day or 1.0)
 
@@ -218,7 +216,7 @@ class product_product(models.Model):
             self.instock_percent = self.sudo().virtual_available / (self.orderpoint_computed or 1.0) * 100
         self.last_sales_count = fields.Datetime.now()
         # update memcached_time to tell memcached to recache page.
-        self.memcached_time = fields.Datetime.now()
+        # self.memcached_time = fields.Datetime.now()
 
     def _get_sales_count(self):
         pass
