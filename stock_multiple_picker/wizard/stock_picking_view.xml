@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="stock_picking_wizard_form" model="ir.ui.view">
+            <field name="name">stock.picking.wizard.form</field>
+            <field name="model">stock.picking.multiple</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Set Picking Employees">
+                    <group>
+                        <field name="picking_ids" widget="many2many_tags" />
+                        <field name="employee_ids" widget="many2many_tags" />
+                        <field name="force" />
+                        <field name="no_print" />
+                    </group>
+                    <footer>
+                        <button name="set_picking_employee" string="Set Picking Employees" type="object" class="oe_highlight" />
+                        <button name="batch_picking" string="Batch Picking" type="object" class="oe_highlight" />
+                            or
+                        <button string="_Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="stock_picking_wizard_form_act" model="ir.actions.act_window">
+            <field name="name">Set Picking Employee</field>
+            <field name="res_model">stock.picking.multiple</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        <record id="stock_picking_multi_action" model="ir.actions.server">
+            <field name="name">Set Picking Employee</field>
+            <field name="model_id" ref="stock.model_stock_picking" />
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list</field>
+            <field name="type">ir.actions.server</field>
+            <field name="state">code</field>
+            <field name="code">
+action = { 'name':'Set Picking Employee','res_model':'stock.picking.multiple','view_model':'form','view_mode':'form','target':'new','type':'ir.actions.act_window','context':{'active_ids':env.context.get('active_ids', []) }  }
+            </field>
+        </record>
+            <record id="stock_picking_multi_action2" model="ir.actions.server">
+            <field name="name">Batch picking</field>
+            <field name="model_id" ref="stock.model_stock_picking" />
+            <field name="type">ir.actions.server</field>
+            <field name="state">code</field>
+            <field name="code">
+action = { 'name':'Batch Picking','res_model':'stock.picking.multiple','view_model':'form','view_mode':'form','target':'new','type':'ir.actions.act_window','context':{'active_ids':env.context.get('active_ids', []) }  }
+            </field>
+        </record>
+<!--        <record model="ir.values" id="stock_picking_menu_action">-->
+<!--            <field name="name">Set Picking employee</field>-->
+<!--            <field name="model">stock.picking</field>-->
+<!--            <field name="model_id" ref="stock.model_stock_picking" />-->
+<!--            <field name="key2">client_action_multi</field>-->
+<!--            <field name="value" eval="'ir.actions.server,%d' % stock_picking_multi_action" />-->
+<!--        </record>-->
+<!--        <record model="ir.actions.server" id="stock_picking_multi_action">-->
+<!--            <field name="menu_ir_values_id" ref="stock_picking_menu_action" />-->
+<!--        </record>-->
+    </data>
+</odoo>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_picking_internal_search" model="ir.ui.view">
+            <field name="name">stock.picking.internal.search</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+            <field name="arch" type="xml">
+                <field name="picking_type_id" position="after">
+                    <field name="qc_id" />
+                    <field name="employee_id" />
+                    <field name="employee_ids" />
+                </field>
+            </field>
+        </record>
+        <record id="view_picking_form" model="ir.ui.view">
+            <field name="name">stock.picking.form.inherit</field>
+            <field name="model">stock.picking</field>
+            <field name="priority" eval="99" />
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <field name="state" position="before">
+                    <button name="%(stock_picking_wizard_form_act)d" type="action" string="Set Picking Users" class="oe_highlight"/>
+<!--                    <button name="stock_multiple_picker.stock_picking_wizard_form_act" type="action" string="Set Picking Users" class="oe_highlight"/>-->
+                </field>
+                <field name="backorder_id" position="after">
+                    <field name="employee_ids" widget="many2many_tags"/>
+                    <field name="write_date" />
+                    <field name="qc_id" />
+                    <field name="employee_id" />
+                </field>
+            </field>
+        </record>
+        <record id="action_stock_picking_check_availability" model="ir.actions.server">
+            <field name="name">Check Availability</field>
+            <field name="state">code</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="code">
+                for o in object.browse(context.get('active_ids', [])):
+                    return_object = o.action_assign()
+                    if isinstance(return_object, dict):
+                        action = return_object
+            </field>
+        </record>
+<!--        <record model="ir.values" id="stock_picking_menu_check_availability">-->
+<!--            <field name="name">Check availbability</field>-->
+<!--            <field name="model">stock.picking</field>-->
+<!--            <field name="model_id" ref="stock.model_stock_picking" />-->
+<!--            <field name="key2">client_action_multi</field>-->
+<!--            <field name="value" eval="'ir.actions.server,%d' % action_stock_picking_check_availability"/>-->
+<!--        </record>-->
+    </data>
+</odoo>
