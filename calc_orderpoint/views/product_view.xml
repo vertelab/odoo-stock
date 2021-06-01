@@ -31,22 +31,24 @@
       <field name="inherit_id" ref="stock.view_template_property_form" />
       <field name="arch" type="xml">
         <field name="has_available_route_ids" position="after">
-          <label for="virtual_available_netto" />
-          <div>
-            <field name="virtual_available_netto" class="oe_inline" />
-            <span>(</span>
-            <field name="virtual_available_days" class="oe_inline" />
-            <span>days / </span>
-            <field name="virtual_available_delay" class="oe_inline" />
-            <span>days delay ⇒</span>
-            <field name="instock_percent" class="oe_inline" />
-            <span>% )</span>
-            <field name="last_sales_count" class="oe_inline" />
-            <button name="calc_orderpoint" type='object' string="Calc Orderpoint" class="oe_highlight"/>
-          </div>
-          <field name="consumption_per_day" />
-          <field name="consumption_per_month" />
-          <field name="consumption_per_year" />
+            <group string="Orderpoint">
+              <label for="virtual_available_netto" />
+              <div>
+                <field name="virtual_available_netto" class="oe_inline" />
+                <span>(</span>
+                <field name="virtual_available_days" class="oe_inline" />
+                <span>days / </span>
+                <field name="virtual_available_delay" class="oe_inline" />
+                <span>days delay ⇒</span>
+                <field name="instock_percent" class="oe_inline" />
+                <span>% )</span>
+                <field name="last_sales_count" class="oe_inline" />
+                <button name="calc_orderpoint" type='object' string="Calc Orderpoint" class="oe_highlight"/>
+              </div>
+              <field name="consumption_per_day" />
+              <field name="consumption_per_month" />
+              <field name="consumption_per_year" />
+            </group>
         </field>
       </field>
     </record>
