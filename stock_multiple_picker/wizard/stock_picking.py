@@ -77,7 +77,7 @@ class stock_picking_wizard(models.TransientModel):
                         move.employee_id = None
                 last_move = move
             if not self.no_print:
-                self.env.ref('stock_multiple_picker.picking_operations_report')._render_qweb_pdf(res_ids=self.picking_ids.ids)
+                return self.env.ref('stock_multiple_picker.picking_operations_report').report_action(self.picking_ids.ids)
             return {'type': 'ir.actions.act_window_close'}
         else:
             raise Warning(_('Picking Employee is already set.'))
@@ -94,10 +94,6 @@ class stock_picking_wizard(models.TransientModel):
             self.picking_ids.enumerate_picking_boxes()
             stock_moves = self.env['stock.move'].search([('picking_id', 'in', self.picking_ids.ids)])
             self.set_picking_employee()
-
-            self.env.ref('stock_multiple_picker.picking_operations_group_report')._render_qweb_pdf(
-                res_ids=stock_moves.ids)
-
-            # return self.env['report'].get_action(stock_moves, 'stock_multiple_picker.picking_operations_group_document')
+            return self.env.ref('stock_multiple_picker.picking_operations_group_report').report_action(stock_moves.ids)
         else:
             raise Warning(_('Picking Employee is already set.'))
