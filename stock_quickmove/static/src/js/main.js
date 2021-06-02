@@ -11,6 +11,8 @@ odoo.define('stock_quickmove.QuickMove', function (require) {
 
     var location_src_scanned = false;
 
+    ajax.loadXML('/stock_quickmove/static/src/xml/picking.xml', core.qweb);
+
     function update_product_lines(res) {
         remove_all_product_lines()
         var product_content = QWeb.render('quickmove_product_lines', {
@@ -44,7 +46,7 @@ odoo.define('stock_quickmove.QuickMove', function (require) {
     function quickmove_minus(e) {
         var input = e.closest("div").find("input");
         var val = input.val();
-        if (parseInt(val) == 0) {
+        if (parseInt(val) === 0) {
             input.val("0");
         }
         else {
@@ -52,6 +54,8 @@ odoo.define('stock_quickmove.QuickMove', function (require) {
         }
         input.change();
     }
+
+    // quickmove_minus()
 
     function quickmove_plus(e) {
         var input = e.closest("div").find("input");
@@ -61,11 +65,11 @@ odoo.define('stock_quickmove.QuickMove', function (require) {
 
     }
 
+    // quickmove_plus()
+
     function quickmove_remove(e) {
         var tr = e.closest("tr").remove();
     }
-
-
 
     // inventory
     function quickmove_adjust(e) {
@@ -85,11 +89,15 @@ odoo.define('stock_quickmove.QuickMove', function (require) {
         });
     }
 
+    // quickmove_adjust()
+
     function set_confirm_enabled(e) {
         var elm = e.closest('tr').find('i.fa-check');
         elm.removeClass('disabled');
         elm.addClass('red_icon');
     }
+
+    // set_confirm_enabled()
 
     (function($){
 
@@ -144,8 +152,8 @@ odoo.define('stock_quickmove.QuickMove', function (require) {
             };
 
             $this.validateKey = function(keycode){
-                if(keycode == 13 || (keycode >= 48 && keycode <= 57) || (keycode >= 65 && keycode <= 90)){
-                    if(keycode == 13){
+                if(keycode === 13 || (keycode >= 48 && keycode <= 57) || (keycode >= 65 && keycode <= 90)){
+                    if(keycode === 13){
                         return keycode;
                     } else {
                         return String.fromCharCode(keycode);
@@ -169,7 +177,7 @@ odoo.define('stock_quickmove.QuickMove', function (require) {
         $.fn.barcodeListener = function(options) {
 
             return this.each(function(){
-                if(undefined == $(this).data('barcodeListener')){
+                if(undefined === $(this).data('barcodeListener')){
                     var plugin = new $.barcodeListener(this, options);
                     $(this).data('barcodeListener', plugin);
                 }
@@ -178,42 +186,43 @@ odoo.define('stock_quickmove.QuickMove', function (require) {
 
     })(jQuery);
 
-    // function quickmove_start_scanner() {
-    //     $("body").barcodeListener().on("barcode.valid", function(e, code){
-    //         var website = openerp.website;
-    //
-    //         website.add_template_file("/stock_quickmove/static/src/xml/picking.xml");
-    //         ajax.jsonRpc("/stock/quickmove_barcode", "call", {
-    //             'barcode': code,
-    //             'location_src_scanned': location_src_scanned
-    //         }).done(function(result){
-    //              console.log(result);
-    //
-    //             if (result === undefined){
-    //                 $(".red-alert-message-undefined").removeClass("hidden");
-    //                 return
-    //
-    //             } else if (result.type === 'product') {
-    //                 var newOption = new Option(result.product_ids[1], result.product_ids[0], false, true);
-    //                 $('select#quickmove_product_search').append(newOption).trigger('change');
-    //                 location_src_scanned = true;
-    //             } else if (result.type === 'src_location') {
-    //
-    //                 var newOption = new Option(result.product_ids[1], result.product_ids[0], false, true);
-    //                 $('select#quickmove_location_src_id').append(newOption).trigger('change');
-    //                 location_src_scanned = true;
-    //
-    //             } else if (result.type === 'dest_location') {
-    //                 var newOption = new Option(result.location.name, result.location.id, false, true);
-    //                 $('select#quickmove_location_dest_id').append(newOption).trigger('change');
-    //                 location_src_scanned = false;
-    //             }
-    //             $(".red-alert-message-undefined").addClass("hidden");
-    //             $('#quickmove_location_src_id').select9('open');
-    //
-    //         })
-    //     })
-    // }
+    function quickmove_start_scanner() {
+        $("body").barcodeListener().on("barcode.valid", function(e, code){
+            // var website = openerp.website;
+            //
+            // website.add_template_file("/stock_quickmove/static/src/xml/picking.xml");
+            ajax.jsonRpc("/stock/quickmove_barcode", "call", {
+                'barcode': code,
+                'location_src_scanned': location_src_scanned
+            }).done(function(result){
+
+                if (result === undefined){
+                    $(".red-alert-message-undefined").removeClass("hidden");
+                    return
+
+                } else if (result.type === 'product') {
+                    var newOption = new Option(result.product_ids[1], result.product_ids[0], false, true);
+                    $('select#quickmove_product_search').append(newOption).trigger('change');
+                    location_src_scanned = true;
+                } else if (result.type === 'src_location') {
+
+                    var newOption = new Option(result.product_ids[1], result.product_ids[0], false, true);
+                    $('select#quickmove_location_src_id').append(newOption).trigger('change');
+                    location_src_scanned = true;
+
+                } else if (result.type === 'dest_location') {
+                    var newOption = new Option(result.location.name, result.location.id, false, true);
+                    $('select#quickmove_location_dest_id').append(newOption).trigger('change');
+                    location_src_scanned = false;
+                }
+                $(".red-alert-message-undefined").addClass("hidden");
+                $('#quickmove_location_src_id').select9('open');
+
+            })
+        })
+    }
+
+    quickmove_start_scanner()
 
     function quickmove_inventory_start_scanner() {
         $("body").barcodeListener().on("barcode.valid", function(e, code){
@@ -250,7 +259,10 @@ odoo.define('stock_quickmove.QuickMove', function (require) {
         })
     }
 
+    quickmove_inventory_start_scanner()
+
     $(document).ready(function() {
+
         // var website = openerp.website;
         // website.add_template_file("/stock_quickmove/static/src/xml/picking.xml");
         $("select#quickmove_location_src_id").select9({

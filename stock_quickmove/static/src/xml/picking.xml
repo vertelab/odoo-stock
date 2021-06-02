@@ -39,7 +39,7 @@
           </div>
         </td>
         <td style="width: 30px;">
-          <i class="fa fa-trash fa-2x text-primary" onclick="quickmove_remove($(this));" />
+          <i class="fa fa-trash fa-2x text-primary" id="quickmove_remove" onclick="quickmove_remove($(this));" />
         </td>
       </tr>
     </t>

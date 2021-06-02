@@ -234,12 +234,12 @@
                                             </thead>
                                             <tbody id="quickmove_product_lines"/>
                                         </table>
-                                        <div class="red-alert-message alert alert-danger hidden" role="alert">
-                                        Something went wrong. Try again.
-                                        </div>
-                                        <div class="red-alert-message-undefined alert alert-danger hidden" role="alert">
-                                        Something went wrong. Try again.
-                                        </div>
+<!--                                        <div class="red-alert-message alert alert-danger hidden" role="alert">-->
+<!--                                        Something went wrong. Try again.-->
+<!--                                        </div>-->
+<!--                                        <div class="red-alert-message-undefined alert alert-danger hidden" role="alert">-->
+<!--                                        Something went wrong. Try again.-->
+<!--                                        </div>-->
                                         <div class="col-md-6 col-sm-6 col-xs-12 mt32" style="padding: 0px;">
                                             <select id="quickmove_product_search" class="form-control" style="width: 100%;" />
                                         </div>
@@ -259,9 +259,9 @@
         <!-- inventory -->
         <template id="webapp_inventory" name="Quick Move Inventory">
             <t t-call="stock_quickmove.layout">
-                <script type="text/javascript">
-                    $(document).ready(quickmove_inventory_start_scanner);
-                </script>
+<!--                <script type="text/javascript">-->
+<!--                    $(document).ready(quickmove_inventory_start_scanner);-->
+<!--                </script>-->
                 <t t-set="title" t-value="'Inventory'"/>
                 <section class="mt16 mb16">
                     <div class="container">
@@ -289,12 +289,12 @@
                                         </thead>
                                         <tbody id="product_location_lines"/>
                                     </table>
-                                    <div class="red-alert-message alert alert-danger hidden" role="alert">
-                                    Something went wrong. Try again.
-                                    </div>
-                                    <div class="red-alert-message-undefined alert alert-danger hidden" role="alert">
-                                    Something. Try again.
-                                    </div>
+<!--                                    <div class="red-alert-message alert alert-danger hidden" role="alert">-->
+<!--                                    Something went wrong. Try again.-->
+<!--                                    </div>-->
+<!--                                    <div class="red-alert-message-undefined alert alert-danger hidden" role="alert">-->
+<!--                                    Something. Try again.-->
+<!--                                    </div>-->
                                 </form>
 
                             </div>

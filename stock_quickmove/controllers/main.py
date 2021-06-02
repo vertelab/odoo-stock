@@ -35,7 +35,7 @@ class StockSquickMove(http.Controller):
     @http.route(['/stock/quickmove',
                  '/stock/quickmove/picking/<model("stock.picking"):picking>',
                  '/stock/quickmove/pickingtype/<model("stock.picking.type"):picking_type_id>'],
-                type='http', auth='user', website=True)
+                type='http', auth='user', website=True, csrf=False)
     def stock_quickmove(self, picking=None, picking_type_id=None, **post):
         if request.httprequest.method == 'POST':
             _logger.warning(post)
@@ -182,7 +182,7 @@ class StockSquickMove(http.Controller):
     def quickmove_product_search(self, word='', **post):
         word = post.get('term')
         results = []
-        products = request.env['product.product'].search_read(['|', '|', ('name', 'ilike', word), ('default_code', 'ilike', word), ('ean13', 'ilike', word)], fields=['id', 'display_name'])
+        products = request.env['product.product'].search_read(['|', '|', ('name', 'ilike', word), ('default_code', 'ilike', word), ('barcode', 'ilike', word)], fields=['id', 'display_name'])
         if len(products) > 0:
             for p in products:
                 results.append({'id': p.get('id'), 'text': p.get('display_name')})
@@ -230,9 +230,11 @@ class StockSquickMove(http.Controller):
         # ~ quants = request.env['stock.quant'].search([('product_id','=',product_id),('location_id','child_of',stock_location.id)])
         quants = request.env['stock.quant'].search([('product_id','=',int(product_id)), ('location_id', 'child_of', stock_warehouse_ids.mapped('lot_stock_id.id') + stock_warehouse_ids.mapped('wh_qc_stock_loc_id.id'))])
         for location in quants.mapped('location_id'):
+            print(location)
             product_locations.append({
-                'qty':sum(quants.filtered(lambda q: q.location_id == location).mapped('qty')),
-                'reserved_qty': sum(quants.filtered(lambda q: q.location_id == location and True if q.reservation_id else False).mapped('qty')),
+                'qty': sum(quants.filtered(lambda q: q.location_id == location).mapped('quantity')),
+                'reserved_qty': sum(quants.filtered(lambda q: q.location_id == location).mapped('reserved_quantity')),
+                # 'reserved_qty': sum(quants.filtered(lambda q: q.location_id == location and True if q.reservation_id else False).mapped('quantity')),
                 'name': location.name,
                 'location_id': location.id})
         
