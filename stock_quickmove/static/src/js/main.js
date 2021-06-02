@@ -43,34 +43,6 @@ odoo.define('stock_quickmove.QuickMove', function (require) {
         $("tbody#quickmove_product_lines").empty();
     }
 
-    function quickmove_minus(e) {
-        var input = e.closest("div").find("input");
-        var val = input.val();
-        if (parseInt(val) === 0) {
-            input.val("0");
-        }
-        else {
-            input.val(String(parseInt(val) - 1));
-        }
-        input.change();
-    }
-
-    // quickmove_minus()
-
-    function quickmove_plus(e) {
-        var input = e.closest("div").find("input");
-        var val = input.val();
-        input.val(String(parseInt(val) + 1));
-        input.change();
-
-    }
-
-    // quickmove_plus()
-
-    function quickmove_remove(e) {
-        var tr = e.closest("tr").remove();
-    }
-
     // inventory
     function quickmove_adjust(e) {
         var tr = e.parents('tr'),
@@ -374,4 +346,26 @@ odoo.define('stock_quickmove.QuickMove', function (require) {
 
 });
 
+function quickmove_minus(e) {
+    var input = e.closest("div").find("input");
+    var val = input.val();
+    if (parseInt(val) === 0) {
+        input.val("0");
+    }
+    else {
+        input.val(String(parseInt(val) - 1));
+    }
+    input.change();
+}
 
+function quickmove_plus(e) {
+    var input = e.closest("div").find("input");
+    var val = input.val();
+    input.val(String(parseInt(val) + 1));
+    input.change();
+
+}
+
+function quickmove_remove(e) {
+    var tr = e.closest("tr").remove();
+}
