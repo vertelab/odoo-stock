@@ -230,7 +230,6 @@ class StockSquickMove(http.Controller):
         # ~ quants = request.env['stock.quant'].search([('product_id','=',product_id),('location_id','child_of',stock_location.id)])
         quants = request.env['stock.quant'].search([('product_id','=',int(product_id)), ('location_id', 'child_of', stock_warehouse_ids.mapped('lot_stock_id.id') + stock_warehouse_ids.mapped('wh_qc_stock_loc_id.id'))])
         for location in quants.mapped('location_id'):
-            print(location)
             product_locations.append({
                 'qty': sum(quants.filtered(lambda q: q.location_id == location).mapped('quantity')),
                 'reserved_qty': sum(quants.filtered(lambda q: q.location_id == location).mapped('reserved_quantity')),
@@ -240,17 +239,24 @@ class StockSquickMove(http.Controller):
         
         return product_locations # list of dicts
         
-    @http.route(['/stock/inventory_adjust'], type='json', auth='user', website=True)
+    @http.route(['/stock/inventory_adjust'], type='http', auth='user', website=True, csrf=False)
     def quickmove_inventory_adjust(self, location_id, product_id, quantity):
-        #
-            inventory = request.env['stock.inventory'].create({'name':'test', 'product_id':product_id, 'location_id':location_id, 'filter':'product'})
-            inventory.prepare_inventory()
-            
-            if inventory.line_ids:
-                inventory.line_ids[0].product_qty = quantity
-                inventory.action_done()
-            else:
-                raise Warning('No stock for %s on location %s'% (inventory.product_id.display_name,inventory.location_id.display_name))
+        inventory = request.env['stock.inventory'].create({
+            'name': 'test',
+            'product_ids': [(4, int(product_id))],
+            'location_ids': [(4, int(location_id))],
+        })
+        inventory._action_start()
+
+        if inventory.line_ids:
+            inventory.line_ids[0].product_qty = float(quantity)
+            inventory.action_validate()
+        else:
+            raise Warning('No stock for %s on location %s'
+                          % (inventory.product_id.display_name, inventory.location_id.display_name))
+
+        return werkzeug.wrappers.Response(status='200', content_type="application/json; charset=utf-8",
+                                          response=json.dumps({'message': 'Created'}, indent=4, sort_keys=True))
 
     @http.route(['/stock/quickmove_get_location'], type='json', auth='user', website=True)
     def quickmove_get_location(self, **kw):

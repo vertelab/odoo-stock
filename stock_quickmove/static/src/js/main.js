@@ -44,32 +44,7 @@ odoo.define('stock_quickmove.QuickMove', function (require) {
     }
 
     // inventory
-    function quickmove_adjust(e) {
-        var tr = e.parents('tr'),
-            id = parseInt(tr.data('id')),
-            product_id = parseInt($("select#inventory_product_search").val()),
-            input = tr.find('input'),
-            quantity = parseInt(input.val());
-            tr.find('i.fa-check').removeClass('red_icon').addClass('disabled');
 
-        ajax.jsonRpc("/stock/inventory_adjust", "call", {
-            'location_id': id, 'product_id': product_id, 'quantity':quantity
-        }).then(function(arg1,res){
-            console.log(arguments);
-            window.alert(res.data.message + '\n\n' + res.data.debug);
-            }).then(function(res){
-        });
-    }
-
-    // quickmove_adjust()
-
-    function set_confirm_enabled(e) {
-        var elm = e.closest('tr').find('i.fa-check');
-        elm.removeClass('disabled');
-        elm.addClass('red_icon');
-    }
-
-    // set_confirm_enabled()
 
     (function($){
 
@@ -368,4 +343,46 @@ function quickmove_plus(e) {
 
 function quickmove_remove(e) {
     var tr = e.closest("tr").remove();
+}
+
+
+function set_confirm_enabled(e) {
+    var elm = e.closest('tr').find('i.fa-check');
+    elm.removeClass('disabled');
+    elm.addClass('red_icon');
+}
+
+function quickmove_adjust(e) {
+    var tr = e.parents('tr'),
+        id = parseInt(tr.data('id')),
+        product_id = parseInt($("select#inventory_product_search").val()),
+        input = tr.find('input'),
+        quantity = parseInt(input.val());
+        tr.find('i.fa-check').removeClass('red_icon').addClass('disabled');
+
+    // $.ajax.jsonRpc("/stock/inventory_adjust", "call", {
+    //     'location_id': id, 'product_id': product_id, 'quantity':quantity
+    // }).then(function(arg1,res){
+    //     console.log(arguments);
+    //     window.alert(res.data.message + '\n\n' + res.data.debug);
+    //     }).then(function(res){
+    // });
+
+    var data = {
+        'location_id': id,
+        'product_id': product_id,
+        'quantity':quantity
+    }
+
+    $.ajax({
+        url: '/stock/inventory_adjust',
+        dataType: 'json',
+        type: 'POST',
+        data: data,
+        // data: JSON.stringify(data)
+    }).then(function(arg1,res){
+        console.log(arguments);
+        window.alert(res.data.message + '\n\n' + res.data.debug);
+        }).then(function(res){
+    });
 }
