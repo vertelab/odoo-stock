@@ -148,8 +148,8 @@ class StockSquickMove(http.Controller):
 
     @http.route(['/stock/quickmove_barcode'], type='json', auth='user', website=True)
     def quickmove_barcode(self, barcode='', location_src_scanned=False, **kw):
-        # search EAN13
-        product_ids = request.env['product.product'].search([('ean13', '=', barcode)])
+        # search Barcode
+        product_ids = request.env['product.product'].search([('barcode', '=', barcode)])
         if len(product_ids) > 0:
             products = []
             for p in product_ids:
