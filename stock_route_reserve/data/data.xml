@@ -1,0 +1,9 @@
+
+<odoo>
+    <data>
+        <record id="removal_fipo" model="product.removal">
+            <field name="name">First In Priority Out (FIPO)</field>
+            <field name="method">fipo</field>
+        </record>
+    </data>
+</odoo>
