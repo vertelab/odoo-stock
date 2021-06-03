@@ -57,8 +57,8 @@ class StockSquickMove(http.Controller):
                     if description:
                         picking.name = '%s - %s' % (picking.name, description)
                     for k, v in post.items():
-                        _logger.warn("~ k = %s, v = %s" % (k,v))
-                        _logger.warn("~ type k = %s, type v = %s" % (type(k),type(v)))
+                        _logger.warning("~ k = %s, v = %s" % (k,v))
+                        _logger.warning("~ type k = %s, type v = %s" % (type(k),type(v)))
                         if k.startswith('total_qty_'):
                             product = request.env['product.product'].browse(int(k.split('_')[-1]))
                             request.env['stock.move'].create({
@@ -107,7 +107,7 @@ class StockSquickMove(http.Controller):
                     operation_completed = []
                     for line in picking.move_lines:
                         try:
-                            ops = request.env['stock.pack.operation'].search([('product_id', '=', line.product_id.id), ('picking_id', '=', picking.id), ('location_id', '=', location_src_id), ('location_dest_id', '=', location_dest_id)])
+                            ops = request.env['stock.move'].search([('product_id', '=', line.product_id.id), ('picking_id', '=', picking.id), ('location_id', '=', location_src_id), ('location_dest_id', '=', location_dest_id)])
                             if len(ops) > 0:
                                 op = ops[0]
                                 if len(ops) > 1:
@@ -125,7 +125,7 @@ class StockSquickMove(http.Controller):
                                     'processed': 'true'
                                 })
                             else:
-                                request.env['stock.pack.operation'].create({
+                                request.env['stock.move'].create({
                                     'product_id': line.product_id.id,
                                     'picking_id': picking.id,
                                     'location_id': location_src_id,
@@ -140,9 +140,9 @@ class StockSquickMove(http.Controller):
                             operation_completed.append(False)
                     if all(operation_completed):
                         picking.do_transfer()
-                return request.render('stock_quickmove.webapp', {'move_class':'active','picking_type_id': picking.picking_type_id.id, 'previous_picking_id': picking.id, 'title':'Stock Quick Move'})
+                return request.render('stock_quickmove.webapp', {'move_class': 'active', 'picking_type_id': picking.picking_type_id.id, 'previous_picking_id': picking.id, 'title': 'Stock Quick Move'})
                 # ~ return request.redirect('/stock/quickmove/picking/%s' %picking.id)
-        return request.render('stock_quickmove.webapp', {'move_class':'active','picking_type_id': post.get('picking_type_id' or ''), 'picking': picking, 'title':'Stock Quick Move'})
+        return request.render('stock_quickmove.webapp', {'move_class': 'active', 'picking_type_id': post.get('picking_type_id' or ''), 'picking': picking, 'title': 'Stock Quick Move'})
 
     @http.route(['/stock/quickmove_barcode'], type='json', auth='user', website=True)
     def quickmove_barcode(self, barcode='', location_src_scanned=False, **kw):
