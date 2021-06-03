@@ -53,12 +53,14 @@ class StockSquickMove(http.Controller):
                 if not picking:
                     picking = request.env['stock.picking'].create({
                         'picking_type_id': picking_type_id,
+                        'location_id': location_src_id,
+                        'location_dest_id': location_dest_id,
                     })
                     if description:
                         picking.name = '%s - %s' % (picking.name, description)
                     for k, v in post.items():
                         _logger.warning("~ k = %s, v = %s" % (k,v))
-                        _logger.warning("~ type k = %s, type v = %s" % (type(k),type(v)))
+                        _logger.warning("~ type k = %s, type v = %s" % (type(k), type(v)))
                         if k.startswith('total_qty_'):
                             product = request.env['product.product'].browse(int(k.split('_')[-1]))
                             request.env['stock.move'].create({

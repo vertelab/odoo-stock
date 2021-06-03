@@ -1,3 +1,7 @@
+body {
+    overflow: auto !important;
+}
+
 #quick_move_wrapwrap {
 	display: table;
 	table-layout: fixed;

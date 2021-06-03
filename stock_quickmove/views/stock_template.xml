@@ -19,7 +19,7 @@
                     <t t-call-assets="website.assets_frontend" t-js="false"/>
                     <link href="/website_bootstrap_select2/static/src/css/select2.min.css" rel="stylesheet"/>
                     <link href="/website_bootstrap_select2/static/src/css/select9.css" rel="stylesheet"/>
-                    <link href="/stock_quickmove/static/src/css/main.css" rel="stylesheet" />
+                    <link href="/stock_quickmove/static/src/css/main.css" rel="stylesheet"/>
 
 <!--                    <t t-set="languages" t-value="website.get_languages() if website else None"/>-->
 <!--                    <t t-if="request and request.website_multilang and website">-->
@@ -36,7 +36,7 @@
                     <script type="text/javascript" src="/website_bootstrap_select2/static/src/js/select9_search.js"/>
                     <script src="/stock_quickmove/static/src/js/main.js" type="text/javascript" />
                 </head>
-                <body>
+                <body style="overflow: auto !important;">
                     <div id="quick_move_wrapwrap">
                         <header>
                             <!--
