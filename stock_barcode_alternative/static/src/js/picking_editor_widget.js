@@ -53,21 +53,16 @@ odoo.define('stock_barcode_alternative.PickingEditorWidget', function(require) {
             this.load_fields();
             // this.rows = [];
             if (! this.rows) {
-                if (parent.packops !== undefined) {
-                    var rows = JSON.parse(JSON.stringify(this.getParent().packops));
-                    _.each(rows, function(row){
-                        row.qty_done = 0.0;
-                        row.qty_remaining = row.quantity;
-                        if (! row.package_id){
-                            row.package_id = {id: null};
-                        }
-                    });
-                    this.rows = rows;
-                    this.save('rows');
-                } else {
-                    this.rows = []
-                }
-
+                var rows = JSON.parse(JSON.stringify(this.getParent().packops));
+                _.each(rows, function(row){
+                    row.qty_done = 0.0;
+                    row.qty_remaining = row.quantity;
+                    if (! row.package_id){
+                        row.package_id = {id: null};
+                    }
+                });
+                this.rows = rows;
+                this.save('rows');
             }
             if (! this.package_data) {
                 var package_data = JSON.parse(JSON.stringify(parent.packages));
@@ -126,7 +121,7 @@ odoo.define('stock_barcode_alternative.PickingEditorWidget', function(require) {
                 fields = [fields];
             }
             _.each(fields, function(field){
-                self[field] = self.storage.getItem(field + '_' + self.getParent().picking_id);
+                self[field] = JSON.parse(self.storage.getItem(field + '_' + self.getParent().picking_id));
             })
         },
         save: function(fields){
@@ -139,7 +134,7 @@ odoo.define('stock_barcode_alternative.PickingEditorWidget', function(require) {
                 fields = [fields];
             }
             _.each(fields, function(field){
-                self.storage.setItem(field + '_' + self.getParent().picking_id, self[field]);
+                self.storage.setItem(field + '_' + self.getParent().picking_id, JSON.stringify(self[field]));
             })
         },
         update_remaining: function(product_id){
@@ -260,7 +255,6 @@ odoo.define('stock_barcode_alternative.PickingEditorWidget', function(require) {
                 args: [[], this.rows, this.package_data],
                 // context: session.user_context
             }).then(function (res) {
-                console.log("do_transfer", res)
                 self.transfer_done(result)
             });
 

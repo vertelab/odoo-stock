@@ -10,9 +10,6 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
 
         init: function(parent, options){
             this._super.apply(this, arguments);
-            //~ console.log('PackageEditorWidget.init');
-            //~ console.log("MyTag0",options);
-            //~ console.log(parent.rows);
             var self = this;
             // this.data contains pure data ({}, [], strings, integers, floats etc) describing this package, destined for storage.
             // We reuse the provided object to keep all the data up to date on PickingEditorWidget (the same object is in that structure, so all changes are automatically mirrored there).
@@ -25,20 +22,20 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
             });
             this.rows = [];
             // // Instantiate a widget for each packop.
+
             _.each(rows, function(row){
                 var row_widget = new OperationEditorWidget(self, {row: row});
                 self.rows.push(row_widget);
             });
-            self.reorder_rows();
+            // self.reorder_rows();
+            self.reorder_rows(this.data.operation_ids);
 
         },
         renderElement: function(){
             var self = this;
-            // console.log($(self.getParent()))
-            // this.setElement(self.getParent().$('tbody.abc-packop-package[data-package-id="' + this.id + '"]'));
-            // this._super();
-            // _.each(this.getChildren(), function(child){child.renderElement()});
-
+            this.setElement(self.getParent().$('tbody.abc-packop-package[data-package-id="' + this.id + '"]'));
+            this._super();
+            _.each(this.getChildren(), function(child){child.renderElement()});
         },
         start: function(){
             this._super.apply(this, arguments);
@@ -51,7 +48,6 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
         reorder_rows: function(packop_id){
             // Reorder the rows. Put packop_id first if specified.
             this.rows.sort(function(el1, el2){
-                console.log(el1);
                 if (el1.id === packop_id) {
                     return -1;
                 } else if (el2.id === packop_id) {
@@ -71,8 +67,7 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
             _.each(this.rows, function(row){
                 operation_ids.push(row.id);
             })
-            // console.log(this.data)
-            // this.data.operation_ids = operation_ids;
+            this.data.operation_ids = operation_ids;
             this.renderElement();
         },
         remove_row: function(row){

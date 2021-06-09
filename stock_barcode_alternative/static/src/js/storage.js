@@ -9,8 +9,6 @@ odoo.define('stock_barcode_alternative.Storage', function(require) {
 
     var QWeb = core.qweb;
 
-    console.log("storage")
-
     var Storage = core.Class.extend({
         init: function(parent, options){
 

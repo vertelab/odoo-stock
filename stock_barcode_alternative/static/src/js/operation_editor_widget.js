@@ -8,7 +8,7 @@ odoo.define('stock_barcode_alternative.OperationEditorWidget', function(require)
     var Widget = require('web.Widget');
 
     var OperationEditorWidget = Widget.extend({
-        template: 'AlternativeOperationEditorWidget',
+        template: 'AlternativeOperationEditorWidgets',
 
         init: function(parent, options){
             this._super.apply(this, arguments);

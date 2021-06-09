@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
     
-    <t t-name='AlternativeOperationEditorWidget'>
+    <t t-name='AlternativeOperationEditorWidgets'>
         <tr t-att-class="widget.get_classes()" t-att-data-id="widget.data.id" t-att-data-product_id="widget.data.product_id.id" t-att-data-package_id="'' + widget.data.package_id.id">
             <!-- Product name -->
             <td><t t-esc="widget.data.product_id.display_name"/></td>
@@ -25,35 +25,36 @@
             </td>
             <!-- From -->
             <td class="brctbl-col4 js_loc">
-                <t t-esc="widget.data.sourceloc_id.display_name" />
-                <t t-if="widget.data.lot_id" ><span> : <t t-esc="widget.data.lot_id.display_name" /></span></t>
+                <t t-esc="widget.data" />
+<!--                <t t-esc="widget.data.location_id.display_name" />-->
+<!--                <t t-if="widget.data.lot_id" ><span> : <t t-esc="widget.data.lot_id.display_name" /></span></t>-->
             </td>
             <!-- To -->
             <td class="brctbl-col5 js_loc">
-                <t t-esc="widget.data.destinationloc_id.display_name" />
-<!--
-                <div class="pull-right btn-group">
-                    <button type="button" class="btn btn-default dropdown-toggle fa fa-cog" data-toggle="dropdown">
-                     <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        <t t-if="row.cols.product_id">
-                            <li><a class="js_create_lot" href="#">Create &#47; Change Lot</a></li>
-                        </t>
-                        <t t-if="!row.cols.head_container &amp;&amp; !row.cols.container">
-                            <li><a class="js_change_src" href="#">Change source location</a></li>
-                            <li><a class="js_change_dst" href="#">Change destination location</a></li>
-                        </t>
-                        <t t-if="row.cols.head_container">
-                            <li><a class="js_pack_change_dst" href="#">Change destination location</a></li>
-                            <li class="divider"></li>
-                            <li><a class="js_pack_configure" href="#">Configure package</a></li>
-                            <li><a class="js_delete_pack" href="#">Remove from package</a></li>
-                            <li><a class="js_print_pack" href="#">Print package label</a></li>
-                        </t>
-                    </ul>
-                </div>
--->
+                <t t-esc="widget.data" />
+<!--                <t t-esc="widget.data.location_dest_id.display_name" />-->
+<!--                <div class="pull-right btn-group">-->
+<!--                    <button type="button" class="btn btn-default dropdown-toggle fa fa-cog" data-toggle="dropdown">-->
+<!--                     <span class="caret"></span>-->
+<!--                    </button>-->
+<!--                    <ul class="dropdown-menu" role="menu">-->
+<!--                        <t t-if="row.cols.product_id">-->
+<!--                            <li><a class="js_create_lot" href="#">Create &#47; Change Lot</a></li>-->
+<!--                        </t>-->
+<!--                        <t t-if="!row.cols.head_container &amp;&amp; !row.cols.container">-->
+<!--                            <li><a class="js_change_src" href="#">Change source location</a></li>-->
+<!--                            <li><a class="js_change_dst" href="#">Change destination location</a></li>-->
+<!--                        </t>-->
+<!--                        <t t-if="row.cols.head_container">-->
+<!--                            <li><a class="js_pack_change_dst" href="#">Change destination location</a></li>-->
+<!--                            <li class="divider"></li>-->
+<!--                            <li><a class="js_pack_configure" href="#">Configure package</a></li>-->
+<!--                            <li><a class="js_delete_pack" href="#">Remove from package</a></li>-->
+<!--                            <li><a class="js_print_pack" href="#">Print package label</a></li>-->
+<!--                        </t>-->
+<!--                    </ul>-->
+<!--                </div>-->
+
             </td>
         </tr>
     </t>
