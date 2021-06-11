@@ -33,6 +33,7 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
         },
         renderElement: function(){
             var self = this;
+            console.log('---', self.getParent())
             this.setElement(self.getParent().$('tbody.abc-packop-package[data-package-id="' + this.id + '"]'));
             this._super();
             _.each(this.getChildren(), function(child){child.renderElement()});
