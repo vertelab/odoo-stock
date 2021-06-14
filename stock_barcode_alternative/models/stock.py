@@ -81,6 +81,7 @@ class StockPicking(models.Model):
                     ('product_uom_id', ['display_name', 'factor']),
                     'product_uom_qty',
                     'product_qty',
+                    'qty_done',
                     ('location_id', ['display_name']),
                     ('location_dest_id', ['display_name']),
                 ]
@@ -90,6 +91,10 @@ class StockPicking(models.Model):
                     ('product_uom', ['display_name', 'factor']),
                     'product_uom_qty',
                     'product_qty',
+                    'reserved_availability',
+                    'availability',
+                    'quantity_done',
+                    'forecast_availability',
                     ('location_id', ['display_name']),
                     ('location_dest_id', ['display_name']),
                 ]
@@ -203,7 +208,9 @@ class StockPicking(models.Model):
         # action = self.do_enter_transfer_details()
         action = self.button_validate()
         # wizard = self.env['stock.transfer_details'].browse(action['res_id'])
+
         wizard = self.env['stock.immediate.transfer'].browse(action['res_id'])
+        # wizard = self.env['stock.immediate.transfer'].browse(action.get('context').get('button_validate_picking_ids'))
         # Keep track of matched transfer items
         matched_ids = []
         for line in lines:
@@ -224,8 +231,8 @@ class StockPicking(models.Model):
                     'product_id': line['product_id']['id'],
                     'product_uom_id': line['product_uom_id']['id'],
                     'quantity': line['qty_done'],
-                    # 'sourceloc_id': line['sourceloc_id']['id'],
-                    'destinationloc_id': line['destinationloc_id']['id'],
+                    # 'sourceloc_id': line['location_id']['id'],
+                    'location_dest_id': line['location_dest_id']['id'],
                     # 'result_package_id': line['result_package_id']['id'],
                     # 'destinationloc_id': line['destinationloc_id']['id'],
                 })

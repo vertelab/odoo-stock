@@ -49,7 +49,6 @@ odoo.define('stock_barcode_alternative.PickingEditorWidget', function(require) {
             var self = this;
             var parent = this.getParent();
             // var parent = JSON.stringify(parent);
-            // console.log("parent", parent['picking'])
             this.load_fields();
             // this.rows = [];
             if (! this.rows) {
@@ -249,6 +248,8 @@ odoo.define('stock_barcode_alternative.PickingEditorWidget', function(require) {
         do_transfer: function(){
             // Complete the picking process.
             var self = this;
+            console.log('row', this.rows)
+            console.log('row', this.rows)
             return this._rpc({
                 model: 'stock.picking',
                 method: 'abc_do_transfer',

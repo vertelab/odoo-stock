@@ -33,15 +33,19 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
         },
         renderElement: function(){
             var self = this;
-            console.log('---', self.getParent())
-            this.setElement(self.getParent().$('tbody.abc-packop-package[data-package-id="' + this.id + '"]'));
-            this._super();
-            _.each(this.getChildren(), function(child){child.renderElement()});
+            if (self.getParent().$el) {
+                console.log(self.getParent().$('tbody.abc-packop-package').attr('data-package-id', self.getParent().id))
+                this.setElement(self.getParent().$('tbody.abc-packop-package').attr('data-package-id', self.getParent().id));
+                this._super();
+                _.each(this.getChildren(), function(child){
+                    child.renderElement()
+                });
+            }
+            // this.setElement(self.getParent().$('tbody.abc-packop-package[data-package-id="' + this.id + '"]'));
         },
         start: function(){
             this._super.apply(this, arguments);
             var self = this;
-            //~ console.log('PackageEditorWidget.start');
         },
         get_picking_widget: function() {
             return this.getParent();
@@ -88,7 +92,6 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
             // Increase quantity of the row containing the given product_id.
             // limit_qty: set to true to avoid increasing over expected qty.
             // Called from the scanner.
-            //~ console.log('PackageEditorWidget(' + this.id + ').increase: ' + product_id, this);
             var self = this;
             var rows = _.filter(this.rows, function(e, pos, l){
                 return e.data.product_id.id === product_id;
@@ -129,7 +132,6 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
                         'qty_done': 1.0,
                         'qty_remaining': -1.0
                     };
-                //~ console.log('Lukas2', row_data)
 
                 return this._rpc({
                     model: 'stock.picking',
@@ -157,7 +159,6 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
                 //         self.rows.push(row_widget);
                 //         self.renderElement();
                 //     });
-                //~ console.log('Lukas2', row_data)
                 // return true;
             }
             return false;
@@ -171,10 +172,8 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
             // TODO: Add support for packaging weight.
             let weight = 0.0;
             let self = this;
-            //~ console.log(this);
             _.each(this.rows, function(row){
                 let product = row.get_product();
-                //~ console.log('Haze weight', product)
                 weight += row.data.qty_done * product.weight;
             })
             return weight;

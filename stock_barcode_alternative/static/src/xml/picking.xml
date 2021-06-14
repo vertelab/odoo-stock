@@ -8,12 +8,17 @@
             <!-- Scanned -->
             <td class="brctbl-col2 text-center js_row_qty">
                 <div class="input-group">
-                    <span class="input-group-addon js_minus input-sm" t-att-data-product-id='widget.data.product_id.id'><a href="#"><i class="abc-op-qty-minus fa fa-minus"></i></a></span>
+                    <span class="input-group-addon js_minus input-sm" t-att-data-product-id='widget.data.product_id.id'>
+                        <a href="#"><i class="abc-op-qty-minus fa fa-minus"></i></a>
+                    </span>
                     <form class="js_submit_value">
-                        <input type="number" class="form-control text-center js_qty" t-att-value="widget.data.qty_done"></input>
+<!--                        <input type="number" class="form-control text-center js_qty" t-att-value="widget.data.qty_done"></input>-->
+                        <input type="number" class="form-control text-center js_qty" t-att-value="widget.data.product_qty"></input>
                         <!-- <input type="submit" class="hidden"></input> -->
                     </form>
-                    <span class="input-group-addon js_plus input-sm" t-att-data-product-id='widget.data.product_id.id'><a href="#"><i class="abc-op-qty-plus fa fa-plus"></i></a></span>
+                    <span class="input-group-addon js_plus input-sm" t-att-data-product-id='widget.data.product_id.id'>
+                        <a href="#"><i class="abc-op-qty-plus fa fa-plus"></i></a>
+                    </span>
                 </div>
             </td>
             <td>
@@ -21,18 +26,17 @@
             </td>
             <!-- Todo -->
             <td class="brctbl-col3 text-center">
-                <t t-esc="widget.data.qty_remaining"/> / <t t-esc="widget.data.quantity"/> <t t-esc="widget.data.product_uom_id.display_name" />
+                <t t-esc="widget.data.product_qty"/> / <t t-esc="widget.data.product_uom_qty"/> <t t-esc="widget.data.product_uom_id.display_name" />
+<!--                <t t-esc="widget.data.qty_remaining"/> / <t t-esc="widget.data.quantity"/> <t t-esc="widget.data.product_uom_id.display_name" />-->
             </td>
             <!-- From -->
             <td class="brctbl-col4 js_loc">
-                <t t-esc="widget.data" />
-<!--                <t t-esc="widget.data.location_id.display_name" />-->
-<!--                <t t-if="widget.data.lot_id" ><span> : <t t-esc="widget.data.lot_id.display_name" /></span></t>-->
+                <t t-esc="widget.data.location_id.display_name" />
+                <t t-if="widget.data.lot_id" ><span> : <t t-esc="widget.data.lot_id.display_name" /></span></t>
             </td>
             <!-- To -->
             <td class="brctbl-col5 js_loc">
-                <t t-esc="widget.data" />
-<!--                <t t-esc="widget.data.location_dest_id.display_name" />-->
+                <t t-esc="widget.data.location_dest_id.display_name" />
 <!--                <div class="pull-right btn-group">-->
 <!--                    <button type="button" class="btn btn-default dropdown-toggle fa fa-cog" data-toggle="dropdown">-->
 <!--                     <span class="caret"></span>-->
@@ -78,8 +82,8 @@
                 <div class="col-lg-6">
                     <h2 class="oe_pick_app_header">
                         <a id="picking_url_backend" t-att-href="widget.get_backend_url()">
-                            <t t-esc="widget.getParent().picking"/>
-<!--                            <t t-esc="widget.getParent().picking.name"/>-->
+<!--                            <t t-esc="widget.getParent().picking"/>-->
+                            <t t-esc="widget.getParent().picking.name"/>
                         </a>
                     </h2>
                 </div>

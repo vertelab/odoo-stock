@@ -1,5 +1,4 @@
 function openerp_picking_alt_widgets(instance){
-    //~ console.log('openerp_picking_alt_widgets');
     var module = instance.stock_barcode_alternative;
     var _t     = instance.web._t;
     var QWeb   = instance.web.qweb;
@@ -36,15 +35,9 @@ function openerp_picking_alt_widgets(instance){
             
         },
         getItem: function(key){
-            //~ console.log(key);
             return JSON.parse(sessionStorage.getItem(key));
         },
         setItem: function(key, value, timestamp){
-        //~ setItem: function(key, value, timestamp){
-            //~ console.log(key + ' ' + value);
-            //~ if (timestamp) {
-                //~ value._save_date = new Date().toTimeString();
-            //~ }
             if (value === undefined) {
                 value = null;
             }

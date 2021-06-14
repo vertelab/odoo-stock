@@ -11,11 +11,9 @@ odoo.define('stock_barcode_alternative.BarcodeScanner', function(require) {
         },
         connect: function(callback){
             // Connect the scanner to a callback function.
-            //~ console.log('Connecting scanner to:', this);
             this.disconnect();
             var self = this;
             this.handler = function(e){
-                //~ console.log('BarcodeScanner.handler: ' + String.fromCharCode(e.which));
                 // Check timeout
                 var now = new Date();
                 if (self.last_parse && ((now - self.last_parse) > self.timeout)){
