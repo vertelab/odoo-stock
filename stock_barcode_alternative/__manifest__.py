@@ -14,7 +14,7 @@ thus speeding up the process.
     'author': 'Vertel AB',
     'website': 'http://www.vertel.se',
     'category': 'website',
-    'depends': ['stock', 'website'],
+    'depends': ['stock', 'website', 'account'],
     'data': [
         'views/assets.xml',
         'views/stock_view.xml',

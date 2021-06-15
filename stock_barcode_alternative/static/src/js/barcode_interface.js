@@ -63,10 +63,10 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
 
         picking_loaded: function(res){
             let self = this;
-            console.log('picking', res.picking)
-            console.log('packages', res.packages)
-            console.log('operations', res.operations)
-            console.log('products', res.products)
+            // console.log('picking', res.picking)
+            // console.log('packages', res.packages)
+            // console.log('operations', res.operations)
+            // console.log('products', res.products)
             self.set_picking(res.picking[0]);
             // self.set_picking(this.picking);
             self.set_packages(res.packages);

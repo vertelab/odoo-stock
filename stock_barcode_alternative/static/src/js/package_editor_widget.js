@@ -34,7 +34,6 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
         renderElement: function(){
             var self = this;
             if (self.getParent().$el) {
-                console.log(self.getParent().$('tbody.abc-packop-package').attr('data-package-id', self.getParent().id))
                 this.setElement(self.getParent().$('tbody.abc-packop-package').attr('data-package-id', self.getParent().id));
                 this._super();
                 _.each(this.getChildren(), function(child){
