@@ -26,10 +26,9 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
             this.picking_type_id = init_params.picking_type_id ? init_params.picking_type_id: undefined;
             this.picking_id = init_params.picking_id ? parseInt(init_params.picking_id):undefined;
             this.storage = sessionStorage;
-            // this.storage = new Storage();
             this.error_beep = new Audio('/stock_barcode_alternative/static/src/sound/negativebeep.wav');
             this.barcode_scanner = new BarcodeScanner;
-            this.products = this.storage.getItem('products') || [];
+            this.products = JSON.parse(this.storage.getItem('products')) || [];
             this.picking = {};
             this.packages = [];
             this.packops = [];
@@ -62,12 +61,17 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
 
         },
 
-        picking_loaded: function(){
+        picking_loaded: function(res){
             let self = this;
-            self.set_picking(this.picking);
-            self.set_packages(this.packages);
-            self.set_packops(this.operations);
-            self.add_products(this.products);
+            // console.log('picking', res.picking)
+            // console.log('packages', res.packages)
+            // console.log('operations', res.operations)
+            // console.log('products', res.products)
+            self.set_picking(res.picking[0]);
+            // self.set_picking(this.picking);
+            self.set_packages(res.packages);
+            self.set_packops(res.operations);
+            self.add_products(res.products);
             self.picking_editor = new PickingEditorWidget(self);
             self.picking_editor.replace(self.$('.oe_placeholder_picking_editor'));
         },
@@ -79,7 +83,6 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
             // on haschange that does magic stuff. Seems to overcomplicate things.
             //$(window).trigger('hashchange');
         },
-
 
         set_picking: function(picking) {
             this.picking = picking;
@@ -124,7 +127,7 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
                     // Update the existing product
                     $.extend(current_product, product);
                 } else {
-                    // Add the new product
+                    // Add the new product'
                     self.products.push(product);
                 }
             })
@@ -141,16 +144,12 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
             }).then(function (res) {
                 window.location = '/web#action=' + res[0]['res_id'];
             });
-
-            // return new instance.web.Model("ir.model.data").get_func("search_read")([['name', '=', 'action_picking_type_form']], ['res_id']).pipe(function(res) {
-            //         window.location = '/web#action=' + res[0]['res_id'];
-            //     });
         },
         destroy: function(){
             this._super();
             // this.disconnect_numpad();
             this.barcode_scanner.disconnect();
-            // instance.webclient.set_content_full_screen(false);
+            instance.webclient.set_content_full_screen(false);
         },
 
 
@@ -178,7 +177,7 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
                 args: [[], this.picking_id],
                 context: session.user_context
             }).then(function (res) {
-                console.log(res)
+                return res
             });
 
         },
@@ -192,7 +191,10 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
             if (! Array.isArray(fields)){
                 fields = [fields];
             }
-            _.each(fields, function(field){self.storage.setItem(field, self[field]);})
+
+            _.each(fields, function(field){
+                self.storage.setItem(field, JSON.stringify(self[field]));
+            })
         },
         clear_products: function(){
             // Clear product data from storage.
@@ -206,25 +208,18 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
         scan: function(code){
             // Handle the scanned code.
             console.log('Scanned: ' + code);
-            //~ console.log(this);
             var self = this;
             var product = _.filter(
                 this.products,
                 function(e, pos, l){
                     return e.ean13 === code || e.default_code === code;
                 })
-            //~ console.log(product);
             if (product.length > 0){
                 // Matched a known product.
                 this.scanned_product(product);
             } else {
                 // Contact backend to get result.
                 // May be a product, picking, etc.
-                //~ console.log('no product found! products:');
-                //~ console.log(this.products);
-                // new instance.web.Model('stock.picking').call('abc_scan', [code], {context: self.session.user_context})
-                //     .then(function(result){self.handle_scan_result(result)});
-
                 return this._rpc({
                     model: 'stock.picking',
                     method: 'abc_scan',
@@ -237,7 +232,6 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
         },
         handle_scan_result: function(result) {
             // Handle the result from backend scan query
-            //~ console.log('handle_scan_result', result);
             if (result.type === 'product.product') {
                 this.add_products(result.product);
                 this.scanned_product(result.product);
@@ -281,7 +275,6 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
                 // This product isn't on the picking
                 this.error_beep.play();
                 this.picking_editor.get_current_package().increase(products[0].id)
-                //~ console.log(product_names);
                 // TODO: Translation
                 //~ window.alert(product_names.join(' / ') + " finns ej på denna plocksedel!");
             }

@@ -64,7 +64,6 @@ class StockPicking(models.Model):
                 ('partner_id', ['display_name']),
             ]
         if record._name == 'stock.transfer_details_items':
-            _logger.warn("Lukas2 %s" % record.mapped('product_id').mapped('sale_ok'))
             return [
                     ('product_id', ['display_name']),
                     ('product_uom_id', ['display_name', 'factor']),
@@ -72,15 +71,44 @@ class StockPicking(models.Model):
                     ('package_id', []),
                     ('packop_id', []),
                     ('result_package_id', ['display_name']),
-                    ('sourceloc_id', ['display_name']),
+                    # ('sourceloc_id', ['display_name']),
                     ('destinationloc_id', ['display_name']),
                     ('lot_id', ['display_name']),
+                ]
+        if record._name == 'stock.move.line':
+            return [
+                    ('product_id', ['display_name']),
+                    ('product_uom_id', ['display_name', 'factor']),
+                    'product_uom_qty',
+                    'product_qty',
+                    'qty_done',
+                    ('location_id', ['display_name']),
+                    ('location_dest_id', ['display_name']),
+                ]
+        if record._name == 'stock.move':
+            return [
+                    ('product_id', ['display_name']),
+                    ('product_uom', ['display_name', 'factor']),
+                    'product_uom_qty',
+                    'product_qty',
+                    'reserved_availability',
+                    'availability',
+                    'quantity_done',
+                    'forecast_availability',
+                    ('location_id', ['display_name']),
+                    ('location_dest_id', ['display_name']),
+                ]
+        if record._name == 'stock.quant.package':
+            return [
+                    'name',
+                    ('location_id', ['display_name']),
+                    ('packaging_id', ['display_name']),
                 ]
         if record._name == 'product.product':
             return [
                     'display_name',
                     'default_code',
-                    'ean13',
+                    'barcode',
                     'sale_ok',
                     'weight',
                     ('uom_id', ['display_name', 'factor']),
@@ -102,12 +130,14 @@ class StockPicking(models.Model):
         # ~ _logger.warn(self._context)
         stock_picking_id = self.env['stock.picking'].browse(picking_id)
         picking = self.abc_make_records(stock_picking_id)
-        if self.state == 'assigned':
-            action = self.button_validate()
-            # wizard = self.env['stock.transfer_details'].browse(action['res_id'])
-            wizard = self.env['stock.immediate.transfer'].browse(action['res_id'])
-            operations = self.abc_make_records(wizard.item_ids)
-            products = self.abc_make_records(wizard.item_ids.mapped('product_id'))
+        if stock_picking_id.state == 'assigned':
+            # action = stock_picking_id.button_validate()
+            # wizard = self.env['stock.immediate.transfer'].browse(action['res_id'])
+            # wizard = self.env['stock.immediate.transfer'].browse(action.get('context').get('button_validate_picking_ids'))
+            operations = self.abc_make_records(stock_picking_id.move_line_ids_without_package)
+            # products = self.abc_make_records(wizard.item_ids.mapped('product_id'))
+            # products = self.abc_make_records(wizard.pick_ids.mapped('product_id'))
+            products = self.abc_make_records(stock_picking_id.move_ids_without_package)
         else:
             operations = []
             products = []
@@ -120,7 +150,6 @@ class StockPicking(models.Model):
 
     def abc_do_transfer(self, lines, packages, **data):
         """Complete the picking operation."""
-        # ~ _logger.warn('\nabc_do_transfer\n\n%s\n\n%s\n\n%s' % (lines, packages, data))
         res = {'warnings': [], 'messages': [], 'results': {}}
         params = {}
         for step in [s[1] for s in sorted(self.abc_transfer_steps())]:
@@ -158,7 +187,7 @@ class StockPicking(models.Model):
             'product_id': self.abc_make_records(product, ['display_name'])[0],
             'sale_ok' : self.abc_make_records(product, ['sale_ok'])[0],
             'destinationloc_id': self.abc_make_records(self.location_dest_id)[0],
-            'sourceloc_id': self.abc_make_records(location)[0],
+            # 'sourceloc_id': self.abc_make_records(location)[0],
             'product_uom_id': self.abc_make_records(product.uom_id)[0],
         })
         #_logger.warn('Haze %s' %row['sale_ok'])
@@ -169,8 +198,9 @@ class StockPicking(models.Model):
         """Return all the steps (function names) to complete the picking process in the correct order."""
         return [
             (20, 'abc_transfer_wizard'),
-            (40, 'abc_create_invoice'),
-            (60, 'abc_confirm_invoice')]
+            # (40, 'abc_create_invoice'),
+            # (60, 'abc_confirm_invoice')
+        ]
 
     def abc_transfer_wizard(self, lines, packages, data, params, res):
         """Run the transfer wizard on the given lines."""
@@ -180,39 +210,42 @@ class StockPicking(models.Model):
         # action = self.do_enter_transfer_details()
         action = self.button_validate()
         # wizard = self.env['stock.transfer_details'].browse(action['res_id'])
+
         wizard = self.env['stock.immediate.transfer'].browse(action['res_id'])
         # Keep track of matched transfer items
         matched_ids = []
         for line in lines:
             if line['id'] > 0:
+                pass
                 # Original line. Match against item in wizard.
-                if line['packop_id']:
-                    item = wizard.item_ids.filtered(lambda i: i.packop_id.id == line['packop_id']['id'])
-                    item.quantity = line['qty_done']
-                    matched_ids.append(item.id)
-                else:
-                    # What if we don't have packop_id. Will this ever occur?
-                    _logger.warn(_("Couldn't match line (id %s) against existing transfer item!\nlines:%s\ntransfer items:%s") % (line['id'], lines, wizard.item_ids.read()))
+                # if line['packop_id']:
+                #     item = wizard.item_ids.filtered(lambda i: i.packop_id.id == line['packop_id']['id'])
+                #     item.quantity = line['qty_done']
+                #     matched_ids.append(item.id)
+                # else:
+                #     # What if we don't have packop_id. Will this ever occur?
+                #     _logger.warning(_("Couldn't match line (id %s) against existing transfer item!\nlines:%s\ntransfer items:%s") % (line['id'], lines, wizard.item_ids.read()))
             else:
                 # New line. Create a new item.
                 # TODO: Split item based on original line from another package.
-                item = wizard.item_ids.create({
+                item = wizard.pick_ids.create({
                     'transfer_id': wizard.id,
                     'product_id': line['product_id']['id'],
                     'product_uom_id': line['product_uom_id']['id'],
                     'quantity': line['qty_done'],
-                    'sourceloc_id': line['sourceloc_id']['id'],
-                    'destinationloc_id': line['destinationloc_id']['id'],
+                    # 'sourceloc_id': line['location_id']['id'],
+                    'location_dest_id': line['location_dest_id']['id'],
                     # 'result_package_id': line['result_package_id']['id'],
                     # 'destinationloc_id': line['destinationloc_id']['id'],
                 })
                 matched_ids.append(item.id)
                 _logger.warning("Lukas7: %s" % item)
-        extra_items = wizard.item_ids.filtered(lambda i: i.id not in matched_ids)
+        extra_items = wizard.pick_ids.filtered(lambda i: i.id not in matched_ids)
         if extra_items:
             _logger.warning(_("Found and deleted extra transfer items! %s" % extra_items.read()))
             extra_items.unlink()
-        wizard.do_detailed_transfer()
+        # wizard.do_detailed_transfer()
+        wizard.process()
         res['results']['transfer'] = 'success'
         params['wizard'] = wizard
 
@@ -295,7 +328,7 @@ class StockPicking(models.Model):
     @api.model
     def abc_scan(self, code):
         """Perform scan on the supplied barcode."""
-        products = self.env['product.product'].search(['|', ('ean13', '=', code), ('default_code', '=', code)])
+        products = self.env['product.product'].search(['|', ('barcode', '=', code), ('default_code', '=', code)])
         _logger.warning("Lukas9: %s" % products)
         if products:
             return {
