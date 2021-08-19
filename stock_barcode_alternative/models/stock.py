@@ -22,7 +22,6 @@ from openerp import api, fields, models,_
 from openerp import http
 from openerp.http import request
 from openerp.exceptions import except_orm, Warning, RedirectWarning
-# ~ from openerp.api import Environment
 from openerp.tools import safe_eval as eval
 from timeit import default_timer as timer
 import traceback
@@ -32,6 +31,7 @@ from openerp.modules.registry import Registry
 
 import logging
 _logger = logging.getLogger(__name__)
+
 
 class BarcodeController(http.Controller):
 
@@ -71,7 +71,6 @@ class StockPicking(models.Model):
                         value = value and value[0] or None
                 rec[field] = value
             result.append(rec)
-            _logger.debug('Lukas1: field %s %s' %(result,fields))
         return result
 
     @api.model
@@ -85,7 +84,6 @@ class StockPicking(models.Model):
                 ('partner_id', ['display_name']),
             ]
         if record._name == 'stock.transfer_details_items':
-            _logger.warn("Lukas2 %s" % record.mapped('product_id').mapped('is_offer'))
             return [
                     ('product_id', ['display_name']),
                     ('product_uom_id', ['display_name', 'factor']),
@@ -120,8 +118,6 @@ class StockPicking(models.Model):
     @api.multi
     def abc_load_picking(self):
         """Create a JSON description of a picking and its products for the Javascript GUI."""
-        # ~ _logger.warn(self)
-        # ~ _logger.warn(self._context)
         self.ensure_one()
         picking = self.abc_make_records(self)[0]
         if self.state == 'assigned':
@@ -135,14 +131,11 @@ class StockPicking(models.Model):
         # TODO: Find packages
         packages = []
         res = {'picking': picking, 'operations': operations, 'products': products, 'packages': packages}
-        _logger.debug('Lukas3: field %s ' %products)
-        # ~ _logger.warn(res)
         return res
 
     @api.multi
     def abc_do_transfer(self, lines, packages, **data):
         """Complete the picking operation."""
-        # ~ _logger.warn('\nabc_do_transfer\n\n%s\n\n%s\n\n%s' % (lines, packages, data))
         self.ensure_one()
         res = {'warnings': [], 'messages': [], 'results': {}}
         params = {}
@@ -154,7 +147,6 @@ class StockPicking(models.Model):
             # params    Parameters accumulated in the picking process. Inject data communicated between steps here.
             # res       The result returned to the UI.
             getattr(self, step)(lines, packages, data, params, res)
-        _logger.debug('Lukas4: %s %s' %(lines,packages))
         return res
 
     @api.multi
@@ -162,7 +154,6 @@ class StockPicking(models.Model):
         """Provide default locations and other data """
         # Lifted from action_assign on stock.move
         product = self.env['product.product'].browse(row['product_id'])
-        _logger.warn("Lukas5: %s" % product['is_offer'])
         location = self.location_id
         main_domain = [('reservation_id', '=', False), ('qty', '>', 0)]
         quants = self.env['stock.quant'].quants_get_prefered_domain(
@@ -176,7 +167,6 @@ class StockPicking(models.Model):
         for quant in quants:
             if quant[0]:
                 location = quant[0].location_id
-        _logger.warn("Lukas6: %s" % self.abc_make_records(product, ['is_offer']))
         row.update({
             '_name': 'stock.transfer_detailsitems',
             'product_id': self.abc_make_records(product, ['display_name'])[0],
@@ -185,7 +175,6 @@ class StockPicking(models.Model):
             'sourceloc_id': self.abc_make_records(location)[0],
             'product_uom_id': self.abc_make_records(product.uom_id)[0],
         })
-        #_logger.warn('Haze %s' %row['is_offer'])
         return row
 
     @api.model
@@ -200,7 +189,6 @@ class StockPicking(models.Model):
     def abc_transfer_wizard(self, lines, packages, data, params, res):
         """Run the transfer wizard on the given lines."""
         # TODO: Add support for packages.
-        # ~ _logger.warn(lines)
         res['results']['transfer'] = 'failure'
         action = self.do_enter_transfer_details()
         wizard = self.env['stock.transfer_details'].browse(action['res_id'])
@@ -230,7 +218,6 @@ class StockPicking(models.Model):
                     # 'destinationloc_id': line['destinationloc_id']['id'],
                 })
                 matched_ids.append(item.id)
-                _logger.warn("Lukas7: %s" % item)
         extra_items = wizard.item_ids.filtered(lambda i: i.id not in matched_ids)
         if extra_items:
             _logger.warn(_("Found and deleted extra transfer items! %s" % extra_items.read()))
@@ -250,7 +237,7 @@ class StockPicking(models.Model):
             if self.sale_id and self.sale_id.order_policy == 'prepaid':
                 res_invoice['prepaid'] = True
             return
-        
+
         # Check if this order is already invoiced. Unknown when this might happen.
         if self.invoice_state == 'invoiced':
             res_invoice['already_invoiced'] = True
@@ -311,7 +298,6 @@ class StockPicking(models.Model):
 
     @api.multi
     def abc_open_picking(self):
-        _logger.warn("Lukas8: %s" % self)
         return {
             'type': 'ir.actions.act_url',
             'target': 'self',
@@ -322,7 +308,6 @@ class StockPicking(models.Model):
     def abc_scan(self, code):
         """Perform scan on the supplied barcode."""
         products = self.env['product.product'].search(['|', ('ean13', '=', code), ('default_code', '=', code)])
-        _logger.warn("Lukas9: %s" % products)
         if products:
             return {
                 'type': 'product.product',
@@ -340,7 +325,6 @@ class StockPickingType(models.Model):
 
     @api.multi
     def abc_open_barcode_interface(self):
-        _logger.warn("Lukas10: %s" % self)
         return {
             'type': 'ir.actions.act_url',
             'target': 'self',
