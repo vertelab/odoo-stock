@@ -223,10 +223,10 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
                 return this._rpc({
                     model: 'stock.picking',
                     method: 'abc_scan',
-                    args: [[], code],
+                    args: [code],
                     context: session.user_context
                 }).then(function (res) {
-                    self.handle_scan_result(result)
+                    self.handle_scan_result(res)
                 });
             }
         },

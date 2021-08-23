@@ -12,8 +12,10 @@
                         <a href="#"><i class="abc-op-qty-minus fa fa-minus"></i></a>
                     </span>
                     <form class="js_submit_value">
-<!--                        <input type="number" class="form-control text-center js_qty" t-att-value="widget.data.qty_done"></input>-->
+                        <input type="number" class="form-control text-center js_qty" t-att-value="widget.data.qty_done"></input>
+<!--
                         <input type="number" class="form-control text-center js_qty" t-att-value="widget.data.product_qty"></input>
+-->
                         <!-- <input type="submit" class="hidden"></input> -->
                     </form>
                     <span class="input-group-addon js_plus input-sm" t-att-data-product-id='widget.data.product_id.id'>
@@ -83,7 +85,9 @@
                     <h2 class="oe_pick_app_header">
                         <a id="picking_url_backend" t-att-href="widget.get_backend_url()">
 <!--                            <t t-esc="widget.getParent().picking"/>-->
-                            <t t-esc="widget.getParent().picking.name"/>
+                            <t t-if="widget.getParent().picking">
+                                <t t-esc="widget.getParent().picking.name"/>
+                            </t>
                         </a>
                     </h2>
                 </div>

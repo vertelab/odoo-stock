@@ -335,13 +335,14 @@ class StockPicking(models.Model):
                 'type': 'product.product',
                 'product': self.abc_make_records(products)}
         picking = self.env['stock.picking'].search_read([('name', '=', code)], ['id'])
+        if not picking:
+            picking = self.env['stock.picking'].search_read([('name', '=', code.replace('-', '/'))], ['id'])
         if picking:
             return {
                 'type': 'stock.picking',
                 'picking': picking[0]
             }
         return {'type': 'no hit'}
-
 
 class StockPickingType(models.Model):
     _inherit = 'stock.picking.type'
