@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
-    
     <t t-name='AlternativeOperationEditorWidgets'>
+        <div>hello?</div>
         <tr t-att-class="widget.get_classes()" t-att-data-id="widget.data.id" t-att-data-product_id="widget.data.product_id.id" t-att-data-package_id="'' + widget.data.package_id.id">
             <!-- Product name -->
             <td><t t-esc="widget.data.product_id.display_name"/></td>
@@ -28,7 +28,7 @@
             </td>
             <!-- Todo -->
             <td class="brctbl-col3 text-center">
-                <t t-esc="widget.data.product_qty"/> / <t t-esc="widget.data.product_uom_qty"/> <t t-esc="widget.data.product_uom_id.display_name" />
+                <t t-esc="widget.data.qty_remaining"/> / <t t-esc="widget.data.product_uom_qty"/> <t t-esc="widget.data.product_uom_id.display_name" />
 <!--                <t t-esc="widget.data.qty_remaining"/> / <t t-esc="widget.data.quantity"/> <t t-esc="widget.data.product_uom_id.display_name" />-->
             </td>
             <!-- From -->
@@ -85,8 +85,8 @@
                     <h2 class="oe_pick_app_header">
                         <a id="picking_url_backend" t-att-href="widget.get_backend_url()">
 <!--                            <t t-esc="widget.getParent().picking"/>-->
-                            <t t-if="widget.getParent().picking">
-                                <t t-esc="widget.getParent().picking.name"/>
+                            <t t-if="widget.getParent()">
+                                <t t-esc="widget.getParent().name"/>
                             </t>
                         </a>
                     </h2>
@@ -124,7 +124,6 @@
                 </div>
             </div>
         </div>
-
         <div style="width:100%">
             <table class='table table-condensed js_op_table_todo'>
                 <thead>
@@ -137,10 +136,6 @@
                         <th class='text-left'>To</th>
                     </tr>
                 </thead>
-
-                <t t-foreach="widget.packages" t-as="package">
-                    <tbody class="abc-packop-package" t-att-data-package-id="'' + package.data.id"/>
-                </t>
             </table>
         </div>
     </t>

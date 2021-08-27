@@ -122,6 +122,16 @@ class StockPicking(models.Model):
                     'display_name',
                     'factor',
                 ]
+        if record._name == 'product.packaging':
+            return [
+                    'name',
+                    'height',
+                    'width',
+                    'packaging_length',
+                    'weight',
+                    'max_weight',
+                    'barcode'
+                ]
         return ['id']
 
     def abc_load_picking(self, picking_id):
@@ -131,13 +141,9 @@ class StockPicking(models.Model):
         stock_picking_id = self.env['stock.picking'].browse(picking_id)
         picking = self.abc_make_records(stock_picking_id)
         if stock_picking_id.state == 'assigned':
-            # action = stock_picking_id.button_validate()
-            # wizard = self.env['stock.immediate.transfer'].browse(action['res_id'])
-            # wizard = self.env['stock.immediate.transfer'].browse(action.get('context').get('button_validate_picking_ids'))
-            operations = self.abc_make_records(stock_picking_id.move_line_ids_without_package)
-            # products = self.abc_make_records(wizard.item_ids.mapped('product_id'))
-            # products = self.abc_make_records(wizard.pick_ids.mapped('product_id'))
-            products = self.abc_make_records(stock_picking_id.move_ids_without_package)
+            operations = self.abc_make_records(stock_picking_id.move_line_ids)
+            products = self.abc_make_records(stock_picking_id.move_line_ids.mapped("product_id"))
+            _logger.warning(f"products victor: {products}")
         else:
             operations = []
             products = []
@@ -329,7 +335,6 @@ class StockPicking(models.Model):
     def abc_scan(self, code):
         """Perform scan on the supplied barcode."""
         products = self.env['product.product'].search(['|', ('barcode', '=', code), ('default_code', '=', code)])
-        _logger.warning("Lukas9: %s" % products)
         if products:
             return {
                 'type': 'product.product',
@@ -341,6 +346,11 @@ class StockPicking(models.Model):
             return {
                 'type': 'stock.picking',
                 'picking': picking[0]
+            }
+        package = self.env['product.packaging'].search([('barcode', '=', code)])
+        return {
+                'type': 'product.packaging',
+                'package': self.abc_make_records(package)
             }
         return {'type': 'no hit'}
 
