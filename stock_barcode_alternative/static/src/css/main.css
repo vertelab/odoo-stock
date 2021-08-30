@@ -69,3 +69,8 @@ p.abc-message-row {
     color: inherit;
     display: inline;
 }
+
+.abc-op-qty-minus, .abc-op-qty-plus {
+    font-size: 200%;
+    border: 2px solid #0000; /* #00000000 */
+}
