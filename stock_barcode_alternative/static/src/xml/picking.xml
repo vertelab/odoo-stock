@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
     <t t-name='AlternativeOperationEditorWidgets'>
-        <div>hello?</div>
         <tr t-att-class="widget.get_classes()" t-att-data-id="widget.data.id" t-att-data-product_id="widget.data.product_id.id" t-att-data-package_id="'' + widget.data.package_id.id">
             <!-- Product name -->
             <td><t t-esc="widget.data.product_id.display_name"/></td>
@@ -119,7 +118,7 @@
                     <h3 style="float:right">
                     <!--Hidden on request-->
 <!--                         <button type="button" class='btn btn-default js_create_package'> Create Package </button>-->
-                        <button type="button" class='btn btn-danger js_do_transfer fa fa-download'> Put in Cart </button>
+                        <button type="button" class='btn btn-danger js_do_transfer fa fa-download'> Create Unifaun Order </button>
                     </h3>
                 </div>
             </div>
@@ -136,6 +135,9 @@
                         <th class='text-left'>To</th>
                     </tr>
                 </thead>
+                <t t-foreach="widget.packages" t-as="package">
+                    <tbody class="abc-packop-package" t-att-data-package-id="'' + package.data.id"/>
+                </t>
             </table>
         </div>
     </t>

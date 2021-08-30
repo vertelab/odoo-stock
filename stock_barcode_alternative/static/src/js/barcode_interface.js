@@ -4,7 +4,7 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
     var core = require('web.core');
     var publicWidget = require("web.public.widget");
     var BarcodeScanner = require("stock_barcode_alternative.BarcodeScanner").BarcodeScanner;
-    var PickingEditorWidget = require("stock_barcode_alternative.PickingEditorWidget").PickingEditorWidget;
+    var PickingEditorWidget = require("stock_barcode_alternative.PickingEditorWidget");
     console.log("pickingeditorwidget:", PickingEditorWidget)
     var _t = core._t;
     var session = require('web.session');
