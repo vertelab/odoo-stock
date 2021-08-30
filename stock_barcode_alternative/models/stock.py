@@ -122,6 +122,16 @@ class StockPicking(models.Model):
                     'display_name',
                     'factor',
                 ]
+        if record._name == 'product.packaging':
+            return [
+                    'name',
+                    'height',
+                    'width',
+                    'packaging_length',
+                    'weight',
+                    'max_weight',
+                    'barcode'
+                ]
         return ['id']
 
     def abc_load_picking(self, picking_id):
@@ -131,13 +141,9 @@ class StockPicking(models.Model):
         stock_picking_id = self.env['stock.picking'].browse(picking_id)
         picking = self.abc_make_records(stock_picking_id)
         if stock_picking_id.state == 'assigned':
-            # action = stock_picking_id.button_validate()
-            # wizard = self.env['stock.immediate.transfer'].browse(action['res_id'])
-            # wizard = self.env['stock.immediate.transfer'].browse(action.get('context').get('button_validate_picking_ids'))
-            operations = self.abc_make_records(stock_picking_id.move_line_ids_without_package)
-            # products = self.abc_make_records(wizard.item_ids.mapped('product_id'))
-            # products = self.abc_make_records(wizard.pick_ids.mapped('product_id'))
-            products = self.abc_make_records(stock_picking_id.move_ids_without_package)
+            operations = self.abc_make_records(stock_picking_id.move_line_ids)
+            products = self.abc_make_records(stock_picking_id.move_line_ids.mapped("product_id"))
+            _logger.warning(f"products victor: {products}")
         else:
             operations = []
             products = []
@@ -150,6 +156,7 @@ class StockPicking(models.Model):
 
     def abc_do_transfer(self, lines, packages, **data):
         """Complete the picking operation."""
+        _logger.warning(f"victor self: {self}, lines: {lines}, packages: {packages}, data: {data}")
         res = {'warnings': [], 'messages': [], 'results': {}}
         params = {}
         for step in [s[1] for s in sorted(self.abc_transfer_steps())]:
@@ -160,7 +167,6 @@ class StockPicking(models.Model):
             # params    Parameters accumulated in the picking process. Inject data communicated between steps here.
             # res       The result returned to the UI.
             getattr(self, step)(lines, packages, data, params, res)
-        _logger.debug('Lukas4: %s %s' % (lines, packages))
         return res
 
     def abc_create_row(self, row):
@@ -198,124 +204,31 @@ class StockPicking(models.Model):
         """Return all the steps (function names) to complete the picking process in the correct order."""
         return [
             (20, 'abc_transfer_wizard'),
-            # (40, 'abc_create_invoice'),
-            # (60, 'abc_confirm_invoice')
+            (40, 'abc_create_invoice'),
+            (60, 'abc_confirm_invoice')
         ]
 
     def abc_transfer_wizard(self, lines, packages, data, params, res):
         """Run the transfer wizard on the given lines."""
-        # TODO: Add support for packages.
-        # ~ _logger.warn(lines)
-        res['results']['transfer'] = 'failure'
-        # action = self.do_enter_transfer_details()
+        
+        _logger.warning(f"victor self: {self}, lines: {lines}, {data=}, {params=}, {res=}")
+        for move in lines:
+            _logger.warning(f" victor in data: {move['qty_done']}")
+            _logger.warning(f" victor odoo data: {self.env['stock.move.line'].browse(move['id']).qty_done}")
+            self.env["stock.move.line"].browse(move['id']).qty_done = move['qty_done']
+            _logger.warning(f" victor odoo data: {self.env['stock.move.line'].browse(move['id']).qty_done}")
         action = self.button_validate()
-        # wizard = self.env['stock.transfer_details'].browse(action['res_id'])
-
-        wizard = self.env['stock.immediate.transfer'].browse(action['res_id'])
+        _logger.warning(f"victor validate: {action}")
         # Keep track of matched transfer items
-        matched_ids = []
-        for line in lines:
-            if line['id'] > 0:
-                pass
-                # Original line. Match against item in wizard.
-                # if line['packop_id']:
-                #     item = wizard.item_ids.filtered(lambda i: i.packop_id.id == line['packop_id']['id'])
-                #     item.quantity = line['qty_done']
-                #     matched_ids.append(item.id)
-                # else:
-                #     # What if we don't have packop_id. Will this ever occur?
-                #     _logger.warning(_("Couldn't match line (id %s) against existing transfer item!\nlines:%s\ntransfer items:%s") % (line['id'], lines, wizard.item_ids.read()))
-            else:
-                # New line. Create a new item.
-                # TODO: Split item based on original line from another package.
-                item = wizard.pick_ids.create({
-                    'transfer_id': wizard.id,
-                    'product_id': line['product_id']['id'],
-                    'product_uom_id': line['product_uom_id']['id'],
-                    'quantity': line['qty_done'],
-                    # 'sourceloc_id': line['location_id']['id'],
-                    'location_dest_id': line['location_dest_id']['id'],
-                    # 'result_package_id': line['result_package_id']['id'],
-                    # 'destinationloc_id': line['destinationloc_id']['id'],
-                })
-                matched_ids.append(item.id)
-                _logger.warning("Lukas7: %s" % item)
-        extra_items = wizard.pick_ids.filtered(lambda i: i.id not in matched_ids)
-        if extra_items:
-            _logger.warning(_("Found and deleted extra transfer items! %s" % extra_items.read()))
-            extra_items.unlink()
-        # wizard.do_detailed_transfer()
-        wizard.process()
         res['results']['transfer'] = 'success'
-        params['wizard'] = wizard
+        params['wizard'] = action
 
     def abc_create_invoice(self, lines, packages, data, params, res):
-        res_invoice = {'id': None, 'name': ''}
-        res['invoice'] = res_invoice
-        # Check if this order is NOT to be invoiced (prepaid most likely)
-        if self.invoice_state == 'none':
-            res_invoice['no_invoice'] = True
-            # TODO: Check where order policy comes from.
-            if self.sale_id and self.sale_id.order_policy == 'prepaid':
-                res_invoice['prepaid'] = True
-            return
-        
-        # Check if this order is already invoiced. Unknown when this might happen.
-        if self.invoice_state == 'invoiced':
-            res_invoice['already_invoiced'] = True
-            return
-        # Create invoice
-        try:
-            context = {'active_id': self.id, 'active_ids': self._ids, 'active_model': self._name, 'default_invoice_date': fields.Date.today()}
-            wizard = self.env['stock.invoice.onshipping'].with_context(context).create({})
-            action = wizard.open_invoice()
-            params['invoice'] = invoice = self.env['account.invoice'].browse(eval(action['domain'])[0][2][0])
-            res_invoice['id'] = invoice.id
-            res_invoice['name'] = invoice.name
-            res['results']['invoice'] = 'created'
-            invoice_menu = self.env.ref('account.menu_action_invoice_tree1')
-            res_invoice['url'] = "/web#id=%s&view_type=form&model=account.invoice&menu_id=%s&action=%s" % (invoice.id, invoice_menu.id, invoice_menu.action.id)
-            res['messages'].append(u'Created an <a taret="_blank" href="%s">invoice</a>.' % res_invoice['url'])
-        except Exception as e:
-            res['results']['invoice'] = 'failure'
-            res['warnings'].append((
-                _(u"Failed to create invoice!"),
-                '%s\n\nTraceback:\n%s' % (e.message or 'Unknown Error', traceback.format_exc())))
-
-    # ~ @api.model
-    # ~ def abc_test_lock_invoice(self, invoice, lock_time=5):
-        # ~ _logger.warn('\n\ninvoice locked!\n')
-        # ~ invoice.signal_workflow('invoice_open')
-        # ~ sleep(lock_time)
-        # ~ raise Warning('invoice lock released!')
+        _logger.warning(f"victor: {self.sale_id._create_invoices()}")
 
     def abc_confirm_invoice(self, lines, packages, data, params, res):
         """Confirm invoice. Split into its own function to not lock the invoice sequence."""
-        invoice = params.get('invoice')
-        if invoice and invoice.state == 'draft':
-            self.env.cr.commit()
-            env = None
-            try:
-                # Ne cursor doesn't time out when requesting lock.
-                # Could be bad I guess? Works for now.
-                # TODO: Look into setting a more reasonable lock wait time.
-                new_cr = Registry(self.env.cr.dbname).cursor()
-                new_cr.autocommit(True)
-                env = api.Environment(new_cr, self.env.uid, self.env.context)
-                # Validate invoice
-                invoice.signal_workflow('invoice_open')
-                res['invoice']['name'] = invoice.number
-                res['messages'].append(u"Created and confirmed invoice %s." % invoice.number)
-                res['results']['invoice'] = 'confirmed'
-                # Commit to unlock the invoice sequence
-                env.cr.commit()
-            except Exception as e:
-                res['warnings'].append((
-                    _(u"Failed to confirm invoice %s!") % (invoice and (invoice.number or invoice.name) or 'Unknown'),
-                    '%s\n\nTraceback:\n%s' % (e.message or 'Unknown Error', traceback.format_exc())))
-            finally:
-                if env:
-                    env.cr.close()
+        pass
 
     def abc_open_picking(self):
         _logger.warning("Lukas8: %s" % self)
@@ -329,19 +242,26 @@ class StockPicking(models.Model):
     def abc_scan(self, code):
         """Perform scan on the supplied barcode."""
         products = self.env['product.product'].search(['|', ('barcode', '=', code), ('default_code', '=', code)])
-        _logger.warning("Lukas9: %s" % products)
         if products:
             return {
                 'type': 'product.product',
                 'product': self.abc_make_records(products)}
         picking = self.env['stock.picking'].search_read([('name', '=', code)], ['id'])
+        if not picking:
+            picking = self.env['stock.picking'].search_read([('name', '=', code.replace('-', '/'))], ['id'])
+            #TODO: this is a hardcode thingy for testing, use the one above instead
+            # ~ picking = self.env['stock.picking'].search_read([('name', '=', 'WH/OUT/00085')], ['id'])
         if picking:
             return {
                 'type': 'stock.picking',
                 'picking': picking[0]
             }
+        package = self.env['product.packaging'].search([('barcode', '=', code)])
+        return {
+                'type': 'product.packaging',
+                'package': self.abc_make_records(package)
+            }
         return {'type': 'no hit'}
-
 
 class StockPickingType(models.Model):
     _inherit = 'stock.picking.type'

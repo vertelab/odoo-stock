@@ -24,6 +24,7 @@ odoo.define('stock_barcode_alternative.OperationEditorWidget', function(require)
             this.setElement(self.getParent().$('tr.abc-packop').attr('data-id', this.id));
             // this.setElement(self.getParent().$('tr.abc-packop[data-id="' + this.id + '"]'));
             this._super();
+            console.log(this);
             this.$('i.abc-op-qty-plus').click(function(){self.increase()});
             this.$('i.abc-op-qty-minus').click(function(){self.decrease()});
             this.$('i.abc-op-maximize-qty').click(function(){self.maximize_qty()});
@@ -46,13 +47,13 @@ odoo.define('stock_barcode_alternative.OperationEditorWidget', function(require)
         },
         maximize_qty: function(){
             // Add the remaining planned quantity to this line
-            this.set_qty(this.data.quantity_done + this.data.qty_remaining);
+            this.set_qty(this.data.qty_done + this.data.qty_remaining);
         },
         increase: function(reorder){
-            this.set_qty(this.data.quantity_done + 1, reorder);
+            this.set_qty(this.data.qty_done + 1, reorder);
         },
         decrease: function(reorder){
-            this.set_qty(this.data.quantity_done - 1, reorder);
+            this.set_qty(this.data.qty_done - 1, reorder);
         },
         get_classes: function(){
             var self = this;
@@ -63,12 +64,13 @@ odoo.define('stock_barcode_alternative.OperationEditorWidget', function(require)
             if(ui.products){
                 _.each(ui.products, function(product){
                     if(product.id === self.data.product_id.id){
-                        if(product){
-                            self.data['quantity_done'] = self.data['quantity'];
-                            console.log('QTY', self.data['quantity_done'])
-                            self.data.qty_remaining = 0;
-                            classes += ' hidden';
-                        }
+                        //~ TODO: implement this (needs picking_based_on_bom)
+                        //~ if(product.is_offer){
+                            //~ self.data['qty_done'] = self.data['quantity'];
+                            //~ console.log('QTY', self.data['qty_done'])
+                            //~ self.data.qty_remaining = 0;
+                            //~ classes += ' hidden';
+                        //~ }
                     }
 
                 })
@@ -76,9 +78,9 @@ odoo.define('stock_barcode_alternative.OperationEditorWidget', function(require)
 
             if (this.data.qty_remaining < 0) {
                 classes += ' qty-over';
-            } else if (this.data.qty_remaining === 0) {
+            } else if (this.data.qty_remaining == 0) {
                 classes += ' finished';
-            } else if (this.data.quantity_done > 0) {
+            } else if (this.data.qty_done > 0) {
                 classes += ' unfinished';
             }
 
@@ -100,16 +102,16 @@ odoo.define('stock_barcode_alternative.OperationEditorWidget', function(require)
             } else if (qty < 0.0) {
                 qty = 0.0;
             }
-            if (qty === this.data.quantity_done) {
+            if (qty === this.data.qty_done) {
                 // Nothing has changed.
                 return;
             }
-            this.data.quantity_done = qty;
+            this.data.qty_done = qty;
             var picking = this.get_picking_widget()
             picking.update_remaining(this.data.product_id.id);
             var parent = this.getParent();
             var picking = this.get_picking_widget();
-            if (this.data.quantity_done === 0.0){
+            if (this.data.qty_done === 0.0){
                 if (this.id < 0) {
                     // Not original row. Should this matter? We don't
                     // reuse the same picking wizard anyway. Lets keep it this way for now.
@@ -136,7 +138,7 @@ odoo.define('stock_barcode_alternative.OperationEditorWidget', function(require)
             let ui = this.get_picking_widget().getParent();
             return _.filter(ui.products, function(product){
 
-                return product.id === self.data.product_id.id;
+                return product.id == self.data.product_id.id;
             })[0];
         },
     });

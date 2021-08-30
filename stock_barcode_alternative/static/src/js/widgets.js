@@ -22,7 +22,7 @@ function openerp_picking_alt_widgets(instance){
 
 
     
-    openerp.web.client_actions.add('stock.ui.alt', 'instance.stock_barcode_alternative.BarcodeInterface');
+    odoo.web.client_actions.add('stock.ui.alt', 'instance.stock_barcode_alternative.BarcodeInterface');
 
     // Storage interface.
     // For now, we use sessionStorage.
@@ -52,7 +52,7 @@ function openerp_picking_alt_widgets(instance){
     });
 }
 
-openerp.stock_barcode_alternative = function(openerp) {
-    openerp.stock_barcode_alternative = openerp.stock_barcode_alternative || {};
+odoo.stock_barcode_alternative = function(odoo) {
+    odoo.stock_barcode_alternative = odoo.stock_barcode_alternative || {};
     openerp_picking_alt_widgets(openerp);
 }

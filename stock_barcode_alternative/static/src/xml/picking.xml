@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
-    
     <t t-name='AlternativeOperationEditorWidgets'>
         <tr t-att-class="widget.get_classes()" t-att-data-id="widget.data.id" t-att-data-product_id="widget.data.product_id.id" t-att-data-package_id="'' + widget.data.package_id.id">
             <!-- Product name -->
@@ -12,8 +11,10 @@
                         <a href="#"><i class="abc-op-qty-minus fa fa-minus"></i></a>
                     </span>
                     <form class="js_submit_value">
-<!--                        <input type="number" class="form-control text-center js_qty" t-att-value="widget.data.qty_done"></input>-->
+                        <input type="number" class="form-control text-center js_qty" t-att-value="widget.data.qty_done"></input>
+<!--
                         <input type="number" class="form-control text-center js_qty" t-att-value="widget.data.product_qty"></input>
+-->
                         <!-- <input type="submit" class="hidden"></input> -->
                     </form>
                     <span class="input-group-addon js_plus input-sm" t-att-data-product-id='widget.data.product_id.id'>
@@ -26,7 +27,7 @@
             </td>
             <!-- Todo -->
             <td class="brctbl-col3 text-center">
-                <t t-esc="widget.data.product_qty"/> / <t t-esc="widget.data.product_uom_qty"/> <t t-esc="widget.data.product_uom_id.display_name" />
+                <t t-esc="widget.data.qty_remaining"/> / <t t-esc="widget.data.product_uom_qty"/> <t t-esc="widget.data.product_uom_id.display_name" />
 <!--                <t t-esc="widget.data.qty_remaining"/> / <t t-esc="widget.data.quantity"/> <t t-esc="widget.data.product_uom_id.display_name" />-->
             </td>
             <!-- From -->
@@ -83,7 +84,9 @@
                     <h2 class="oe_pick_app_header">
                         <a id="picking_url_backend" t-att-href="widget.get_backend_url()">
 <!--                            <t t-esc="widget.getParent().picking"/>-->
-                            <t t-esc="widget.getParent().picking.name"/>
+                            <t t-if="widget.getParent()">
+                                <t t-esc="widget.getParent().name"/>
+                            </t>
                         </a>
                     </h2>
                 </div>
@@ -115,12 +118,11 @@
                     <h3 style="float:right">
                     <!--Hidden on request-->
 <!--                         <button type="button" class='btn btn-default js_create_package'> Create Package </button>-->
-                        <button type="button" class='btn btn-danger js_do_transfer fa fa-download'> Put in Cart </button>
+                        <button type="button" class='btn btn-danger js_do_transfer fa fa-download'> Create Unifaun Order </button>
                     </h3>
                 </div>
             </div>
         </div>
-
         <div style="width:100%">
             <table class='table table-condensed js_op_table_todo'>
                 <thead>
@@ -133,7 +135,6 @@
                         <th class='text-left'>To</th>
                     </tr>
                 </thead>
-
                 <t t-foreach="widget.packages" t-as="package">
                     <tbody class="abc-packop-package" t-att-data-package-id="'' + package.data.id"/>
                 </t>

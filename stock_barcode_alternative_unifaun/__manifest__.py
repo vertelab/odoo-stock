@@ -12,7 +12,7 @@ Adds Unifaun functionality to the alternative barcode interface.
     'category': 'website',
     'website': 'http://www.vertel.se',
     'author': 'Vertel AB',
-    'depends': ['stock_barcode_alternative'],
+    'depends': ['stock_barcode_alternative', 'delivery_unifaun_base'],
     'data': [
         'views/stock_view.xml',
     ],

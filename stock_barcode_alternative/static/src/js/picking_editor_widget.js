@@ -1,13 +1,13 @@
 odoo.define('stock_barcode_alternative.PickingEditorWidget', function(require) {
     "use strict";
 
+    var publicWidget = require("web.public.widget");
     var Widget = require('web.Widget');
     var core = require('web.core');
     var PackageEditorWidget = require("stock_barcode_alternative.PackageEditorWidget").PackageEditorWidget;
     var session = require('web.session');
 
-
-    var PickingEditorWidget = Widget.extend({
+    publicWidget.registry.PickingEditorWidget = publicWidget.Widget.extend({
         template: 'AlternativePickingEditorWidget',
 
         init: function(parent, options){
@@ -252,7 +252,7 @@ odoo.define('stock_barcode_alternative.PickingEditorWidget', function(require) {
             return this._rpc({
                 model: 'stock.picking',
                 method: 'abc_do_transfer',
-                args: [[this.id], this.rows, this.package_data],
+                args: [[this.id], this.rows, this.display_manual_packages],
                 // args: [[this.id, this.rows, this.package_data], this.get_extra_transfer_data()],
                 // context: this.get_extra_transfer_data()
             }).then(function (res) {
@@ -297,8 +297,6 @@ odoo.define('stock_barcode_alternative.PickingEditorWidget', function(require) {
     });
 
 
-    return {
-        PickingEditorWidget: PickingEditorWidget
-    };
+    return publicWidget.registry.PickingEditorWidget;
 
 });

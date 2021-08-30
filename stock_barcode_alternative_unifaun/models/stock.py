@@ -37,12 +37,12 @@ class StockPicking(models.Model):
                     ('unifaun_id', ['name', ('picking_ids', ['name'])])]
         return res
     
-    @api.model
-    def abc_transfer_steps(self):
-        steps = super(StockPicking, self).abc_transfer_steps()
-        steps.append((30, 'abc_unifaun'))
-        steps.append((10, 'abc_unifaun_parcel_data'))
-        return steps
+    # ~ @api.model
+    # ~ def abc_transfer_steps(self):
+        # ~ steps = super(StockPicking, self).abc_transfer_steps()
+        # ~ steps.append((30, 'abc_unifaun'))
+        # ~ steps.append((10, 'abc_unifaun_parcel_data'))
+        # ~ return steps
     
     def abc_unifaun_parcel_data(self, lines, packages, data, params, res):
         """"""
@@ -59,20 +59,20 @@ class StockPicking(models.Model):
         
         if self.carrier_id.is_unifaun and not data.get('unifaun_no_order'):
             res['results']['unifaun'] = 'failure'
-            try:
-                self.order_stored_shipment()
-                if self.unifaun_status_ids:
-                    # TODO: Translation, error details
-                    res['warnings'].append((_(u"Det finns felmeddelanden i svaret från Unifaun.\n\n1) "
-                                              u"Kontrollera meddelandena och rätta ordern\n2)Beställ om transport "
-                                              u"(Order Transport-knappen)\n3) Verifiera att problemen är lösta\n4) "
-                                              u"Bekräfta transporten\n5) Skriv ut etiketten"),
-                                            'TODO: List details from Unifaun here'))
-                else:
-                    self.confirm_stored_shipment()
-                    # ~ res.update(self.action_barcode_ui_print_unifaun_label())
-                    res['results']['unifaun'] = 'success'
-            except Exception as e:
-                res['warnings'].append((
-                    u'Något gick fel i Unifaun-kopplingen!',
-                    '%s\n\nTraceback:\n%s' % (e.message, traceback.format_exc())))
+            # ~ try:
+            self.order_stored_shipment()
+            if self.unifaun_status_ids:
+                # TODO: Translation, error details
+                res['warnings'].append((_(u"Det finns felmeddelanden i svaret från Unifaun.\n\n1) "
+                                          u"Kontrollera meddelandena och rätta ordern\n2)Beställ om transport "
+                                          u"(Order Transport-knappen)\n3) Verifiera att problemen är lösta\n4) "
+                                          u"Bekräfta transporten\n5) Skriv ut etiketten"),
+                                        'TODO: List details from Unifaun here'))
+            else:
+                self.confirm_stored_shipment()
+                # ~ res.update(self.action_barcode_ui_print_unifaun_label())
+                res['results']['unifaun'] = 'success'
+            # ~ except Exception as e:
+                # ~ res['warnings'].append((
+                    # ~ u'Något gick fel i Unifaun-kopplingen!',
+                    # ~ '%s\n\nTraceback:\n%s' % (e.message, traceback.format_exc())))

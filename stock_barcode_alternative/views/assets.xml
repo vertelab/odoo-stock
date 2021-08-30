@@ -17,6 +17,8 @@
             <script src="/stock_barcode_alternative/static/src/js/picking_editor_widget.js" type="text/javascript"/>
             <script src="/stock_barcode_alternative/static/src/js/package_editor_widget.js" type="text/javascript"/>
             <script src="/stock_barcode_alternative/static/src/js/operation_editor_widget.js" type="text/javascript"/>
+            <script src="/stock_barcode_alternative/static/src/js/widgets.js" type="text/javascript"/>
+            <script src="/stock_barcode_alternative/static/src/js/storage.js" type="text/javascript"/>
          </xpath>
      </template>
 </odoo>

@@ -9,7 +9,7 @@
             </t>
             <t t-set="title">Barcode Scanner</t>
 
-            <div class='barcode_container openerp openerp_webclient_container'>
+            <div class='barcode_container odoo odoo_webclient_container'>
 <!--                <table class='oe_webclient'>-->
 <!--                    <tr>-->
 <!--                        <td class='barcode_container oe_application' />-->

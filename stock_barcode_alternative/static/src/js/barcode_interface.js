@@ -4,7 +4,8 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
     var core = require('web.core');
     var publicWidget = require("web.public.widget");
     var BarcodeScanner = require("stock_barcode_alternative.BarcodeScanner").BarcodeScanner;
-    var PickingEditorWidget = require("stock_barcode_alternative.PickingEditorWidget").PickingEditorWidget;
+    var PickingEditorWidget = require("stock_barcode_alternative.PickingEditorWidget");
+    console.log("pickingeditorwidget:", PickingEditorWidget)
     var _t = core._t;
     var session = require('web.session');
 
@@ -73,6 +74,7 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
             self.set_packops(res.operations);
             self.add_products(res.products);
             self.picking_editor = new PickingEditorWidget(self);
+            console.log("picking_editor: ", self.picking_editor)
             self.picking_editor.replace(self.$('.oe_placeholder_picking_editor'));
         },
         goto_picking: function(picking_id){
@@ -99,10 +101,10 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
             this.save('packops');
             var picking_goals = {};
             _.each(packops, function(op) {
-                if (picking_goals[op.product_id.id] === undefined) {
-                    picking_goals[op.product_id.id] = op.quantity;
+                if (picking_goals[op.product_id.id] == undefined) {
+                    picking_goals[op.product_id.id] = op.product_uom_qty;
                 } else  {
-                    picking_goals[op.product_id.id] += op.quantity;
+                    picking_goals[op.product_id.id] += op.product_uom_qty;
                 }
             });
             this.picking_goals = picking_goals;
@@ -212,7 +214,7 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
             var product = _.filter(
                 this.products,
                 function(e, pos, l){
-                    return e.ean13 === code || e.default_code === code;
+                    return e.barcode === code || e.default_code === code;
                 })
             if (product.length > 0){
                 // Matched a known product.
@@ -223,10 +225,10 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
                 return this._rpc({
                     model: 'stock.picking',
                     method: 'abc_scan',
-                    args: [[], code],
+                    args: [code],
                     context: session.user_context
                 }).then(function (res) {
-                    self.handle_scan_result(result)
+                    self.handle_scan_result(res)
                 });
             }
         },
@@ -237,8 +239,7 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
                 this.scanned_product(result.product);
             } else if (result.type === 'stock.picking'){
                 this.goto_picking(result.picking.id);
-            }
-            else if (result.type === 'no hit'){
+            } else if (result.type === 'no hit'){
                 this.error_beep.play();
                 window.alert(result.term + " didn't match any products or pickings.");
             }
@@ -315,4 +316,5 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
             }
         }
     });
+    return publicWidget.registry.BarcodeInterface;
 });
