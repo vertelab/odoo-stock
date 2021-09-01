@@ -37,19 +37,28 @@ class StockPicking(models.Model):
                     ('unifaun_id', ['name', ('picking_ids', ['name'])])]
         return res
     
-    # ~ @api.model
-    # ~ def abc_transfer_steps(self):
-        # ~ steps = super(StockPicking, self).abc_transfer_steps()
-        # ~ steps.append((30, 'abc_unifaun'))
-        # ~ steps.append((10, 'abc_unifaun_parcel_data'))
-        # ~ return steps
+    @api.model
+    def abc_transfer_steps(self):
+        steps = super(StockPicking, self).abc_transfer_steps()
+        steps.append((30, 'abc_unifaun'))
+        steps.append((10, 'abc_unifaun_parcel_data'))
+        return steps
     
     def abc_unifaun_parcel_data(self, lines, packages, data, params, res):
         """"""
         if self.carrier_id.is_unifaun and not data.get('unifaun_no_order'):
+            _logger.warning(f"HEJ HOPP{data=}, {packages=}, {lines=}, {params=}, {res=}")
+            quant_packages = self.env['stock.quant.package']
+            for package in packages:
+                quant_packages |= self.env['stock.quant.package'].create({
+                'name': package['name'],
+                'shipping_weight': package['weight']
+                    })
+            _logger.warning(f"victor QUANT PACKAGES: {quant_packages=}")
             self.write({
                 'unifaun_parcel_count': data.get('unifaun_parcel_count', 0),
                 'unifaun_parcel_weight': data.get('unifaun_parcel_weight', 0),
+                'barcode_package_ids': quant_packages
             })
     
     def abc_unifaun(self, lines, packages, data, params, res):
@@ -63,15 +72,19 @@ class StockPicking(models.Model):
             self.order_stored_shipment()
             if self.unifaun_status_ids:
                 # TODO: Translation, error details
-                res['warnings'].append((_(u"Det finns felmeddelanden i svaret från Unifaun.\n\n1) "
-                                          u"Kontrollera meddelandena och rätta ordern\n2)Beställ om transport "
-                                          u"(Order Transport-knappen)\n3) Verifiera att problemen är lösta\n4) "
-                                          u"Bekräfta transporten\n5) Skriv ut etiketten"),
+                res['warnings'].append((_("Det finns felmeddelanden i svaret från Unifaun.\n\n1) "
+                                          "Kontrollera meddelandena och rätta ordern\n2)Beställ om transport "
+                                          "(Order Transport-knappen)\n3) Verifiera att problemen är lösta\n4) "
+                                          "Bekräfta transporten\n5) Skriv ut etiketten"),
                                         'TODO: List details from Unifaun here'))
             else:
-                self.confirm_stored_shipment()
+                self.create_unifaun_order()
+                if self.unifaun_id:
+                    self.unifaun_id.order_stored_shipment()
+                    if self.unifaun_id.confirm_stored_shipment():
+                        res['results']['unifaun'] = 'success'
                 # ~ res.update(self.action_barcode_ui_print_unifaun_label())
-                res['results']['unifaun'] = 'success'
+                
             # ~ except Exception as e:
                 # ~ res['warnings'].append((
                     # ~ u'Något gick fel i Unifaun-kopplingen!',

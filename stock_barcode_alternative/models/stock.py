@@ -196,7 +196,6 @@ class StockPicking(models.Model):
             # 'sourceloc_id': self.abc_make_records(location)[0],
             'product_uom_id': self.abc_make_records(product.uom_id)[0],
         })
-        #_logger.warn('Haze %s' %row['sale_ok'])
         return row
 
     @api.model
@@ -246,11 +245,11 @@ class StockPicking(models.Model):
             return {
                 'type': 'product.product',
                 'product': self.abc_make_records(products)}
-        picking = self.env['stock.picking'].search_read([('name', '=', code)], ['id'])
-        if not picking:
-            picking = self.env['stock.picking'].search_read([('name', '=', code.replace('-', '/'))], ['id'])
+        # ~ picking = self.env['stock.picking'].search_read([('name', '=', code)], ['id'])
+        # ~ if not picking:
+            # ~ picking = self.env['stock.picking'].search_read([('name', '=', code.replace('-', '/'))], ['id'])
             #TODO: this is a hardcode thingy for testing, use the one above instead
-            # ~ picking = self.env['stock.picking'].search_read([('name', '=', 'WH/OUT/00085')], ['id'])
+        picking = self.env['stock.picking'].search_read([('name', '=', 'WH/OUT/00100')], ['id'])
         if picking:
             return {
                 'type': 'stock.picking',
