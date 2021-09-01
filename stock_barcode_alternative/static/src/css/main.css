@@ -15,24 +15,30 @@ button.js_backorder {
 }
 
 .dn_unifaun_input {
-    width: 100px;
+    width: 40px;
 }
 
 @media (max-width: 768px) {
 }
 
-/*
-Hiding input spinner. Proudly stolen from stack overflow.
-*/
-input.js_qty::-webkit-outer-spin-button,
-input.js_qty::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+/* Chrome, Safari, Edge, Opera */
+.container input::-webkit-outer-spin-button,
+           input::-webkit-inner-spin-button  {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-input.js_qty[type=number] {
-    -moz-appearance:textfield; /* Firefox */
+/* Firefox */
+.container input[type=number] {
+  -moz-appearance: textfield;
+}
+
+#unifaun_unique_package_weight_input {
+    width: 100px;
+}
+
+#abc_dn_unifaun_weight, #abc_dn_unifaun_nr_packages {
+    text-align: center;
 }
 
 .abc-message-area {
@@ -70,7 +76,23 @@ p.abc-message-row {
     display: inline;
 }
 
-.abc-op-qty-minus, .abc-op-qty-plus {
+#abc_dn_packages_area i {
     font-size: 200%;
     border: 2px solid #0000; /* #00000000 */
+}
+
+.fa-fast-forward:hover {
+    cursor: pointer;
+}
+
+input#abc_dn_unifaun_nr_packages, input#abc_dn_unifaun_weight, input#unifaun_unique_package_weight_input {
+    height: calc(1.5em + 0.75rem + 2px);
+}
+
+input#abc_dn_unifaun_nr_packages, input#abc_dn_unifaun_weight {
+    width: 55px;
+}
+
+.input-group {
+    align-items: center;
 }

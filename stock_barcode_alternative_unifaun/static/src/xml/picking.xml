@@ -16,21 +16,45 @@
                         <input type="checkbox" id="abc_dn_unifaun_active" name="abc_dn_unifaun_active" t-att="{'checked': widget.unifaun_no_order || undefined}"/>
                         <span class="dn_wrapping_label col-xs-12 col-md-6">Do not book transport</span>
                     </div>
-                    <div class="col-xs-12 col-sm-4 col-md-4" id="abc_dn_nr_packages_div">
-                        <span class="dn_wrapping_label col-xs-12 col-md-6"># of Packages</span>
-                        <input id="abc_dn_unifaun_nr_packages" class="dn_unifaun_input" type="number" step="0" t-att-value="widget.unifaun_parcel_count"/>
+                    <div class="col-xs-12 col-sm-4 col-md-6" id="abc_dn_nr_packages_div">
+                        <div class="input-group">
+                            <span class="dn_wrapping_label col-xs-12 col-md-6"># of Packages</span>
+                            <span class="input-group-addon js_minus input-sm">
+                                <a href="#"><i class="package-qty-minus fa fa-minus"></i></a>
+                            </span>
+                            <input id="abc_dn_unifaun_nr_packages" class="dn_unifaun_input" type="number" step="0" t-att-value="widget.unifaun_parcel_count"/>
+                            <span class="input-group-addon js_plus input-sm">
+                                <a href="#"><i class="package-qty-plus fa fa-plus"></i></a>
+                            </span>
+                        </div>
                     </div>
                     <div class="col-xs-12 col-sm-4 col-md-4" id="abc_dn_weight_div">
-                        <span class="dn_wrapping_label col-xs-12 col-md-6">Total Weight</span>
-                        <input id="abc_dn_unifaun_weight" class="dn_unifaun_input" type="number" step="0.01" t-att-value="widget.unifaun_parcel_weight"/>
+                        <div class="input-group">
+                            <span class="dn_wrapping_label col-xs-12 col-md-6">Total Weight</span>
+                            <span class="input-group-addon js_minus input-sm">
+                                <a href="#"><i class="total-weight-minus fa fa-minus"></i></a>
+                            </span>
+                            <input id="abc_dn_unifaun_weight" class="dn_unifaun_input" type="number" step="0.01" t-att-value="widget.unifaun_parcel_weight"/>
+                            <span class="input-group-addon js_plus input-sm">
+                                <a href="#"><i class="total-weight-plus fa fa-plus"></i></a>
+                            </span>
+                        </div>
                         <span class="col-xs-12">Calculated: <b id="dn_wrapping_weight_calculated"><t t-esc="widget.get_weight().toFixed(3)"/></b> kg</span>
                     </div>
                     <div>
                         <ul>
                         <t t-foreach="widget.display_manual_packages" t-as="i">
                             <li>
-                                <span class="dn_wrapping_label col-xs-12 col-md-6" t-esc="i.name"></span>
-                                <input id="unifaun_package_weight_input_{i.id}" class="unifaun_package_weight_input" type="number" step="0.01" t-att-value="i.weight"> Kg</input>
+                                <div id="unique_package" class="input-group">
+                                    <span class="dn_wrapping_label col-xs-12 col-md-6" t-esc="i.name"></span>
+                                    <span class="input-group-addon js_minus input-sm">
+                                        <a href="#"><i t-att-button-id="i.id" class="unique-package-weight-minus fa fa-minus"></i></a>
+                                    </span>
+                                    <input id="unifaun_unique_package_weight_input" t-att-list-id="i.id" class="unifaun_package_weight_input" type="number" step="0.01" t-att-value="i.weight"> Kg</input>
+                                    <span class="input-group-addon js_plus input-sm">
+                                        <a href="#"><i t-att-button-id="i.id" class="unique-package-weight-plus fa fa-plus"></i></a>
+                                    </span>
+                                </div>
                             </li>
                         </t>
                         </ul>

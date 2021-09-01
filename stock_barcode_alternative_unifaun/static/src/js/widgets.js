@@ -4,9 +4,9 @@ odoo.define('stock_barcode_alternative.Unifaun', function(require) {
     var publicWidget = require("web.public.widget");
     var BarcodeInterface = require('stock_barcode_alternative.BarcodeInterface');
     var PickingEditorWidget = require('stock_barcode_alternative.PickingEditorWidget');
-    console.log('openerp_picking_alt_widgets_unifaun');
-    console.log(PickingEditorWidget);
-    console.log(BarcodeInterface);
+    // console.log('openerp_picking_alt_widgets_unifaun');
+    // console.log(PickingEditorWidget);
+    // console.log(BarcodeInterface);
     var xml_files = BarcodeInterface.prototype.xmlDependencies.concat(['/stock_barcode_alternative_unifaun/static/src/xml/picking.xml'])
     BarcodeInterface.include({
         xmlDependencies: xml_files
@@ -54,20 +54,61 @@ class Package {
             
         },
         renderElement: function(){
-            console.log('unifaun.renderElement');
             var self = this;
             this._super();
+            this.$('i.package-qty-minus').click(() => {
+                // Uses the following: https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/stepDown
+                let package_qty = this.$("#abc_dn_unifaun_nr_packages")[0];
+                package_qty.stepDown()
+                self.unifaun_update_packages()
+            })
+            this.$('i.package-qty-plus').click(() => {  
+                // Uses the following: https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/stepUp   
+                let package_qty =  this.$("#abc_dn_unifaun_nr_packages")[0];
+                package_qty.stepUp()
+                self.unifaun_update_packages()
+            })
+            this.$('i.total-weight-minus').click(() => {     
+                let package_weight = this.$("#abc_dn_unifaun_weight")[0];
+                package_weight.stepDown()
+                self.unifaun_update_packages()
+            })
+            this.$('i.total-weight-plus').click(() => {     
+                let package_weight = this.$("#abc_dn_unifaun_weight")[0];
+                package_weight.stepUp()
+                self.unifaun_update_packages()
+            })
+            this.$('i.unique-package-weight-minus').click((c) => {
+                let targetbutton = c.target.attributes['button-id'].value
+                this.$('.unifaun_package_weight_input').each((i, n) => {
+                    if (targetbutton == n.attributes['list-id'].value) {
+                        n.stepDown()
+                        self.unifaun_update_packages()
+                    }
+                })
+            })
+            this.$('i.unique-package-weight-plus').click((c) => {     
+                let targetbutton = c.target.attributes['button-id'].value
+                this.$('.unifaun_package_weight_input').each((i, n) => {
+                    if (targetbutton == n.attributes['list-id'].value) {
+                        n.stepUp()
+                        self.unifaun_update_packages()
+                    }
+                })
+            })
+
             this.$('#abc_dn_unifaun_active').change(function(){self.unifaun_update_packages()});
             this.$('#abc_dn_unifaun_nr_packages').change(function(){self.unifaun_update_packages()});
             this.$('#abc_dn_unifaun_weight').change(function(){self.unifaun_update_packages()});
             this.$('.unifaun_package_weight_input').change(function(){self.unifaun_update_packages()});
         },
-        get_saved_fields: function(){
+
+        get_saved_fields: function() {
             var fields = this._super();
             return fields.concat(['unifaun_no_order', 'unifaun_parcel_count', 'unifaun_parcel_weight'])
         },
-        unifaun_update_packages: function(){
-            
+
+        unifaun_update_packages: function() {    
             
             let self = this
             
