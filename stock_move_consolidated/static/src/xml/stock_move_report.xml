@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    <button t-name="ConsolidatedStockMove.Buttons" class="btn btn-primary" type="button">
+        Stock Move at Date
+    </button>
+<!--    <t t-extend="ListView.buttons">-->
+<!--        <t t-jquery="button.oe_list_add" t-operation="after" t-name="ConsolidatedStockMove.Buttons">-->
+<!--            <button class="oe_button oe_new_button oe_highlight" type="button">New Button</button>-->
+<!--        </t>-->
+<!--    </t>-->
+</templates>
