@@ -50,7 +50,6 @@ class StockPicking(models.Model):
                         value = value and value[0] or None
                 rec[field] = value
             result.append(rec)
-            _logger.debug('Lukas1: field %s %s' % (result, fields))
         return result
 
     @api.model
@@ -136,27 +135,21 @@ class StockPicking(models.Model):
 
     def abc_load_picking(self, picking_id):
         """Create a JSON description of a picking and its products for the Javascript GUI."""
-        # ~ _logger.warn(self)
-        # ~ _logger.warn(self._context)
         stock_picking_id = self.env['stock.picking'].browse(picking_id)
         picking = self.abc_make_records(stock_picking_id)
         if stock_picking_id.state == 'assigned':
             operations = self.abc_make_records(stock_picking_id.move_line_ids)
             products = self.abc_make_records(stock_picking_id.move_line_ids.mapped("product_id"))
-            _logger.warning(f"products victor: {products}")
         else:
             operations = []
             products = []
         # TODO: Find packages
         packages = []
         res = {'picking': picking, 'operations': operations, 'products': products, 'packages': packages}
-        _logger.debug('Lukas3: field %s ' % products)
-        # ~ _logger.warn(res)
         return res
 
     def abc_do_transfer(self, lines, packages, **data):
         """Complete the picking operation."""
-        _logger.warning(f"victor self: {self}, lines: {lines}, packages: {packages}, data: {data}")
         res = {'warnings': [], 'messages': [], 'results': {}}
         params = {}
         for step in [s[1] for s in sorted(self.abc_transfer_steps())]:
@@ -173,7 +166,6 @@ class StockPicking(models.Model):
         """Provide default locations and other data """
         # Lifted from action_assign on stock.move
         product = self.env['product.product'].browse(row['product_id'])
-        _logger.warning("Lukas5: %s" % product['sale_ok'])
         location = self.location_id
         main_domain = [('reservation_id', '=', False), ('qty', '>', 0)]
         quants = self.env['stock.quant'].quants_get_prefered_domain(
@@ -187,7 +179,6 @@ class StockPicking(models.Model):
         for quant in quants:
             if quant[0]:
                 location = quant[0].location_id
-        _logger.warning("Lukas6: %s" % self.abc_make_records(product, ['sale_ok']))
         row.update({
             '_name': 'stock.transfer_detailsitems',
             'product_id': self.abc_make_records(product, ['display_name'])[0],
@@ -209,28 +200,24 @@ class StockPicking(models.Model):
 
     def abc_transfer_wizard(self, lines, packages, data, params, res):
         """Run the transfer wizard on the given lines."""
-        
-        _logger.warning(f"victor self: {self}, lines: {lines}, {data=}, {params=}, {res=}")
+
         for move in lines:
-            _logger.warning(f" victor in data: {move['qty_done']}")
-            _logger.warning(f" victor odoo data: {self.env['stock.move.line'].browse(move['id']).qty_done}")
             self.env["stock.move.line"].browse(move['id']).qty_done = move['qty_done']
-            _logger.warning(f" victor odoo data: {self.env['stock.move.line'].browse(move['id']).qty_done}")
         action = self.button_validate()
-        _logger.warning(f"victor validate: {action}")
         # Keep track of matched transfer items
         res['results']['transfer'] = 'success'
         params['wizard'] = action
 
     def abc_create_invoice(self, lines, packages, data, params, res):
-        _logger.warning(f"victor: {self.sale_id._create_invoices()}")
+        # ~ TODO: we should create an invoice here!!!! This is a needed functionality that needs to be implemented before going to production
+        # ~ _logger.warning(f"victor: {self.sale_id._create_invoices()}")
 
     def abc_confirm_invoice(self, lines, packages, data, params, res):
         """Confirm invoice. Split into its own function to not lock the invoice sequence."""
+        # ~ TODO: we should confirm an invoice here!!!! This is a needed functionality that needs to be implemented before going to production
         pass
 
     def abc_open_picking(self):
-        _logger.warning("Lukas8: %s" % self)
         return {
             'type': 'ir.actions.act_url',
             'target': 'self',
@@ -245,11 +232,9 @@ class StockPicking(models.Model):
             return {
                 'type': 'product.product',
                 'product': self.abc_make_records(products)}
-        # ~ picking = self.env['stock.picking'].search_read([('name', '=', code)], ['id'])
-        # ~ if not picking:
-            # ~ picking = self.env['stock.picking'].search_read([('name', '=', code.replace('-', '/'))], ['id'])
-            #TODO: this is a hardcode thingy for testing, use the one above instead
-        picking = self.env['stock.picking'].search_read([('name', '=', 'WH/OUT/00100')], ['id'])
+        picking = self.env['stock.picking'].search_read([('name', '=', code)], ['id'])
+        if not picking:
+            picking = self.env['stock.picking'].search_read([('name', '=', code.replace('-', '/'))], ['id'])
         if picking:
             return {
                 'type': 'stock.picking',
@@ -266,7 +251,6 @@ class StockPickingType(models.Model):
     _inherit = 'stock.picking.type'
 
     def abc_open_barcode_interface(self):
-        _logger.warning("Lukas10: %s" % self)
         return {
             'type': 'ir.actions.act_url',
             'target': 'self',

@@ -5,7 +5,6 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
     var publicWidget = require("web.public.widget");
     var BarcodeScanner = require("stock_barcode_alternative.BarcodeScanner").BarcodeScanner;
     var PickingEditorWidget = require("stock_barcode_alternative.PickingEditorWidget");
-    console.log("pickingeditorwidget:", PickingEditorWidget)
     var _t = core._t;
     var session = require('web.session');
 
@@ -64,17 +63,12 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
 
         picking_loaded: function(res){
             let self = this;
-            // console.log('picking', res.picking)
-            // console.log('packages', res.packages)
-            // console.log('operations', res.operations)
-            // console.log('products', res.products)
             self.set_picking(res.picking[0]);
             // self.set_picking(this.picking);
             self.set_packages(res.packages);
             self.set_packops(res.operations);
             self.add_products(res.products);
             self.picking_editor = new PickingEditorWidget(self);
-            console.log("picking_editor: ", self.picking_editor)
             self.picking_editor.replace(self.$('.oe_placeholder_picking_editor'));
         },
         goto_picking: function(picking_id){

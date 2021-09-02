@@ -248,7 +248,6 @@ odoo.define('stock_barcode_alternative.PickingEditorWidget', function(require) {
         do_transfer: function(){
             // Complete the picking process.
             var self = this;
-            console.log('self', self.id)
             return this._rpc({
                 model: 'stock.picking',
                 method: 'abc_do_transfer',

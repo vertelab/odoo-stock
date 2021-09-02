@@ -47,14 +47,12 @@ class StockPicking(models.Model):
     def abc_unifaun_parcel_data(self, lines, packages, data, params, res):
         """"""
         if self.carrier_id.is_unifaun and not data.get('unifaun_no_order'):
-            _logger.warning(f"HEJ HOPP{data=}, {packages=}, {lines=}, {params=}, {res=}")
             quant_packages = self.env['stock.quant.package']
             for package in packages:
                 quant_packages |= self.env['stock.quant.package'].create({
                 'name': package['name'],
                 'shipping_weight': package['weight']
                     })
-            _logger.warning(f"victor QUANT PACKAGES: {quant_packages=}")
             self.write({
                 'unifaun_parcel_count': data.get('unifaun_parcel_count', 0),
                 'unifaun_parcel_weight': data.get('unifaun_parcel_weight', 0),

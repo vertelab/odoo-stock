@@ -4,9 +4,6 @@ odoo.define('stock_barcode_alternative.Unifaun', function(require) {
     var publicWidget = require("web.public.widget");
     var BarcodeInterface = require('stock_barcode_alternative.BarcodeInterface');
     var PickingEditorWidget = require('stock_barcode_alternative.PickingEditorWidget');
-    // console.log('openerp_picking_alt_widgets_unifaun');
-    // console.log(PickingEditorWidget);
-    // console.log(BarcodeInterface);
     var xml_files = BarcodeInterface.prototype.xmlDependencies.concat(['/stock_barcode_alternative_unifaun/static/src/xml/picking.xml'])
     BarcodeInterface.include({
         xmlDependencies: xml_files
