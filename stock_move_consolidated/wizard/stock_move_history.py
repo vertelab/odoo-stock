@@ -56,5 +56,4 @@ class StockQuantityHistory(models.TransientModel):
 
         for move in move_dict_items:
             move['name'] = 'New Stock Move from %s - %s' % (self.date_from, self.date_to)
-            move['state'] = 'done'
             self.env['stock.move'].create(move)
