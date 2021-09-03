@@ -20,6 +20,7 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
             var rows = _.filter(parent.rows, function(e, pos, l){
                 return self.data.operation_ids.indexOf(e.id) > -1;
             });
+            console.log("rows1:", rows)
             this.rows = [];
             // // Instantiate a widget for each packop.
 
@@ -27,6 +28,7 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
                 var row_widget = new OperationEditorWidget(self, {row: row});
                 self.rows.push(row_widget);
             });
+            console.log("rows2:", rows)
             // self.reorder_rows();
             self.reorder_rows(this.data.operation_ids);
 
@@ -71,6 +73,7 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
             _.each(this.rows, function(row){
                 operation_ids.push(row.id);
             })
+            console.log("operation_ids", operation_ids)
             this.data.operation_ids = operation_ids;
             this.renderElement();
         },
@@ -172,6 +175,9 @@ odoo.define('stock_barcode_alternative.PackageEditorWidget', function(require) {
             let weight = 0.0;
             let self = this;
             _.each(this.rows, function(row){
+                console.log(row);
+                console.log("betweeeeeen")
+                console.log(row.get_product());
                 let product = row.get_product();
                 weight += row.data.qty_done * product.weight;
             })

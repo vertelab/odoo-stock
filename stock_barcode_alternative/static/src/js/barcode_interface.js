@@ -69,6 +69,7 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
             self.set_packops(res.operations);
             self.add_products(res.products);
             self.picking_editor = new PickingEditorWidget(self);
+            console.log("picking_editor: ", self.picking_editor)
             self.picking_editor.replace(self.$('.oe_placeholder_picking_editor'));
         },
         goto_picking: function(picking_id){

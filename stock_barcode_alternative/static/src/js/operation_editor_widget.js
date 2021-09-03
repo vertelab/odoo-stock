@@ -24,6 +24,7 @@ odoo.define('stock_barcode_alternative.OperationEditorWidget', function(require)
             this.setElement(self.getParent().$('tr.abc-packop').attr('data-id', this.id));
             // this.setElement(self.getParent().$('tr.abc-packop[data-id="' + this.id + '"]'));
             this._super();
+            console.log(this);
             this.$('i.abc-op-qty-plus').click(function(){self.increase()});
             this.$('i.abc-op-qty-minus').click(function(){self.decrease()});
             this.$('i.abc-op-maximize-qty').click(function(){self.maximize_qty()});

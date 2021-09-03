@@ -39,7 +39,6 @@ button.js_backorder {
 
 #abc_dn_unifaun_weight, #abc_dn_unifaun_nr_packages {
     text-align: center;
-}
 
 .abc-message-area {
     list-style: none;
@@ -91,3 +90,4 @@ input#abc_dn_unifaun_nr_packages, input#abc_dn_unifaun_weight {
 .input-group {
     align-items: center;
 }
+
