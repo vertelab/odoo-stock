@@ -21,13 +21,4 @@
             </form>
         </field>
     </record>
-
-    <record id="consolidate_stock_move_action" model="ir.actions.act_window">
-        <field name="name">Consolidate Stock Move</field>
-        <field name="res_model">stock.move.consolidation</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-        <field name="binding_model_id" ref="stock.model_stock_move"/>
-        <field name="binding_view_types">list</field>
-    </record>
 </odoo>

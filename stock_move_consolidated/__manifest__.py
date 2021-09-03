@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "stock_location_priority",
-    'summary': """Added a fipo rule that allows prioritization of locations""",
-    'description': """Added a fipo rule that allows prioritization of locations""",
+    'name': "Consolidate Stock Moves",
+    'summary': """Consolidate Stock Moves""",
+    'description': """Consolidate Stock Moves""",
     'author': "Vertel",
     'website': "vertel.se",
     'category': 'stock',
     'version': '14.0.0.0.1',
     'depends': ['base', 'stock'],
-    # always loaded
     'data': [
         'security/ir.model.access.csv',
-        # 'views/stock_move_line_view.xml',
         'wizard/stock_move_history_view.xml',
         'views/template.xml',
     ],

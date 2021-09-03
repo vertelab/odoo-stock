@@ -15,17 +15,15 @@ class StockQuantityHistory(models.TransientModel):
     date_to = fields.Datetime('To', default=fields.Datetime.now)
 
     def stock_move_till_date(self):
-        if self.env.context.get('active_ids'):
-            move_ids = self.env['stock.move'].browse(self.env.context.get('active_ids'))
-        else:
-            move_ids = self.env['stock.move'].search([
-                ('date', '>=', self.date_from), ('date', '<=', self.date_to), ('state', '=', 'done')
-            ])
+        move_ids = self.env['stock.move'].search([
+            ('date', '>=', self.date_from),
+            ('date', '<=', self.date_to),
+            ('state', '=', 'done')
+        ])
 
-        print(move_ids)
-        items = []
+        move_items = []
         for rec in move_ids:
-            items.append({
+            move_items.append({
                 'product_id': rec.product_id.id,
                 'location_id': rec.location_id.id,
                 'location_dest_id': rec.location_dest_id.id,
@@ -34,7 +32,7 @@ class StockQuantityHistory(models.TransientModel):
             })
 
         move_dict = OrderedDict()
-        for items in items:
+        for items in move_items:
             move_dict.setdefault(
                 (
                     items['product_id'],
@@ -56,6 +54,6 @@ class StockQuantityHistory(models.TransientModel):
         ]
 
         for move in move_dict_items:
-            move['name'] = 'Stock Move from %s - %s' % (self.date_from, self.date_to)
+            move['name'] = 'New Stock Move from %s - %s' % (self.date_from, self.date_to)
+            move['state'] = 'done'
             self.env['stock.move'].create(move)
-
