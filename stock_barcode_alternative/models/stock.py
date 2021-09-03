@@ -211,6 +211,7 @@ class StockPicking(models.Model):
     def abc_create_invoice(self, lines, packages, data, params, res):
         # ~ TODO: we should create an invoice here!!!! This is a needed functionality that needs to be implemented before going to production
         # ~ _logger.warning(f"victor: {self.sale_id._create_invoices()}")
+        pass
 
     def abc_confirm_invoice(self, lines, packages, data, params, res):
         """Confirm invoice. Split into its own function to not lock the invoice sequence."""
@@ -233,6 +234,7 @@ class StockPicking(models.Model):
                 'type': 'product.product',
                 'product': self.abc_make_records(products)}
         picking = self.env['stock.picking'].search_read([('name', '=', code)], ['id'])
+        # the barcode scanner isnt capable of giving us "/", when it reads a "/" it gives us a "-"
         if not picking:
             picking = self.env['stock.picking'].search_read([('name', '=', code.replace('-', '/'))], ['id'])
         if picking:

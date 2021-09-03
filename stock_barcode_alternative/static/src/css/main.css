@@ -49,11 +49,6 @@ button.js_backorder {
     max-height: 200px;
     overflow-y: auto;
     width: 100%;
-/*
-      background: #333;
-      * border: 1px solid #000;
-      color: #fff;
-*/
 }
 
 .abc-message-warning {

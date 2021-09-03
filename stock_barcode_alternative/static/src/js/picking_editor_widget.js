@@ -252,15 +252,9 @@ odoo.define('stock_barcode_alternative.PickingEditorWidget', function(require) {
                 model: 'stock.picking',
                 method: 'abc_do_transfer',
                 args: [[this.id], this.rows, this.display_manual_packages],
-                // args: [[this.id, this.rows, this.package_data], this.get_extra_transfer_data()],
-                // context: this.get_extra_transfer_data()
             }).then(function (res) {
                 self.transfer_done(res)
             });
-
-            // new instance.web.Model('stock.picking')
-            //     .call('abc_do_transfer', [this.id, this.rows, this.package_data], this.get_extra_transfer_data())
-            //     .then(function(result){self.transfer_done(result)});
         },
         transfer_done: function(result){
             var self = this;

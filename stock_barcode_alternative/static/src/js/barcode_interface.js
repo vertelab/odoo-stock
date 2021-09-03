@@ -116,7 +116,7 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
                 let current_product = _.filter(
                     self.products,
                     function(e, pos, l){
-                        return e.id === product.id;
+                        return e.id == product.id;
                 });
                 current_product = current_product.length > 0 ? current_product[0]: null;
                 if (current_product){
@@ -159,7 +159,7 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
                 var picking = this.storage.getItem('picking');
                 var operations = this.storage.getItem('operations');
                 var products = this.storage.getItem('products');
-                if (picking && picking.id === this.picking_id){
+                if (picking && picking.id == this.picking_id){
                     // The picking is already loaded in the storage.
                     var answer = $.Deferred();
                     answer.resolve({picking: picking, operations: operations, products: products});
@@ -208,7 +208,7 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
             var product = _.filter(
                 this.products,
                 function(e, pos, l){
-                    return e.barcode === code || e.default_code === code;
+                    return e.barcode == code || e.default_code == code;
                 })
             if (product.length > 0){
                 // Matched a known product.
@@ -228,12 +228,12 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
         },
         handle_scan_result: function(result) {
             // Handle the result from backend scan query
-            if (result.type === 'product.product') {
+            if (result.type == 'product.product') {
                 this.add_products(result.product);
                 this.scanned_product(result.product);
-            } else if (result.type === 'stock.picking'){
+            } else if (result.type == 'stock.picking'){
                 this.goto_picking(result.picking.id);
-            } else if (result.type === 'no hit'){
+            } else if (result.type == 'no hit'){
                 this.error_beep.play();
                 window.alert(result.term + " didn't match any products or pickings.");
             }
