@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    <button t-name="ConsolidatedStockMove.Buttons" class="btn btn-primary" type="button">
+        Consolidate Stock Move
+    </button>
+</templates>

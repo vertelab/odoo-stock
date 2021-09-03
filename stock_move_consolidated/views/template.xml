@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="stock_move_assets_backend" name="stock move assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/stock_move_consolidated/static/src/js/stock_move_report_list_controller.js"></script>
+            </xpath>
+        </template>
+    </data>
+</openerp>
