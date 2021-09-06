@@ -150,7 +150,6 @@ class StockPicking(models.Model):
 
     def abc_do_transfer(self, lines, packages, **data):
         """Complete the picking operation."""
-        _logger.warning(f"victor self: {self}, lines: {lines}, packages: {packages}, data: {data}")
         res = {'warnings': [], 'messages': [], 'results': {}}
         params = {}
         for step in [s[1] for s in sorted(self.abc_transfer_steps())]:
@@ -201,9 +200,11 @@ class StockPicking(models.Model):
 
     def abc_transfer_wizard(self, lines, packages, data, params, res):
         """Run the transfer wizard on the given lines."""
+
         for move in lines:
             self.env["stock.move.line"].browse(move['id']).qty_done = move['qty_done']
         action = self.button_validate()
+        # Keep track of matched transfer items
         res['results']['transfer'] = 'success'
         params['wizard'] = action
 
@@ -215,10 +216,6 @@ class StockPicking(models.Model):
     def abc_confirm_invoice(self, lines, packages, data, params, res):
         """Confirm invoice. Split into its own function to not lock the invoice sequence."""
         # ~ TODO: we should confirm an invoice here!!!! This is a needed functionality that needs to be implemented before going to production
-        pass
-
-    def abc_confirm_invoice(self, lines, packages, data, params, res):
-        """Confirm invoice. Split into its own function to not lock the invoice sequence."""
         pass
 
     def abc_open_picking(self):
