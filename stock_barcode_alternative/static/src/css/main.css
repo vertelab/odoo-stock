@@ -1,0 +1,93 @@
+tr.abc-packop.unfinished {
+    background-color: #FFFAD8;
+}
+
+tr.abc-packop.finished {
+    background-color: #DFF0D8;
+}
+
+tr.abc-packop.qty-over {
+    background-color: #F2DEDE;
+}
+
+button.js_backorder {
+    margin-right: 100px;
+}
+
+.dn_unifaun_input {
+    width: 40px;
+}
+
+@media (max-width: 768px) {
+}
+
+/* Chrome, Safari, Edge, Opera */
+.container input::-webkit-outer-spin-button,
+           input::-webkit-inner-spin-button  {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.container input[type=number] {
+  -moz-appearance: textfield;
+}
+
+#unifaun_unique_package_weight_input {
+    width: 100px;
+}
+
+#abc_dn_unifaun_weight, #abc_dn_unifaun_nr_packages {
+    text-align: center;
+}
+
+.abc-message-area {
+    list-style: none;
+    -webkit-padding-start: 0;
+    -webkit-margin-after: 0;
+    -webkit-margin-before: 1em;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.abc-message-warning {
+    color: red;
+}
+
+p.abc-message-row {
+    margin: 0 0 0 0;
+}
+
+.abc-message-chevron {
+    display: inline-block;
+    width: 80px;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.abc-message-chevron i, .abc-message-chevron a{
+    color: inherit;
+    display: inline;
+}
+
+#abc_dn_packages_area i {
+    font-size: 200%;
+    border: 2px solid #0000; /* #00000000 */
+}
+
+.fa-fast-forward:hover {
+    cursor: pointer;
+}
+
+input#abc_dn_unifaun_nr_packages, input#abc_dn_unifaun_weight, input#unifaun_unique_package_weight_input {
+    height: calc(1.5em + 0.75rem + 2px);
+}
+
+input#abc_dn_unifaun_nr_packages, input#abc_dn_unifaun_weight {
+    width: 55px;
+}
+
+.input-group {
+    align-items: center;
+}
