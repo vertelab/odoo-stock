@@ -16,7 +16,7 @@ class StockPicking(models.Model):
     def abc_scan(self, code):
         """Perform scan on the supplied barcode."""
         
-        resp = super.abc_scan(code)
+        resp = super(StockPicking, self).abc_scan(code)
         if(resp['type'] == 'no-hit'):
             products = self.env['product.product'].search(['|', ('ean13', '=', code), ('default_code', '=', code)])
             if products:
