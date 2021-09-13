@@ -208,9 +208,6 @@ odoo.define('stock_barcode_alternative.BarcodeInterface', function(require) {
             var product = _.filter(
                 this.products,
                 function(e, pos, l){
-                    if(e.ean13){
-                        return e.ean13 == code || e.default_code == code;
-                    }
                     return e.barcode == code || e.default_code == code;
                 })
             if (product.length > 0){
