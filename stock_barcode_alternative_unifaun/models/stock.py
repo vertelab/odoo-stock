@@ -66,24 +66,26 @@ class StockPicking(models.Model):
         
         if self.carrier_id.is_unifaun and not data.get('unifaun_no_order'):
             res['results']['unifaun'] = 'failure'
-            try:
-                self.order_stored_shipment()
-                if self.unifaun_status_ids:
-                    # TODO: Translation, error details
-                    res['warnings'].append((_("Det finns felmeddelanden i svaret från Unifaun.\n\n1) "
-                                              "Kontrollera meddelandena och rätta ordern\n2)Beställ om transport "
-                                              "(Order Transport-knappen)\n3) Verifiera att problemen är lösta\n4) "
-                                              "Bekräfta transporten\n5) Skriv ut etiketten"),
-                                            'TODO: List details from Unifaun here'))
-                else:
-                    self.create_unifaun_order()
-                    if self.unifaun_id:
-                        self.unifaun_id.order_stored_shipment()
-                        if self.unifaun_id.confirm_stored_shipment():
-                            res['results']['unifaun'] = 'success'
-                    # ~ res.update(self.action_barcode_ui_print_unifaun_label())
-                
-            except Exception as e:
-                res['warnings'].append((
-                    u'Något gick fel i Unifaun-kopplingen!',
-                    '%s\n\nTraceback:\n%s' % (e.message, traceback.format_exc())))
+            # ~ try:
+            _logger.warning(f"victor1: {self.unifaun_status_ids}")
+            self.order_stored_shipment()
+            _logger.warning(f"victor2: {self.unifaun_status_ids}")
+            if self.unifaun_status_ids:
+                # TODO: Translation, error details
+                res['warnings'].append((_("Det finns felmeddelanden i svaret från Unifaun.\n\n1) "
+                                          "Kontrollera meddelandena och rätta ordern\n2)Beställ om transport "
+                                          "(Order Transport-knappen)\n3) Verifiera att problemen är lösta\n4) "
+                                          "Bekräfta transporten\n5) Skriv ut etiketten"),
+                                        'TODO: List details from Unifaun here'))
+            else:
+                self.create_unifaun_order()
+                if self.unifaun_id:
+                    self.unifaun_id.order_stored_shipment()
+                    if self.unifaun_id.confirm_stored_shipment():
+                        res['results']['unifaun'] = 'success'
+                # ~ res.update(self.action_barcode_ui_print_unifaun_label())
+            
+            # ~ except Exception as e:
+                # ~ res['warnings'].append((
+                    # ~ u'Något gick fel i Unifaun-kopplingen!',
+                    # ~ '%s\n\nTraceback:\n%s' % (e.message, traceback.format_exc())))

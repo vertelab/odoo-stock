@@ -13,6 +13,9 @@ Adds Unifaun functionality to the alternative barcode interface.
     'website': 'http://www.vertel.se',
     'author': 'Vertel AB',
     'depends': ['stock_barcode_alternative', 'stock'],
+    'data': [
+        #'report/report_stockpicking_operations.xml'
+    ],
     'installable': True,
     'application': True,
     'auto_install': False,
