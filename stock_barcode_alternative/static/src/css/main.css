@@ -76,6 +76,10 @@ p.abc-message-row {
     border: 2px solid #0000; /* #00000000 */
 }
 
+.abc-op-qty-plus.fa.fa-plus, .abc-op-qty-minus.fa.fa-minus {
+    font-size: 200%;
+}
+
 .fa-fast-forward:hover {
     cursor: pointer;
 }

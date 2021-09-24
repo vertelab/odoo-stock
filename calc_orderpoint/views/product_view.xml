@@ -89,7 +89,7 @@
       <field name="type">tree</field>
       <field name="inherit_id" ref="product.product_product_tree_view" />
       <field name="arch" type="xml">
-        <field name="barcode" position="after">
+        <field name="default_code" position="after">
           <field name="consumption_per_day" string="CpD" />
           <field name="consumption_per_month" string="CpM" />
           <field name="consumption_per_year" string="CpY" />

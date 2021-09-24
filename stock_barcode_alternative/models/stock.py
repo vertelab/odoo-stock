@@ -211,12 +211,51 @@ class StockPicking(models.Model):
     def abc_create_invoice(self, lines, packages, data, params, res):
         # ~ TODO: we should create an invoice here!!!! This is a needed functionality that needs to be implemented before going to production
         # ~ _logger.warning(f"victor: {self.sale_id._create_invoices()}")
-        pass
+        _logger.warning(f"VICTOR create invoice: {self=}, {lines=}, {packages=}, {data=}, {params=}, {res=}")
+        res_invoice = {'id': None, 'name': ''}
+        res['invoice'] = res_invoice
+        # Check if this order is NOT to be invoiced (prepaid most likely)
+        if self.sale_id.invoice_status == 'no':
+            res_invoice['no_invoice'] = True
+            return
+
+        # Check if this order is already invoiced. Unknown when this might happen.
+        if self.sale_id.invoice_status == 'invoiced':
+            res_invoice['already_invoiced'] = True
+            return
+        # Create invoice
+        try:
+            invoice = self.sale_id._create_invoices()
+            params['invoice'] = invoice
+            res_invoice['id'] = invoice.id
+            res_invoice['name'] = invoice.name
+            res['results']['invoice'] = 'created'
+            invoice_menu = self.env.ref('account.menu_finance')
+            res_invoice['url'] = f"/web?#active_id=mail.box_inbox&id={invoice.id}&menu_id={invoice_menu.id}&model=account.move&view_type=form"
+            _logger.warning("VICTOR RES_INVOICE URL")
+            _logger.warning(res_invoice['url'])
+            _logger.warning("VICTOR RES_INVOICE URL SLUT")
+            res['messages'].append(u'Created an <a taret="_blank" href="%s">invoice</a>.' % res_invoice['url'])
+        except Exception as e:
+            res['results']['invoice'] = 'failure'
+            res['warnings'].append((
+                _(u"Failed to create invoice!"),
+                '%s\n\nTraceback:\n%s' % (e.message or 'Unknown Error', traceback.format_exc())))
 
     def abc_confirm_invoice(self, lines, packages, data, params, res):
         """Confirm invoice. Split into its own function to not lock the invoice sequence."""
         # ~ TODO: we should confirm an invoice here!!!! This is a needed functionality that needs to be implemented before going to production
-        pass
+        invoice = params.get('invoice')
+        if invoice and invoice.state == 'draft':
+            try:
+                invoice.action_post()
+                res['invoice']['name'] = invoice.name
+                res['messages'].append(u"Created and confirmed invoice %s." % invoice.name)
+                res['results']['invoice'] = 'confirmed'
+            except Exception as e:
+                res['warnings'].append((
+                    _(u"Failed to confirm invoice %s!") % (invoice and invoice.name or 'Unknown'),
+                    '%s\n\nTraceback:\n%s' % (e.message or 'Unknown Error', traceback.format_exc())))
 
     def abc_open_picking(self):
         return {
@@ -243,9 +282,10 @@ class StockPicking(models.Model):
                 'picking': picking[0]
             }
         package = self.env['product.packaging'].search([('barcode', '=', code)])
-        return {
-                'type': 'product.packaging',
-                'package': self.abc_make_records(package)
+        if package:
+            return {
+                    'type': 'product.packaging',
+                    'package': self.abc_make_records(package)
             }
         return {'type': 'no hit'}
 
