@@ -204,6 +204,8 @@ class StockPicking(models.Model):
         for move in lines:
             self.env["stock.move.line"].browse(move['id']).qty_done = move['qty_done']
         action = self.button_validate()
+        _logger.warning("VICTOR"*99)
+        _logger.warning(f"VICTOR: {action}")
         # Keep track of matched transfer items
         res['results']['transfer'] = 'success'
         params['wizard'] = action

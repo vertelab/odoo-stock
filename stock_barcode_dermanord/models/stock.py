@@ -28,7 +28,20 @@ class StockPicking(models.Model):
                     'product': self.abc_make_records(products)}
         return resp
 
+    def abc_transfer_steps(self):
+        steps = super(StockPicking, self).abc_transfer_steps()
+        steps.append((0, 'abc_dn_set_qc'))
 
+        _logger.warning(f"VICTOR STEPS: {steps}")
+        return steps
+
+    def abc_dn_set_qc(self, lines, packages, data, params, res):
+        """Set Quality Controller"""
+        if not self.qc_id:
+            employee = self.env['hr.employee'].search([('user_id', '=', self.env.user.id)], limit=1)
+            if employee:
+                self.qc_id = employee
+                self.employee_id = employee
 
 
 
