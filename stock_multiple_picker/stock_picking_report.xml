@@ -195,33 +195,16 @@
                                         <td style="text-right">
                                            <span t-field="move.weight" />
                                         </td>
-                                     </t>
-                                     <!--
-                                   <t t-if="o.picking_type_id.code != 'incoming'">
-                                   <td>
-                                   <span t-field="move.quant_source_location" />
-                                   
-                                   <span t-if="move.package_id">:</span><span t-field="move.package_id" />
-                                   <span t-if="move.lot_id">:</span><span t-field="move.lot_id" />
-                                   
-                                   </td>
-                                   </t>
-                                   
-                                   <td>
-                                   <span t-if="move.product_id and move.product_id.ean13">
-                                   <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', move.product_id.ean13, 600, 100)" style="width:300px;height:50px"/>
-                                   </span>
-                                   </td>
-                              -->
-                                     <t t-if="o.picking_type_id.code != 'outgoing'">
-                                        <td>
-                                           <t t-if="move.product_id.stock_location_id and move.location_dest_id.search_count([('id', '=', move.product_id.stock_location_id.id), ('id', 'child_of', move.location_dest_id.id)])">
-                                              <span t-field="move.product_id.stock_location_id" />
-                                           </t>
-                                           <t t-if="not (move.product_id.stock_location_id and move.location_dest_id.search_count([('id', '=', move.product_id.stock_location_id.id), ('id', 'child_of', move.location_dest_id.id)]))">
-                                              <span t-field="move.location_dest_id" />
-                                           </t>
-                                        </td>
+                                        <t t-if="o.picking_type_id.code != 'outgoing'">
+                                           <td>
+                                              <t t-if="move.product_id.stock_location_id and move.location_dest_id.search_count([('id', '=', move.product_id.stock_location_id.id), ('id', 'child_of', move.location_dest_id.id)])">
+                                                 <span t-field="move.product_id.stock_location_id" />
+                                              </t>
+                                              <t t-if="not (move.product_id.stock_location_id and move.location_dest_id.search_count([('id', '=', move.product_id.stock_location_id.id), ('id', 'child_of', move.location_dest_id.id)]))">
+                                                 <span t-field="move.location_dest_id" />
+                                              </t>
+                                           </td>
+                                        </t>
                                      </t>
                                   </t>
                                </t>
