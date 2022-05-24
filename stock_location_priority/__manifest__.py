@@ -7,10 +7,10 @@
         """,
 
     'description': """
-        Added a fipo rule that allows prioritization of locations                             
+        Added a fipo rule that allows prioritization of locations
     """,
 
-    'author': "Vertel",
+    'author': "Vertel AB",
     'website': "vertel.se",
 
     # Categories can be used to filter modules in modules listing
