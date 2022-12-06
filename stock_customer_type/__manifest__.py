@@ -34,7 +34,7 @@
     """,
     #'sequence': '1',
     'author': 'Vertel AB',
-    'website': 'https://vertel.se/apps/odoo-stock/stock_barcode_dermanord',
+    'website': 'https://vertel.se/apps/odoo-stock/stock_customer_type',
     'images': ['static/description/banner.png'], # 560x280 px.
     'license': 'AGPL-3',
     'contributor': '',
