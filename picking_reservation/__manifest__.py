@@ -33,7 +33,7 @@
     """,
     #'sequence': '1',
     'author': 'Vertel AB',
-    'website': 'https://vertel.se/apps/odoo-stock/calc_orderpoint',
+    'website': 'https://vertel.se/apps/odoo-stock/picking_reservation',
     'images': ['static/description/banner.png'], # 560x280 px.
     'license': 'AGPL-3',
     'contributor': '',
