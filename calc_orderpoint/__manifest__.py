@@ -23,7 +23,7 @@
     'name': 'Stock: Calculate Orderpoint',
     'version': '14.0.1.0',
     # Version ledger: 14.0 = Odoo version. 1 = Major. Non regressionable code. 2 = Minor. New features that are regressionable. 3 = Bug fixes
-    'summary': 'Calculates consumtion_per_day, orderpoint_computed, virtual_available_days',
+    'summary': 'Calculates consumtion_per_day, orderpoint_computed, virtual_available_days.',
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/14.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
