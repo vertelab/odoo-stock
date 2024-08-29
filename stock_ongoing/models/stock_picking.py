@@ -1,6 +1,9 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 from zeep.exceptions import Fault
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class StockPicking(models.Model):
@@ -13,15 +16,15 @@ class StockPicking(models.Model):
         try:
             data = {**auth_data, **self._order_definition()}
             response = client.service.ProcessOrder(**data)
-            print("Response:", response)
+            _logger.info("Response:", response)
 
         except Fault as e:
             # Handle SOAP faults
-            print(f"SOAP Fault: {e}")
+            _logger.error("SOAP Fault:", e)
 
         except Exception as e:
             # Handle general exceptions
-            print(f"An error occurred: {e}")
+            _logger.error("An error occurred:", e)
 
     def _customer_definition(self):
         return {

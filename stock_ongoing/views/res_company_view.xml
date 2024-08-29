@@ -9,6 +9,7 @@
                     <page name="ongoing_settings" string="Ongoing Settings">
                         <group>
                             <field name="ongoing_wsdl"/>
+                            <field name="ongoing_owner_code"/>
                             <field name="ongoing_username"/>
                             <field name="ongoing_password" password="True"/>
                         </group>

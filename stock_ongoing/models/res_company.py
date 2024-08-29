@@ -13,6 +13,7 @@ class ResCompany(models.Model):
     ongoing_wsdl = fields.Char(string="URL")
     ongoing_username = fields.Char(string="Username")
     ongoing_password = fields.Char(string="Password")
+    ongoing_owner_code = fields.Char(string="GoodsOwnerCode")
 
     @api.model
     def ongoing_client(self, action):
@@ -37,7 +38,7 @@ class ResCompany(models.Model):
 
         # Initialize the client with the transport and settings
         client = Client(
-            'https://wms1.ongoingsystems.se/vertel/service.asmx?WSDL',
+            self.ongoing_wsdl,
             settings=settings,
             transport=transport
         )
@@ -49,7 +50,7 @@ class ResCompany(models.Model):
         Builds the XML structure for the authorization.
         """
         return {
-            'GoodsOwnerCode': "Vertel AB",
+            'GoodsOwnerCode': self.ongoing_owner_code,
             'UserName': self.ongoing_username,
             'Password': self.ongoing_password
         }
