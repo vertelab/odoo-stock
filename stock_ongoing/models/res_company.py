@@ -27,11 +27,9 @@ class ResCompany(models.Model):
             'Content-Type': 'text/xml;charset=utf-8'
         }
 
-        # Create a session and attach your custom headers
+        # Create a session and attach custom headers
         session = Session()
         session.headers.update(headers)
-
-        # Set settings (e.g., to allow large XML trees)
         settings = Settings(strict=False, xml_huge_tree=True)
 
         # Create a transport using the session
