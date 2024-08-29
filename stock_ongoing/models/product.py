@@ -1,6 +1,10 @@
+import logging
+
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 from zeep.exceptions import Fault
+
+_logger = logging.getLogger(__name__)
 
 
 class ProductProduct(models.Model):
@@ -36,13 +40,11 @@ class ProductProduct(models.Model):
         try:
             data = {**auth_data, **self.ongoing_article_definition()}
             response = client.service.ProcessArticle(**data)
-            print("Response:", response)
+            _logger.info(f"Response: {response}")
             self.message_post(body="Product synced to ongoing successfully.")
-
         except Fault as e:
             # Handle SOAP faults
-            print(f"SOAP Fault: {e}")
-
+            _logger.error(f"SOAP Fault: {e}")
         except Exception as e:
             # Handle general exceptions
-            print(f"An error occurred: {e}")
+            _logger.error(f"An error occurred: {e}")
