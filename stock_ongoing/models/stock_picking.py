@@ -9,41 +9,13 @@ _logger = logging.getLogger(__name__)
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    ongoing_order_id = fields.Char(string="Ongoing Order", readonly=True)
+    ongoing_order_status = fields.Char(string="Ongoing Status", readonly=True)
+
     def send_order_to_ongoing(self):
-        client = self.env.company.ongoing_client(action="ProcessOrder")
-        auth_data = self.env.company.ongoing_auth()
 
-        try:
-            data = {**auth_data, **self._order_definition()}
-            response = client.service.ProcessOrder(**data)
-            _logger.info(f"Response: {response}")
-            self.message_post(body="Order synced to ongoing successfully.")
-        except Fault as e:
-            # Handle SOAP faults
-            _logger.error(f"SOAP Fault: {e}")
-        except Exception as e:
-            # Handle general exceptions
-            _logger.error(f"An error occurred: {e}")
 
-    def _customer_definition(self):
-        return {
-            'CustomerOperation': 'CreateOrUpdate',
-            'CustomerIdentification': "FullNameAndAddress",
-            'CustomerNumber': 'CN124',
-            'Name': self.partner_id.name,
-            'Address': self.partner_id.street or None,
-            'Address2': self.partner_id.street2 or None,
-            'PostCode': self.partner_id.zip or None,
-            'City': self.partner_id.city or None,
-            'CountryCode': self.partner_id.country_id.code or 'SE',
-            'IsVisible': True,
-            'NotifyBySMS': True,
-            'NotifyByEmail': True,
-            'NotifyByTelephone': False
-        }
-
-    def _order_definition(self):
-        data = {
+        order_definition = {
             'co': {
                 'OrderInfo': {
                     'OrderIdentification': "GoodsOwnerOrderNumber",
@@ -58,9 +30,29 @@ class StockPicking(models.Model):
             }
 
         }
-        return data
+        self.ongoing_request(order_definition, "ProcessOrder")
+
+    def _customer_definition(self):
+        return {
+            'CustomerOperation': 'CreateOrUpdate',
+            'CustomerIdentification': "FullNameAndAddress",
+            'CustomerNumber': 'CN124',
+            'Name': self.partner_id.name,
+            'Address': self.partner_id.street or None,
+            'Address2': self.partner_id.street2 or None,
+            'PostCode': self.partner_id.zip or None,
+            'City': self.partner_id.city or None,
+            'CountryCode': self.partner_id.country_id.code or 'SE',
+            'IsVisible': True,
+            'NotifyBySMS': False,
+            'NotifyByEmail': False,
+            'NotifyByTelephone': False
+        }
 
     def _order_line_definition(self):
+        for product in self.move_ids_without_package.mapped("product_id"):
+            product.sync_product_to_ongoing()
+
         orders = [
             {
                 'ArticleIdentification': "ArticleNumber",
@@ -72,3 +64,50 @@ class StockPicking(models.Model):
             for i, line in enumerate(self.move_ids_without_package)
         ]
         return orders
+
+    def ongoing_incoming_shipment(self):
+        inorder_definition = {
+            'co': {
+                'InOrderInfo': {
+                    'InOrderIdentification': "GoodsOwnerOrderNumber",
+                    'GoodsOwnerOrderNumber': self.name,
+                    'InOrderOperation': 'CreateOrUpdate',
+                },
+                'InOrderLines': {
+                    'InOrderLine': self._inorder_line_definition()
+                }
+            }
+
+        }
+        self.ongoing_request(inorder_definition, "ProcessInOrder")
+
+    def _inorder_line_definition(self):
+        for product in self.move_ids_without_package.mapped("product_id"):
+            product.sync_product_to_ongoing()
+        orders = [
+            {
+                'ArticleIdentification': "ArticleNumber",
+                'OrderLineIdentification': "ArticleNumber",
+                'ExternalOrderLineCode': i + 1,
+                'ArticleNumber': line.product_id.ongoing_article_number,
+                'NumberOfItems': line.quantity,
+            }
+            for i, line in enumerate(self.move_ids_without_package)
+        ]
+        return orders
+
+    def ongoing_request(self, definition, action):
+        client = self.env.company.ongoing_client(action=action)
+        auth_data = self.env.company.ongoing_auth()
+
+        try:
+            data = {**auth_data, **definition}
+            response = getattr(client.service, action)(**data)
+            _logger.info(f"Response: {response}")
+            self.message_post(body="Order synced to ongoing successfully.")
+        except Fault as e:
+            # Handle SOAP faults
+            _logger.error(f"SOAP Fault: {e}")
+        except Exception as e:
+            # Handle general exceptions
+            _logger.error(f"An error occurred: {e}")
