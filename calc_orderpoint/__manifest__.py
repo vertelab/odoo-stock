@@ -2,7 +2,7 @@
 ##############################################################################
 #
 #    Odoo SA, Open Source Management Solution, third party addon
-#    Copyright (C) 2022- Vertel AB (<https://vertel.se>).
+#    Copyright (C) 2022- Vertel Sverige AB (<https://vertel.se>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -21,7 +21,7 @@
 
 {
     'name': 'Stock: Calculate Orderpoint',
-    'version': '14.0.1.0',
+    'version': "18.0.1.0",
     # Version ledger: 14.0 = Odoo version. 1 = Major. Non regressionable code. 2 = Minor. New features that are regressionable. 3 = Bug fixes
     'summary': 'Calculates consumtion_per_day, orderpoint_computed, virtual_available_days.',
     # Categories can be used to filter modules in modules listing
@@ -57,12 +57,12 @@ start and stop hours, e.g. "0 4 18 24" (between 00:00 and 04:00, and
  * calc_orderpoint.product_limit - The max number of products. Integer.
     """,
     #'sequence': '1',
-    'author': 'Vertel AB',
+    'author': 'Vertel Sverige AB',
     'website': 'https://vertel.se/apps/odoo-stock/calc_orderpoint',
     'images': ['static/description/banner.png'], # 560x280 px.
     'license': 'AGPL-3',
     'contributor': '',
-    'maintainer': 'Vertel AB',
+    'maintainer': 'Vertel Sverige AB',
     'repository': 'https://github.com/vertelab/odoo-stock',
     # Any module necessary for this one to work correctly
 
